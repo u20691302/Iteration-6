@@ -1,0 +1,471 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>View Activities</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left" ></i> Return
+      </button>
+      <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateActivityModal)">
+        <i class="fa-solid fa-plus"></i> Add Activity
+      </button>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Activity Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Tasks</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let activity of activities">
+      <tr>
+        <td>{{ activity.activity_Name }}</td>
+        <td>{{ activity.activity_Description }}</td>
+        <td>
+          <div class="button-container">
+            <button (click)="openTaskModel(activity.activity_ID, ViewTasks)" class="btn-form-add">View Tasks</button>
+          </div>
+        </td>
+        <td>
+          <div class="button-container">
+            <button class="btn-update" (click)="LoadActivity(activity.activity_ID, addUpdateActivityModal)" title="Update"> 
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, activity)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="activities.length === 0">
+      <tr>
+        <td colspan="6">No Activity Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add/Update Activity Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddActivity(ConfirmationModal, AddUpdateError) : UpdateActivity(ConfirmationModal, AddUpdateError)">  
+  <ng-template #addUpdateActivityModal let-modal class="modal fade" >
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Activity' : 'Update Existing Activity' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="activity_Name" class="form-label">Activity Name</label>
+            <input type="text" class="text-input form-control" id="activity_Name" name="activity_Name" [(ngModel)]="addUpdateActivityRequest.activity_Name" required>
+            <div *ngIf="form.controls['activity_Name']?.invalid && (form.controls['activity_Name']?.dirty || form.controls['activity_Name']?.touched)">
+              <div *ngIf="form.controls['activity_Name']?.errors?.['required']">
+                <p class="validation-notification">Activity Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="activity_Description" class="form-label">Activity Description</label>
+            <input type="text" class="text-input form-control" id="activity_Description" name="activity_Description" [(ngModel)]="addUpdateActivityRequest.activity_Description" required>
+            <div *ngIf="form.controls['activity_Description']?.invalid && (form.controls['activity_Description']?.dirty || form.controls['activity_Description']?.touched)">
+              <div *ngIf="form.controls['activity_Description']?.errors?.['required']">
+                <p class="validation-notification">Activity Description is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
+          <button type="button" class="btn-form-add" (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+            {{ isAddMode ? 'Add Activity' : 'Update Activity' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Activity Modal -->
+  <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Activity' : 'Confirm Update Activity' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} activity's details correct?</b></p>
+      <div class="activity-details">
+        <div class="detail">
+          <span class="label">Activity Name: </span>
+          <span class="value">{{ Activity.activity_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Activity Description: </span>
+          <span class="value">{{ Activity.activity_Description }}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateActivityModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new activity has been successfully created!' : 'An existing activity has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- AddUpdate Error -->
+<ng-template #AddUpdateError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this activity's details.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="activity-details">
+      <div class="detail">
+        <span class="label">Activity Name: </span>
+        <span class="value">{{ Activity.activity_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Activity Description: </span>
+        <span class="value">{{ Activity.activity_Description }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteActivity(Activity.activity_ID, ConfirmationOfDelete, ActivityDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The activity has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #ActivityDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of activity.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Tasks Modal -->
+<ng-template #ViewTasks let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">Tasks of {{ activityName }} </h5>
+    </div>
+    <div class="modal-body">
+      <!-- Toolbar -->
+      <div class="task container toolbar">
+        <div class="row align-items-center">
+          <div class="col d-flex justify-content-start">
+            <button type="button" class="btn btn-add" (click)="OpenTaskAddModal(addUpdateTaskModal)">
+              <i class="fa-solid fa-plus"></i> Add Activity
+            </button>
+          </div>
+          <div class="col-md-4 d-flex justify-content-end">
+            <div class="input-group">
+              <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTaskTerm" (ngModelChange)="filterTasksBySearchTerm(addUpdateActivityRequest.activityTask)">
+              <span class="input-group-text" *ngIf="searchTaskTerm" (click)="ClearTaskSearchTerm()">
+                <i class="fa-solid fa-times"></i>
+              </span>
+              <span class="input-group-text" *ngIf="!searchTaskTerm">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </span>
+            </div>
+          </div>
+        </div>  
+      </div>
+      <div class="task-table-container">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th><u>Task Name</u></th>
+              <th><u>Task Description</u></th>
+              <th><u> Required Skill</u></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let task of filteredTasks">
+              <td>{{ task.task?.task_Name }}</td>
+              <td>{{ task.task?.task_Description }}</td>
+              <td>{{ task.task?.skill?.skill_Name }}</td>
+              <td>
+                <div class="button-container">
+                  <button class="btn-update" (click)="LoadTaskToUpdate(task.task_ID, addUpdateTaskModal)" title="Update"> 
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-delete" (click)="OpenActivityTaskDeleteModal(DeleteActivityTaskConfirmationModal, task.activityTask_ID)" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="addUpdateActivityRequest.activityTask?.length === 0">
+            <tr>
+              <td colspan="4">No Task Listings</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>  
+
+<!-- ActivityTask Delete Confirmation Modal -->
+<ng-template #DeleteActivityTaskConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="activity-details">
+      <div class="detail">
+        <span class="label">Task Name: </span>
+        <span class="value">{{ AddUpdateActivityTaskRequest.task?.task_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Task Number: </span>
+        <span class="value">{{ AddUpdateActivityTaskRequest.task?.task_Description }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Required Skill: </span>
+        <span class="value">{{AddUpdateActivityTaskRequest.task?.skill?.skill_Name }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); ConfirmActivityTaskDelete(AddUpdateActivityTaskRequest.activityTask_ID, ActivityTaskConfirmationOfDelete, LastTaskError, ActivityTaskError);">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ActivityTask Confirmation of delete -->
+<ng-template #ActivityTaskConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>A task of this activity has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Last Task Delete Error -->
+<ng-template #LastTaskError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There must this activity is associated with another entity and cant be deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ActivityTask Delete Error -->
+<ng-template #ActivityTaskError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this task.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Add/Update Task Modal -->
+<form #task="ngForm" (ngSubmit)="isAddMode ? AddTask(TaskConfirmationModal, AddUpdateTaskError) : UpdateTask(ConfirmationModal, AddUpdateError)">  
+  <ng-template #addUpdateTaskModal let-modal class="modal fade" >
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Task' : 'Update Existing Task' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="task_Name" class="form-label">Task Name</label>
+            <input type="text" class="text-input form-control" id="task_Name" name="task_Name" [(ngModel)]="addUpdateTaskRequest.task_Name" required>
+            <div *ngIf="task.controls['task_Name']?.invalid && (task.controls['task_Name']?.dirty || task.controls['task_Name']?.touched)">
+              <div *ngIf="task.controls['task_Name']?.errors?.['required']">
+                <p class="validation-notification">Task Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="task_Description" class="form-label">Task Description</label>
+            <input type="text" class="text-input form-control" id="task_Description" name="task_Description" [(ngModel)]="addUpdateTaskRequest.task_Description" required>
+            <div *ngIf="task.controls['task_Description']?.invalid && (task.controls['task_Description']?.dirty || task.controls['task_Description']?.touched)">
+              <div *ngIf="task.controls['task_Description']?.errors?.['required']">
+                <p class="validation-notification">Task Description is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="skills" class="form-label">Select a Required Skill</label>
+            <select class="form-select" id="skills" name="skills" [(ngModel)]="addUpdateTaskRequest.skill_ID" required pattern="[1-9][0-9]*" #skillSelect = "ngModel">
+              <option value="0" selected disabled>Select a Required Skill</option>
+              <option *ngFor="let skill of skills" [value]="skill.skill_ID">{{ skill.skill_Name }}</option>
+            </select>
+            <div *ngIf="task.controls['skills']?.invalid && (task.controls['skills']?.dirty || task.controls['skills']?.touched)">
+              <div *ngIf="task.controls['skills']?.errors?.['required']">
+                <p class="validation-notification">A Supplier Type must be selected.</p>
+              </div>
+              <div *ngIf="task.controls['skills']?.errors?.['pattern']">
+                <p class="validation-notification">A Supplier Type must be selected.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); task.reset();">Cancel</button>
+          <button type="button" class="btn-form-add" (click)="OpenAddUpdateTaskConfirmDetailsModal(OpenAddUpdateTaskModalConfirmation); modal.close('Close click')" [disabled]="isAddMode ? !task.valid || skillSelect.pristine : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !task.valid : (!isAddMode && !task.dirty)}">
+            {{ isAddMode ? 'Add Task' : 'Update Task' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Task Modal -->
+  <ng-template #OpenAddUpdateTaskModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Task' : 'Confirm Update Task' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} task's details correct?</b></p>
+      <div class="task-details">
+        <div class="detail">
+          <span class="label">Task Name: </span>
+          <span class="value">{{ Task.task_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Task Description: </span>
+          <span class="value">{{ Task.task_Description }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Required Skill: </span>
+          <span class="value">{{ Task.skill?.skill_Name}}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateTaskModal(addUpdateTaskModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); task.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #TaskConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new task has been successfully created!' : 'An existing task has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- AddUpdate Error -->
+<ng-template #AddUpdateTaskError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this task's details.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

@@ -1,0 +1,34 @@
+<!-- Image 1 -->
+<div class="transparent-background image1">
+  <div class="translucent-overlay"></div>
+</div>
+
+<!-- Image 2 -->
+<div class="transparent-background image2">
+  <div class="translucent-overlay"></div>
+</div>
+
+<!-- Image 3 -->
+<div class="transparent-background image3">
+  <div class="translucent-overlay"></div>
+</div>
+
+ <!-- Image 4 -->
+ <div class="transparent-background image4">
+  <div class="translucent-overlay"></div>
+</div>
+
+<ng-container *ngIf="currentRoute !== 'register-admin' && currentRoute !== 'login' && currentRoute !== 'forgot-password'">
+  <ng-container *ngIf="userRole === 'User'; else adminNavbar">
+    <app-usernavbar></app-usernavbar>
+  </ng-container>
+  <ng-template #adminNavbar>
+    <app-navbarstuff></app-navbarstuff>
+  </ng-template>
+</ng-container>
+
+
+<router-outlet *ngIf="currentRoute === 'register-admin' || currentRoute === 'login' || currentRoute === 'forgot-password'"></router-outlet>
+<ng-toast></ng-toast>
+
+<router-outlet></router-outlet>

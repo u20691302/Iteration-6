@@ -1,0 +1,371 @@
+.top-panel {
+    background-color: #001844;
+    height:116px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; 
+}
+
+nav {
+    margin-top: 116px;
+}   
+
+.collapse.navbar-collapse {
+    justify-content: center;
+}
+ 
+.navbar-nav {
+    justify-content: space-between;
+    width: 95%;
+}  
+  
+.nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+i{
+    font-size: 24px;
+}
+
+.bottom-panel {
+    height: 50px;
+    background-color: #CD1543;
+    height:57px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.bottom-panel img {
+    margin-right: 7px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width:100px;
+    height:50px;
+    border-radius:10px;
+} 
+
+
+
+
+.help-button {
+  background-color: #001844;
+  border-color: #001844;
+  color: white;
+  margin-right: 10px;
+  border-radius:20px;
+  border:none;
+  }
+
+  
+
+
+
+  .modal-body .close {
+    color: #B30C37;
+    margin-left: 50px;
+  }
+  
+  .help-button:hover {
+    background-color: #B30C37;
+  }
+  
+  .modal-content {
+    background-color: #F2F2F2;
+    border-radius: 5px;
+  }
+  
+  .modal-title {
+    color: #ffffff;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+     display: flex;
+     align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-body video {
+    width: 100%;
+    height: auto;
+  }
+  
+
+  .modal-header {
+    background-color: #001844; /* Set your desired background color */
+    color: white; /* Set the text color */
+  }
+
+
+  .modal-footer {
+    justify-content: flex-start;
+    background-color: #CD1543;
+    height: 50px;
+    margin-top: 15px;
+  }
+  
+  .modal-body button {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border: none;
+    margin-left: 365px;
+    margin-top: 15px;
+  }
+
+  
+  
+  /* Add the following rules to your existing SCSS file */
+.modal-open {
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .modal-open .modal {
+    display: block;
+  }
+  
+  .modal-open .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1040;
+  }
+  
+  .modal-open .modal-dialog {
+    pointer-events: auto;
+    z-index: 1050;
+  }
+  
+  /* help.component.scss */
+
+    /* help.component.scss */
+
+    /* help.component.scss */
+
+
+  
+  .modal {
+    /* Existing modal styles */
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.video-container video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+
+.modal-dialog {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    margin: 0;
+    max-height: calc(100vh - 40px); /* Adjust the value (40px) to leave space for the modal header and footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+  }
+  
+  
+  .modal-body {
+    padding: 0;
+    
+  }
+  
+  .modal-body video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .modal-body {
+    .close {
+      color: red;
+      margin-left: 50px;
+    }
+}
+  
+.mid-panel {
+    background-color: #869EC3;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    left: 0;
+    right: 0; 
+  }
+
+
+  ///////////////////////////////Table///////////////////////////////////////////////////
+  
+  .container table td {
+    cursor: pointer;
+  }
+  
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  
+    .search-bar {
+      margin-bottom: 20px;
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+  
+    th {
+      background-color: #f2f2f2;
+      padding: 10px;
+      text-align: left;
+    }
+  
+    td {
+      padding: 10px;
+    }
+  
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+}
+
+.search-bar {
+    margin-bottom: 10px;
+  }
+  
+  
+  .container {
+    position: relative;
+  }
+  
+  .vertical-line {
+    border-right: 1px solid #ccc;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+  }
+
+
+  #pdf-viewer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+  }
+  
+  #pdf-viewer-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 900px;
+    height: 80%;
+    max-height: 600px;
+    background-color: #fff;
+    z-index: 10000;
+    padding: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #000;
+  }
+  
+  .close-btn:focus {
+    outline: none;
+  }
+  
+  
+  
+  .page-container {
+    position: relative;
+    /* Add any desired styling for the container */
+  }
+  
+  .pdf-button {
+    position: fixed;
+    bottom: 65px;
+    left: 50%; /* Updated property */
+    transform: translateX(-50%); /* Updated property */
+    padding: 10px 20px;
+    background-color: #001844;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    /* Add any desired styling for the button */
+  }
+
+
+
+  .pdf-button:hover {
+
+    box-shadow:0 2px 4px #001844;
+    
+
+  }
+  
+  
+  

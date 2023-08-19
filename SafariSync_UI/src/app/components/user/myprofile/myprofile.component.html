@@ -1,0 +1,150 @@
+<div class="mid-panel">
+  <h3>My Profile</h3>
+</div>
+
+<div class="container">
+  
+  <div class="icon-container">
+    <img [src]="profileImage" alt="Profile Image" class="profile-image">
+  </div>
+
+  <h5>{{ fullName }}</h5>
+  <h6>{{ userRole }}</h6>
+
+  <div class="stars-container">
+    <i *ngFor="let star of starsArray" class="fas fa-star"></i>
+    <i *ngFor="let emptyStar of emptyStarsArray" class="far fa-star"></i>
+  </div>
+
+  <div class="rating-container">
+    <p>({{rating}})</p>
+  </div>
+  
+  
+  
+<!--*ngIf="userRole !== 'User'"-->
+  <button class="edit-buttons"  routerLink="/editdetails">Edit Personal Information</button>
+  <button  class="edit-buttons" (click)="openModal()">Change Password</button>
+  <button class="btn-return" routerLink="/dashboard">Return</button>
+  
+  <button class="btn-logout" (click)="logout()">Logout</button>
+</div>
+
+<!-- Change Password Modal -->
+<ng-template #content let-modal #updatePasswordModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Change My Password</h5>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="mb-3">
+        <div class="input-container">
+          <div class="modal-icon-container">
+            <i class="fa-solid fa-lock fa-xl"></i>
+          </div>
+          <input type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" placeholder="Enter Current Password" [(ngModel)]="currentPassword" formControlName="CurrentPassword" [attr.autofocus]="false">
+          <i class="toggle-password fa-solid fa-eye" (click)="togglePasswordVisibility('CurrentPassword', $event)"></i>
+        </div>
+      </div>
+      <div *ngIf="form.controls['CurrentPassword']?.invalid && (form.controls['CurrentPassword']?.dirty || form.controls['CurrentPassword']?.touched)">
+        <div *ngIf="form.controls['CurrentPassword']?.errors?.['required']">
+          <p class="validation-notification">Current password is required.</p>
+        </div>
+        <div *ngIf="form.controls['CurrentPassword']?.errors?.['pattern']">
+          <p class="validation-notification">Password requires capital, symbol, number, minimum 5 characters.</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-container">
+          <div class="modal-icon-container">
+            <i class="fa-solid fa-lock fa-xl"></i>
+          </div>
+          <input type="password" class="form-control" id="NewPassword" name="NewPassword" placeholder="Enter New Password" [(ngModel)]="newPassword" formControlName="NewPassword">
+          <i class="toggle-password fa-solid fa-eye" (click)="togglePasswordVisibility1('NewPassword', $event)"></i>
+        </div>
+      </div>
+      <div *ngIf="form.controls['NewPassword']?.invalid && (form.controls['NewPassword']?.dirty || form.controls['NewPassword']?.touched)">
+        <div *ngIf="form.controls['NewPassword']?.errors?.['required']">
+          <p class="validation-notification">New password is required.</p>
+        </div>
+        <div *ngIf="form.controls['NewPassword']?.errors?.['pattern']">
+          <p class="validation-notification">Password requires capital, symbol, number, minimum 5 characters.</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-container">
+          <div class="modal-icon-container">
+            <i class="fa-solid fa-lock fa-xl"></i>
+          </div>
+          <input type="password" class="form-control" id="NewPassword2" name="NewPassword2" placeholder="Confirm New Password" [(ngModel)]="newPasswordConfirm" formControlName="NewPassword2" (ngModelChange)="onNewPassword2Change()">
+          <i class="toggle-password fa-solid fa-eye" (click)="togglePasswordVisibility2('NewPassword2', $event)"></i>
+        </div>
+      </div>
+      <div *ngIf="form.controls['NewPassword2']?.invalid && (form.controls['NewPassword2']?.dirty || form.controls['NewPassword2']?.touched)">
+        <div *ngIf="form.controls['NewPassword2']?.errors?.['required']">
+          <p class="validation-notification">Confirmation of new password is required.</p>
+        </div>
+        <div *ngIf="form.controls['NewPassword2']?.errors?.['pattern']">
+          <p class="validation-notification">Password requires capital, symbol, number, minimum 5 characters.</p>
+        </div>
+      </div>
+      <!-- Show the error validation message when passwords do not match -->
+      <div *ngIf="!newPassword2Matches">
+        <p class="validation-notification">Passwords do not match.</p>
+      </div>
+    </form>
+    <button type="button" class="btn-modal-return" (click)="modal.close('Close click')">Cancel</button>
+    <button type="button" class="btn-form-add" (click)="savePassword()" [disabled]="!form.valid || !newPassword2Matches">Save</button>
+  </div>
+  <div class="modal-footer">
+    
+  </div>
+</ng-template>
+
+<!-- ... Existing HTML code ... -->
+
+<!-- Confirmation Modal -->
+<ng-template #confirmationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Confirmation</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Close click')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to update your password?</p>
+    <button type="button" class="btn-modal-return" (click)="modal.dismiss('Close click'); openModal()">No</button>
+    <button type="button" class="btn-form-add" (click)="confirmUpdate()">Yes</button>
+  </div>
+  <div class="modal-footer">
+    
+  </div>
+</ng-template>
+
+<!-- Success Modal -->
+<ng-template #successModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Close click')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>Password has been successfully updated.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-form-ok" (click)="modal.dismiss('Close click')">Ok</button>
+  </div>
+</ng-template>
+
+<!-- Failed Modal -->
+<ng-template #failedModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Failed</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Close click')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>Your current password is incorrect.</p>
+    <button type="button" class="btn-modal-return" (click)="modal.dismiss('Close click')">Close</button>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>

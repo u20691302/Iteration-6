@@ -1,0 +1,34 @@
+<div class="mid-panel">
+    <h3>Send Registration Link</h3>
+</div>
+  
+  <div class="container">
+    
+    <form [formGroup]="form" (ngSubmit)="sendResetPasswordLink()"> 
+    <div class="mb-3">
+        <div class="icon-container">
+        <i class="fa-solid fa-mobile-alt fa-xl"></i>
+        </div>
+        <input type="text" class="form-control" id="Cellphone" name="Cellphone" placeholder="Cell Phone Number" formControlName="Cellphone" [(ngModel)]="cellnum"> 
+    </div>
+
+    <div *ngIf="form.controls['Cellphone']?.invalid && (form.controls['Cellphone']?.dirty || form.controls['Cellphone']?.touched)">
+        <div *ngIf="form.controls['Cellphone']?.errors?.['required']">
+          <p class="validation-notification">Phone number is required</p>
+        </div>
+        <div *ngIf="form.controls['Cellphone']?.errors?.['pattern']">
+          <p class="validation-notification">Invalid phone number</p>
+        </div>
+    </div>
+
+
+
+    
+        <button type="submit" class="submit-button">Send Link</button>
+        <button class="btn-return">Return</button>
+
+    
+</form>
+  
+
+  

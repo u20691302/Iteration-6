@@ -1,0 +1,525 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>View Toolboxes</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+      <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateToolboxModal)">
+        
+        <i class="fa-solid fa-plus"></i> Add Toolbox
+      </button>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Toolbox Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Tasks</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let toolbox of toolboxes">
+      <tr>
+        <td>{{ toolbox.toolbox_Name }}</td>
+        <td>{{ toolbox.toolbox_Description }}</td>
+        <td>
+          <div class="button-container">
+            <button  class="btn-form-add" (click)="OpenToolboxItemsModal(toolbox.toolbox_ID, ViewToolboxItems)">View Toolbox Items</button>
+            
+          </div>
+        </td>
+        <td>
+          <div class="button-container">
+            <button class="btn-update" (click)="OpenUpdateModal(toolbox.toolbox_ID, addUpdateToolboxModal)" title="Update"> 
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, toolbox)" title="Delete">  
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="toolboxes.length === 0">
+      <tr>
+        <td colspan="6">No Toolbox Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add/Update Toolbox Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddToolbox(ConfirmationModal, AddUpdateError) : UpdateToolbox(ConfirmationModal, AddUpdateError)">  
+  <ng-template #addUpdateToolboxModal let-modal class="modal fade" >
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Toolbox' : 'Update Existing Toolbox' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="toolbox_Name" class="form-label">Toolbox Name</label>
+            <input type="text" class="text-input form-control" id="toolbox_Name" name="toolbox_Name" [(ngModel)]="addUpdateToolboxRequest.toolbox_Name" required>
+            <div *ngIf="form.controls['toolbox_Name']?.invalid && (form.controls['toolbox_Name']?.dirty || form.controls['toolbox_Name']?.touched)">
+              <div *ngIf="form.controls['toolbox_Name']?.errors?.['required']">
+                <p class="validation-notification">Toolbox Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="toolbox_Description" class="form-label">Toolbox Description</label>
+            <input type="text" class="text-input form-control" id="toolbox_Description" name="toolbox_Description" [(ngModel)]="addUpdateToolboxRequest.toolbox_Description" required>
+            <div *ngIf="form.controls['toolbox_Description']?.invalid && (form.controls['toolbox_Description']?.dirty || form.controls['toolbox_Description']?.touched)">
+              <div *ngIf="form.controls['toolbox_Description']?.errors?.['required']">
+                <p class="validation-notification">Toolbox Description is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
+          <button type="button" class="btn-form-add" (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+            {{ isAddMode ? 'Add Toolbox' : 'Update Toolbox' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Toolbox Modal -->
+  <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Toolbox' : 'Confirm Update Toolbox' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} toolbox's details correct?</b></p>
+      <div class="toolbox-details">
+        <div class="detail">
+          <span class="label">Toolbox Name: </span>
+          <span class="value">{{ Toolbox.toolbox_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Toolbox Description: </span>
+          <span class="value">{{ Toolbox.toolbox_Description }}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(Toolbox.toolbox_ID, addUpdateToolboxModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new toolbox has been successfully created!' : 'An existing toolbox has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- AddUpdate Error -->
+<ng-template #AddUpdateError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this toolbox's details.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="toolbox-details">
+      <div class="detail">
+        <span class="label">Toolbox Name: </span>
+        <span class="value">{{ Toolbox.toolbox_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Toolbox Description: </span>
+        <span class="value">{{ Toolbox.toolbox_Description }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteToolbox(Toolbox.toolbox_ID, ConfirmationOfDelete, ToolboxAssociationError, ToolboxDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The toolbox has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Toolbox Delete Error -->
+<ng-template #ToolboxDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of toolbox.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+
+<!-- Toolbox Association Delete Error -->
+<ng-template #ToolboxAssociationError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This toolbox is associated with another entity and cannot be deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Tasks Modal -->
+<ng-template #ViewToolboxItems let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ Toolbox.toolbox_Name }} </h5>
+  </div>
+  <div class="modal-body">
+    <!-- Toolbar -->
+    <div class="task container toolbar">
+      <div class="row align-items-center">
+      </div>
+      <div class="row align-items-center">
+        <div class="col d-flex justify-content-start">
+          <label for="equipment" class="form-label">Select Equipment</label>
+          <div class="d-flex align-items-center">
+            <select class="form-select" id="equipment" name="equipment" [(ngModel)]="selectedEquipment">
+              <option value="0" selected disabled>Select Equipment</option>
+              <option *ngFor="let equipment of Equipment" [value]="equipment.equipment_ID">{{ equipment.equipment_Name }}</option>
+            </select>
+          </div>
+          <!-- Add the input field for quantity -->
+          <div class="d-flex align-items-center">
+            <label for="quantity" class="form-label">Quantity</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" [(ngModel)]="equipmentQuantity" required min="0">
+          </div>
+          <button type="button" class="btn btn-add" (click)="openAddItemConfirmationModal(OpenAddEquipmentModalConfirmation)"
+            [attr.disabled]="!(selectedEquipment && equipmentQuantity > 0) ? true : null">
+            <i class="fa-solid fa-plus"></i> Add Equipment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Equipment Name</u></th>
+            <th><u> Equipment Quantity</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let equipment of Toolbox.toolboxEquipment">
+            <td>{{ equipment.equipment?.equipment_Name }}</td>
+            <td>{{ equipment.quantity }}</td>
+            <td>
+              <div class="button-container">
+                <button class="btn-delete" (click)="OpenDeleteToolboxEquipmentModal(DeleteToolboxEquipmentConfirmationModal, equipment.toolboxEquipment_ID)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="Toolbox.toolboxEquipment.length === 0">
+          <tr>
+            <td colspan="4">No Task Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="task container toolbar">
+      <div class="row align-items-center">
+        <div class="col d-flex justify-content-start">
+          <label for="stock" class="form-label">Select Stock</label>
+          <div class="d-flex align-items-center">
+            <select class="form-select" id="stock" name="stock" [(ngModel)]="selectedStock">
+              <option value="0" selected disabled>Select Stock</option>
+              <option *ngFor="let stock of Stock" [value]="stock.stock_ID">{{ stock.stock_Name }}</option>
+            </select>
+          </div>
+          <!-- Add the input field for quantity -->
+          <div class="d-flex align-items-center">
+            <label for="quantity" class="form-label">Quantity</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" [(ngModel)]="stockQuantity" required min="0">
+          </div>
+          <button type="button" class="btn btn-add" (click)="openAddItemConfirmationModal(OpenAddStockModalConfirmation)"
+          [attr.disabled]="!(selectedStock && stockQuantity > 0) ? true : null">
+          <i class="fa-solid fa-plus"></i> Add Stock
+        </button>
+        </div>
+      </div> 
+    </div>
+
+    <div class="task-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Stock Name</u></th>
+            <th><u> Stock Quantity</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stock of Toolbox.toolboxStock">
+            <td>{{ stock.stock?.stock_Name }}</td>
+            <td>{{ stock.quantity }}</td>
+            <td>
+              <div class="button-container">
+                <button class="btn-delete" (click)="OpenDeleteToolboxStockModal(DeleteToolboxStockConfirmationModal, stock.toolboxStock_ID)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="Toolbox.toolboxStock.length === 0">
+          <tr>
+            <td colspan="4">No Task Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>  
+
+<!-- Confirm Add/Update Toolbox Modal -->
+<ng-template #OpenAddEquipmentModalConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Confirm Add Equipment Item</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to add this equipment item to this toolbox?</b></p>
+    <div class="toolbox-details">
+      <div class="detail">
+        <span class="label">Equipment Name: </span>
+        <span class="value">{{ AddUpdateToolboxEquipmentRequest.equipment?.equipment_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Equipment Qunatity: </span>
+        <span class="value">{{ equipmentQuantity }}</span>
+      </div>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+      <button type="button" class="btn-add" (click)="modal.close('Close click'); AddToolboxEquipment(ConfirmationItemModal, AddError)">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirm Add/Update Toolbox Modal -->
+<ng-template #OpenAddStockModalConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Confirm Add Stock Item</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to add this stock item to this toolbox?</b></p>
+    <div class="toolbox-details">
+      <div class="detail">
+        <span class="label">Stock Name: </span>
+        <span class="value">{{ AddUpdateToolboxStockRequest.stock?.stock_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Equipment Qunatity: </span>
+        <span class="value">{{ stockQuantity }}</span>
+      </div>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+      <button type="button" class="btn-add" (click)="modal.close('Close click'); AddToolboxStock(ConfirmationItemModal, AddError)">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Add item Success Confirmation Modal -->
+<ng-template #ConfirmationItemModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>A new item has been successfully added to this toolbox.</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Add item Error -->
+<ng-template #AddError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error adding the item to this toolbox.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ToolEquipment Delete Confirmation Modal -->
+<ng-template #DeleteToolboxEquipmentConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="toolbox-details">
+      <div class="detail">
+        <span class="label">Equipment Name: </span>
+        <span class="value">{{ AddUpdateToolboxEquipmentRequest.equipment?.equipment_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Quantity: </span>
+        <span class="value">{{ AddUpdateToolboxEquipmentRequest.quantity }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); deleteToolboxEquipment(AddUpdateToolboxEquipmentRequest.toolboxEquipment_ID, ToolboxItemConfirmationOfDelete, AssociationError, failedError);">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ToolboxStock Delete Confirmation Modal -->
+<ng-template #DeleteToolboxStockConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="toolbox-details">
+      <div class="detail">
+        <span class="label">Equipment Name: </span>
+        <span class="value">{{ AddUpdateToolboxStockRequest.stock?.stock_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Quantity: </span>
+        <span class="value">{{ AddUpdateToolboxStockRequest.quantity }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); deleteToolboxStock(AddUpdateToolboxStockRequest.toolboxStock_ID, ToolboxItemConfirmationOfDelete, AssociationError, failedError);">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ToolboxTask Confirmation of delete -->
+<ng-template #ToolboxItemConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Toolbox item has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Last Task Delete Error -->
+<ng-template #AssociationError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There is atleast one task associated with this toolbox item.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ToolboxTask Delete Error -->
+<ng-template #failedError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this toolbox item.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

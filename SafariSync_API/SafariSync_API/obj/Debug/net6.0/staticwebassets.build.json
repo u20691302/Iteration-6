@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "ge0IBTyAE1lPGcbDu5SYxK1RkVcTiGv7+HXurTn5CeU=",
+  "Source": "SafariSync_API",
+  "BasePath": "_content/SafariSync_API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

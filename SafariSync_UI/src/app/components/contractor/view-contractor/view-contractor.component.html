@@ -1,0 +1,300 @@
+<!-- Top Panel -->
+<div class="top-panel">
+  <h3>View Contractors</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+<div class="row align-items-center">
+  <div class="col d-flex justify-content-start">
+    <button type="button" class="btn btn-return" routerLink="/dashboard">
+      <i class="fa-solid fa-arrow-left"></i> Return
+    </button>
+    <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateContractorModal)">
+      <i class="fa-solid fa-plus"></i> Add Contractor
+    </button>
+  </div>
+  <div class="col-md-4 d-flex justify-content-end">
+    <div class="input-group">
+      <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+      <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+        <i class="fa-solid fa-times"></i>
+      </span>
+      <span class="input-group-text" *ngIf="!searchTerm">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th><u>Contractor Name</u></th>
+      <th><u>Phone Number</u></th>
+      <th><u>Email Address</u></th>
+      <th><u>Address</u></th>
+      <th><u>Type</u></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let contractor of contractors">
+    <tr>
+      <td>{{ contractor.contractor_Name }}</td>
+      <td>{{ contractor.contractor_Phone_Number }}</td>
+      <td>{{ contractor.contractor_Email_Address }}</td>
+      <td>{{ contractor.contractor_Address }}</td>
+      <td>{{ contractor.contractorType?.contractorType_Name }}</td>
+      <td>
+        <div class="button-container">
+          <button class="btn-update" (click)="LoadContractor(contractor.contractor_ID, addUpdateContractorModal)" title="Update"> 
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, contractor)" title="Delete">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tbody *ngIf="contractors.length === 0">
+    <tr>
+      <td colspan="6">No Contractor Listings</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Add/Update Contractor Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddContractor(ConfirmationModal, ErrorModal) : UpdateContractor(ConfirmationModal, ErrorModal)">  
+<ng-template #addUpdateContractorModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ isAddMode ? 'Add New Contractor' : 'Update Existing Contractor' }}</h5>
+  </div>
+  
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-6">
+
+        <div class="mb-3">
+          <label for="contractor_Name" class="form-label">Contractor Name</label>
+          <input type="text" class="text-input form-control" id="contractor_Name" name="contractor_Name" [(ngModel)]="addUpdateContractorRequest.contractor_Name" required>
+          <div *ngIf="form.controls['contractor_Name']?.invalid && (form.controls['contractor_Name']?.dirty || form.controls['contractor_Name']?.touched)">
+            <div *ngIf="form.controls['contractor_Name']?.errors?.['required']">
+              <p class="validation-notification">Contractor Name is required.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="contractor_Phone_Number" class="form-label">Phone Number</label>
+          <input type="text" class="text-input form-control" id="contractor_Phone_Number" name="contractor_Phone_Number" [(ngModel)]="addUpdateContractorRequest.contractor_Phone_Number" required pattern="[0-9]{10}">
+          <div *ngIf="form.controls['contractor_Phone_Number']?.invalid && (form.controls['contractor_Phone_Number']?.dirty || form.controls['contractor_Phone_Number']?.touched)">
+            <div *ngIf="form.controls['contractor_Phone_Number']?.errors?.['required']">
+              <p class="validation-notification">Phone Number is required.</p>
+            </div>
+            <div *ngIf="form.controls['contractor_Phone_Number']?.errors?.['pattern']">
+              <p class="validation-notification">Phone Number must be a 10-digit number.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="contractor_Email_Address" class="form-label">Email Address</label>
+          <input type="email" class="text-input form-control" id="contractor_Email_Address" name="contractor_Email_Address" [(ngModel)]="addUpdateContractorRequest.contractor_Email_Address" required pattern="^[a-zA-Z0-9._%+\-\~]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">
+          <div *ngIf="form.controls['contractor_Email_Address']?.invalid && (form.controls['contractor_Email_Address']?.dirty || form.controls['contractor_Email_Address']?.touched)">
+            <div *ngIf="form.controls['contractor_Email_Address']?.errors?.['required']">
+              <p class="validation-notification">Email Address is required.</p>
+            </div>
+            <div *ngIf="form.controls['contractor_Email_Address']?.errors?.['pattern']">
+              <p class="validation-notification">Invalid email address.</p>
+            </div>
+          </div>
+        </div>         
+
+        <div class="mb-3">
+          <label for="contractor_Address" class="form-label">Address</label>
+          <input type="text" class="text-input form-control" id="contractor_Address" name="contractor_Address" [(ngModel)]="addUpdateContractorRequest.contractor_Address" required minlength="5">
+          <div *ngIf="form.controls['contractor_Address']?.invalid && (form.controls['contractor_Address']?.dirty || form.controls['contractor_Address']?.touched)">
+            <div *ngIf="form.controls['contractor_Address']?.errors?.['required']">
+              <p class="validation-notification">Address is required.</p>
+            </div>
+            <div *ngIf="form.controls['contractor_Address']?.errors?.['minlength']">
+              <p class="validation-notification">Address should have at least 5 characters.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="contractorType" class="form-label">Select a Contractor Type</label>
+          <select class="form-select" id="contractorType" name="contractorType" [(ngModel)]="addUpdateContractorRequest.contractorType_ID" required pattern="[1-9][0-9]*" #contractorTypeSelect = "ngModel">
+            <option value="0" selected disabled>Select a Contractor Type</option>
+            <option *ngFor="let type of contractorTypes" [value]="type.contractorType_ID">{{ type.contractorType_Name }}</option>
+          </select>
+          <div *ngIf="form.controls['contractorType']?.invalid && (form.controls['contractorType']?.dirty || form.controls['contractorType']?.touched)">
+            <div *ngIf="form.controls['contractorType']?.errors?.['required']">
+              <p class="validation-notification">A Contractor Type must be selected.</p>
+            </div>
+            <div *ngIf="form.controls['contractorType']?.errors?.['pattern']">
+              <p class="validation-notification">A Contractor Type must be selected.</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset()">Cancel</button>
+        <button type="button" class="btn-form-add" (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')" [disabled]="isAddMode ? !form.valid || contractorTypeSelect.pristine : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+          {{ isAddMode ? 'Add Contractor' : 'Update Contractor' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirm Add/Update Contractor Modal -->
+<ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Contractor' : 'Confirm Update Contractor' }}</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} contractor's details correct?</b></p>
+    <div class="contractor-details">
+      <div class="detail">
+        <span class="label">Contractor Name: </span>
+        <span class="value">{{ contractor.contractor_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Phone Number: </span>
+        <span class="value">{{ contractor.contractor_Phone_Number }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Email Address: </span>
+        <span class="value">{{contractor.contractor_Email_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Address: </span>
+        <span class="value">{{ contractor.contractor_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Type: </span>
+        <span class="value">{{ output }}</span>
+      </div>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateContractorModal)">Return</button>
+      <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+</div>
+<div class="modal-body">
+  <p><b>{{ isAddMode ? 'A new contractor has been successfully created!' : 'An existing contractor has been successfully updated!' }}</b></p>
+  <div class="text-center">
+    <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>
+
+<!-- Add/Update Error Modal -->
+<ng-template #ErrorModal let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title" id="ConfirmationModal">Error</h5>
+</div>
+<div class="modal-body">
+  <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this contractor's details.</b></p>
+  <div class="text-center">
+    <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title">Warning</h5>
+</div>
+<div class="modal-body">
+  <p><b>Are you sure you want to delete this record?</b></p>
+  <div class="contractor-details">
+    <div class="detail">
+      <span class="label">Contractor Name: </span>
+      <span class="value">{{ contractor.contractor_Name }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Phone Number: </span>
+      <span class="value">{{ contractor.contractor_Phone_Number }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Email: </span>
+      <span class="value">{{contractor.contractor_Email_Address }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Address: </span>
+      <span class="value">{{ contractor.contractor_Address }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Type: </span>
+      <span class="value">{{ contractor.contractorType?.contractorType_Name }}</span>
+    </div>
+  </div>
+  <div class="text-center">
+    <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+    <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteContractor(contractor.contractor_ID, ConfirmationOfDelete, DeleteError, DeleteContractorAssociationError );">Confirm</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title">Success</h5>
+</div>
+<div class="modal-body">
+  <p><b>The contractor has been deleted.</b></p>
+  <div class="text-center">
+    <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Error -->
+<ng-template #DeleteError let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title">Error</h5>
+</div>
+<div class="modal-body">
+  <p><b>There was an error deleting this contractor.</b></p>
+  <div class="text-center">
+    <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete ContractorAssociationError -->
+<ng-template #DeleteContractorAssociationError let-modal class="modal fade">
+<div class="modal-header">
+  <h5 class="modal-title">Error</h5>
+</div>
+<div class="modal-body">
+  <p><b>This contractor is associated with other records and cannot be deleted.</b></p>
+  <div class="text-center">
+    <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+  </div>
+</div>
+<div class="modal-footer"></div>
+</ng-template>

@@ -1,0 +1,210 @@
+.mid-panel {
+    background-color: #869EC3;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    left: 0;
+    right: 0; 
+  }
+  
+  .my-custom-icon {
+    font-size: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    justify-content: center;
+  }
+  
+  .icon-container {
+    margin-bottom: 10px;
+  }
+  
+  .stars-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .my-custom-icon {
+    font-size: 60px;
+  }
+  
+  h5 {
+    margin-top: 5px;
+    text-align: center;
+  }
+  
+  h6 {
+    color: #CD1543;
+  }
+  
+  .edit-buttons {
+    color: black;
+    background-color: white;
+    border-color: black;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .btn-return {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    margin-top: 0px;
+  }
+
+  .btn-logout {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    margin-top: 10px;
+  }
+  
+  //modal stuff
+  .modal-header{
+    background-color: #001844;
+    border: 1px solid #001844;
+    height:70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-title {
+    text-align: center;
+    color: white;
+  }
+
+  .modal-body {
+    text-align: center;
+    background-color: #869EC3;
+  }
+
+  .modal-footer{
+    background-color: #CD1543;
+    border: 1px solid #CD1543;
+    height:50px;
+  }
+
+  .btn-form-add{
+    background-color: #001844;
+    border-color: #001844;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border:none;
+  }
+  
+  .btn-close{
+    background-color: white;
+  }
+
+  .btn-modal-return {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    margin-right: 10px;
+  }
+
+  .btn-form-ok{
+    background-color: #001844;
+    border-color: #001844;
+    color: white;
+    border-radius:20px;
+    border:none;
+    
+  }
+
+  .btn-form-add:disabled {
+    background-color: #001844; 
+    border-color: #001844;
+    box-shadow: none; 
+    opacity: 0.7; 
+    cursor: not-allowed;
+    
+  }
+  
+  .validation-notification{
+    color: #CD1543;
+    font-weight: bold;
+  }
+
+  .modal-icon-container {
+    position: absolute;
+    left: 8px; /* Adjust the value as needed to align the icon */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ffffff;
+    padding: 6px;
+  }
+
+  .input-container {
+    position: relative;
+  }
+
+  .input-container input {
+    padding-left: 50px; /* Adjust the value as needed to create space for the icon and text */
+  }
+
+  .profile-image {
+    width: 100px; /* Adjust the width to your desired size */
+    height: 100px; /* Adjust the height to your desired size */
+    border-radius: 50%; /* Make the image circular */
+    object-fit: cover; /* Ensure the image fits within the circular container */
+    margin-bottom: 10px; /* Optional: Add some space between the image and the other content */
+  }
+
+  /* Add custom styles for the toggle password icon */
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  /* Add the eye icon and eye-slash icon using Font Awesome */
+  .fa-eye:before {
+    content: "\f06e"; /* Eye icon */
+  }
+
+  .fa-eye-slash:before {
+    content: "\f070"; /* Eye slash icon */
+  }
+
+  /* Hide password by default */
+  input[type="password"] {
+    padding-right: 30px; /* Add some right padding for the eye icon */
+  }
+
+  .rating-container {
+    display: flex; /* Use Flexbox to control the layout */
+    align-items: center; /* Align items vertically */
+    margin-top: -20px; /* Adjust the margin as needed to move it closer to the other div */
+    margin-bottom: 20px;
+  }
+  
+  /* Additional styles for the <p> tag, you can customize as needed */
+  .rating-container p {
+    margin: 0; /* Remove default margin */
+    font-size: 16px; /* Adjust the font size as needed */
+  }
+
+
+ 

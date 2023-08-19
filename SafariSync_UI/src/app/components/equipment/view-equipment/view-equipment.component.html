@@ -1,0 +1,448 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>View Equipment</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+      <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateEquipmentModal)">
+        <i class="fa-solid fa-plus"></i> Add Equipment
+      </button>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Equipment Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Quantity on Hand</u></th>
+        <th><u>Low-Level_Warning</u></th>
+        <th><u>Suppliers</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let equipment of equipments">
+      <tr>
+        <td>{{ equipment.equipment_Name }}</td>
+        <td>{{ equipment.equipment_Description }}</td>
+        <td>{{ equipment.equipment_Quantity_On_Hand }}</td>
+        <td>{{ equipment.equipment_Low_Level_Warning }}</td>
+        <td>
+          <div class="button-container">
+            <button (click)="LoadSupplier(equipment.equipment_ID, ViewSuppliers)" class="btn-form-add">View Suppliers</button>
+          </div>
+        </td>
+        <td>
+          <div class="button-container">
+            <button class="btn-update" (click)="LoadEquipment(equipment.equipment_ID, addUpdateEquipmentModal)" title="Update"> 
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, equipment)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="equipments.length === 0">
+      <tr>
+        <td colspan="6">No Equipment Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add/Update Equipment Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddEquipment(ConfirmationModal, AddUpdateError) : UpdateEquipment(ConfirmationModal, AddUpdateError)">  
+  <ng-template #addUpdateEquipmentModal let-modal class="modal fade" >
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Equipment' : 'Update Existing Equipment' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="equipment_Name" class="form-label">Equipment Name</label>
+            <input type="text" class="text-input form-control" id="equipment_Name" name="equipment_Name" [(ngModel)]="addUpdateEquipmentRequest.equipment_Name" required>
+            <div *ngIf="form.controls['equipment_Name']?.invalid && (form.controls['equipment_Name']?.dirty || form.controls['equipment_Name']?.touched)">
+              <div *ngIf="form.controls['equipment_Name']?.errors?.['required']">
+                <p class="validation-notification">Equipment Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="equipment_Description" class="form-label">Equipment Description</label>
+            <input type="text" class="text-input form-control" id="equipment_Description" name="equipment_Description" [(ngModel)]="addUpdateEquipmentRequest.equipment_Description" required>
+            <div *ngIf="form.controls['equipment_Description']?.invalid && (form.controls['equipment_Description']?.dirty || form.controls['equipment_Description']?.touched)">
+              <div *ngIf="form.controls['equipment_Description']?.errors?.['required']">
+                <p class="validation-notification">Equipment Description is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="Quantity_on_Hand" class="form-label">Quantity on Hand</label>
+            <input type="number" class="text-input form-control" id="Quantity_on_Hand" name="Quantity_on_Hand" [(ngModel)]="addUpdateEquipmentRequest.equipment_Quantity_On_Hand" required min="0">
+            <div *ngIf="form.controls['Quantity_on_Hand']?.invalid && (form.controls['Quantity_on_Hand']?.dirty || form.controls['Quantity_on_Hand']?.touched)">
+              <div *ngIf="form.controls['Quantity_on_Hand']?.errors?.['required']">
+                <p class="validation-notification">Quantity on Hand is required.</p>
+              </div>
+              <div *ngIf="form.controls['Quantity_on_Hand']?.errors?.['min']">
+                <p class="validation-notification">Quantity on Hand cannot be negative.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="Low-Level_Warning" class="form-label">Low-Level Warning</label>
+            <input type="number" class="text-input form-control" id="Low-Level_Warning" name="Low-Level_Warning" [(ngModel)]="addUpdateEquipmentRequest.equipment_Low_Level_Warning" required min="0">
+            <div *ngIf="form.controls['Low-Level_Warning']?.invalid && (form.controls['Low-Level_Warning']?.dirty || form.controls['Low-Level_Warning']?.touched)">
+              <div *ngIf="form.controls['Low-Level_Warning']?.errors?.['required']">
+                <p class="validation-notification">Low-Level Warning is required.</p>
+              </div>
+              <div *ngIf="form.controls['Low-Level_Warning']?.errors?.['min']">
+                <p class="validation-notification">Low-Level Warning cannot be negative.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="supplier" class="form-label">Select a Supplier</label>
+            <div class="d-flex align-items-center">
+              <select class="form-select" id="supplier" name="supplier" [(ngModel)]="selectedSupplier">
+                <option value="null" selected disabled>Select a Supplier</option>
+                <option *ngFor="let supplier of suppliers" [value]="supplier.supplier_ID">{{ supplier.supplier_Name }}</option>
+              </select>
+          
+              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSupplierToArray()" [disabled]="!selectedSupplier">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>          
+
+          <div class="supplier-table-container">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th><u>Supplier Name</u></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody *ngIf="addUpdateSuppliers.length > 0">
+                <tr *ngFor="let supplier of addUpdateSuppliers">
+                  <td>{{ supplier.supplier_Name }}</td>
+                  <td>
+                    <div class="button-container">
+                      <button class="btn-delete" title="Delete" (click)="deleteSupplierFromArray(supplier)">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="addUpdateSuppliers.length === 0">
+                <tr>
+                  <td colspan="2">No Supplier Listings</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>          
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
+          <button type="button" class="btn-form-add"
+            (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')"
+            [disabled]="isAddMode ? (!form.valid || isSupplierListEmpty) : (!form.dirty || isSupplierListEmpty)"
+            [ngClass]="{'disabled': isAddMode ? (!form.valid || isSupplierListEmpty) : (!form.dirty || isSupplierListEmpty)}">
+            {{ isAddMode ? 'Add Equipment' : 'Update Equipment' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Equipment Modal -->
+  <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Equipment' : 'Confirm Update Equipment' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} equipment's details correct?</b></p>
+      <div class="equipment-details">
+        <div class="detail">
+          <span class="label">Equipment Name: </span>
+          <span class="value">{{ Equipment.equipment_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Equipment Description: </span>
+          <span class="value">{{ Equipment.equipment_Description }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Quantity on Hand: </span>
+          <span class="value">{{Equipment.equipment_Quantity_On_Hand }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Low-Level Warning: </span>
+          <span class="value">{{ Equipment.equipment_Low_Level_Warning }}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateEquipmentModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new equipment has been successfully created!' : 'An existing equipment has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- AddUpdate Error -->
+<ng-template #AddUpdateError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this equipment's details.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="equipment-details">
+      <div class="detail">
+        <span class="label">Equipment Name: </span>
+        <span class="value">{{ Equipment.equipment_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Equipment Description: </span>
+        <span class="value">{{ Equipment.equipment_Description }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Quantity on Hand: </span>
+        <span class="value">{{Equipment.equipment_Quantity_On_Hand }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Low-Level Warning: </span>
+        <span class="value">{{ Equipment.equipment_Low_Level_Warning }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteEquipment(Equipment.equipment_ID, ConfirmationOfDelete,EquipmentAssociationDeleteError, EquipmentDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The equipment has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Equipment Delete Error -->
+<ng-template #EquipmentDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of equipment.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Equipment Delete Error -->
+<ng-template #EquipmentAssociationDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This equipment is associated with other records and cannot be deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Suppliers Modal -->
+<ng-template #ViewSuppliers let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Suppliers of {{equipmentName}} </h5>
+  </div>
+  <div class="modal-body">
+    <div class="supplier-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Supplier Name</u></th>
+            <th><u>Phone Number</u></th>
+            <th><u>Email Address</u></th>
+            <th><u>Address</u></th>
+            <th><u>Type</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let supplier of addUpdateEquipmentRequest.equipmentSupplier">
+            <td>{{ supplier.supplier?.supplier_Name }}</td>
+            <td>{{ supplier.supplier?.supplier_Phone_Number }}</td>
+            <td>{{ supplier.supplier?.supplier_Email_Address }}</td>
+            <td>{{ supplier.supplier?.supplier_Address }}</td>
+            <td>{{ supplier.supplier?.supplierType?.supplierType_Name }}</td>
+            <td>
+              <div class="button-container">
+                <button class="btn-delete" (click)="OpenEquipmentSupplierDeleteModal(DeleteEquipmentSupplierConfirmationModal, supplier.equipmentSupplier_ID)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="equipments.length === 0">
+          <tr>
+            <td colspan="6">No Supplier Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 
+
+<!-- EquipmentSupplier Delete Confirmation Modal -->
+<ng-template #DeleteEquipmentSupplierConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="equipment-details">
+      <div class="detail">
+        <span class="label">Supplier Name: </span>
+        <span class="value">{{ AddUpdateEquipmentSupplierRequest.supplier?.supplier_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Supplier Number: </span>
+        <span class="value">{{ AddUpdateEquipmentSupplierRequest.supplier?.supplier_Phone_Number }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Email Address: </span>
+        <span class="value">{{AddUpdateEquipmentSupplierRequest.supplier?.supplier_Email_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Address: </span>
+        <span class="value">{{ AddUpdateEquipmentSupplierRequest.supplier?.supplier_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Type: </span>
+        <span class="value">{{ AddUpdateEquipmentSupplierRequest.supplier?.supplierType?.supplierType_Name }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); ConfirmEquipmentSupplierDelete(AddUpdateEquipmentSupplierRequest.equipmentSupplier_ID, EquipmentSupplierConfirmationOfDelete, LastSupplierError, EquipmentSupplierError);">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- EquipmentSupplier Confirmation of delete -->
+<ng-template #EquipmentSupplierConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>A supplier of this equipment has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Last Supplier Delete Error -->
+<ng-template #LastSupplierError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There must be atleast one supplier associated with a piece of equiment.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- EquipmentSupplier Delete Error -->
+<ng-template #EquipmentSupplierError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this supplier.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

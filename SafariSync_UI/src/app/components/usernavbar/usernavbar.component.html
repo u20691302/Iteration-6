@@ -1,0 +1,100 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h1>SafariSync</h1>
+  </div>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          
+          <!-- Dashboard Dropdown Link -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-table-columns"></i>Dashboard
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" routerLink="dashboard">View Dashboard</a></li>
+            </ul>
+          </li>
+  
+          <!-- My Profile Dropdown Link -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-address-card"></i>My Profile
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" href="#" routerLink="/myprofile">View My Profile</a></li>
+            </ul>
+          </li>
+  
+          <!-- Scheduled Activities Dropdown Link -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-regular fa-calendar-days"></i>Scheduled Activities
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" routerLink="/scheduleActivity">View Scheduled Activities</a></li>
+            </ul>
+          </li>
+
+          <!-- Employees Dropdown Link -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-users"></i>Training
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" href="#">View My Training</a></li>
+            </ul>
+          </li>
+  
+          <!-- Help Dropdown Link -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-question-circle"></i>Help
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                <li>
+                    <!-- Help Video Modal -->
+                    <button class="dropdown-item" autofocus="false" (click)="openModal(videoModal)">View Current Page Help</button>
+                </li>
+                <li><a class="dropdown-item" routerLink="/page" href="#">View Help Document</a></li>
+            </ul>
+        </li>
+
+  
+        </ul>
+      </div>
+    </div>
+  </nav>
+          
+
+<!-- Help video Modal -->
+<ng-template #videoModal let-modal modal-fade autofocus="false">
+  <div class="modal-header">
+      <h4 class="modal-title">Help Video</h4>
+  </div>
+  <div class="modal-body" autofocus="false">
+      <video width="100%" controls>
+          <source src="/assets/Test4.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <button autofocus="false" type="button" class="modal-button" (click)="modal.close('Close click')">Close</button>
+  </div>
+  <div class="modal-footer">
+      <!-- Modal footer content -->
+  </div>
+</ng-template>
+
+  <router-outlet></router-outlet>
+  
+  <!-- Bottom Panel -->
+  <div class="bottom-panel">
+    <img src="\assets\EPI-USE\EPI-USE Logo.jpg" alt="EPI-USE Logo">
+  </div>
+  
+  

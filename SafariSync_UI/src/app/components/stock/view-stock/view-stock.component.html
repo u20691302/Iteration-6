@@ -1,0 +1,448 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>View Stock</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+      <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateStockModal)">
+        <i class="fa-solid fa-plus"></i> Add Stock
+      </button>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Stock Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Quantity on Hand</u></th>
+        <th><u>Low-Level_Warning</u></th>
+        <th><u>Suppliers</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let stock of stocks">
+      <tr>
+        <td>{{ stock.stock_Name }}</td>
+        <td>{{ stock.stock_Description }}</td>
+        <td>{{ stock.stock_Quantity_On_Hand }}</td>
+        <td>{{ stock.stock_Low_Level_Warning }}</td>
+        <td>
+          <div class="button-container">
+            <button (click)="LoadSupplier(stock.stock_ID, ViewSuppliers)" class="btn-form-add">View Suppliers</button>
+          </div>
+        </td>
+        <td>
+          <div class="button-container">
+            <button class="btn-update" (click)="LoadStock(stock.stock_ID, addUpdateStockModal)" title="Update"> 
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, stock)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="stocks.length === 0">
+      <tr>
+        <td colspan="6">No Stock Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add/Update Stock Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddStock(ConfirmationModal, AddUpdateError) : UpdateStock(ConfirmationModal, AddUpdateError)">  
+  <ng-template #addUpdateStockModal let-modal class="modal fade" >
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Stock' : 'Update Existing Stock' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="stock_Name" class="form-label">Stock Name</label>
+            <input type="text" class="text-input form-control" id="stock_Name" name="stock_Name" [(ngModel)]="addUpdateStockRequest.stock_Name" required>
+            <div *ngIf="form.controls['stock_Name']?.invalid && (form.controls['stock_Name']?.dirty || form.controls['stock_Name']?.touched)">
+              <div *ngIf="form.controls['stock_Name']?.errors?.['required']">
+                <p class="validation-notification">Stock Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="stock_Description" class="form-label">Stock Description</label>
+            <input type="text" class="text-input form-control" id="stock_Description" name="stock_Description" [(ngModel)]="addUpdateStockRequest.stock_Description" required>
+            <div *ngIf="form.controls['stock_Description']?.invalid && (form.controls['stock_Description']?.dirty || form.controls['stock_Description']?.touched)">
+              <div *ngIf="form.controls['stock_Description']?.errors?.['required']">
+                <p class="validation-notification">Stock Description is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="Quantity_on_Hand" class="form-label">Quantity on Hand</label>
+            <input type="number" class="text-input form-control" id="Quantity_on_Hand" name="Quantity_on_Hand" [(ngModel)]="addUpdateStockRequest.stock_Quantity_On_Hand" required min="0">
+            <div *ngIf="form.controls['Quantity_on_Hand']?.invalid && (form.controls['Quantity_on_Hand']?.dirty || form.controls['Quantity_on_Hand']?.touched)">
+              <div *ngIf="form.controls['Quantity_on_Hand']?.errors?.['required']">
+                <p class="validation-notification">Quantity on Hand is required.</p>
+              </div>
+              <div *ngIf="form.controls['Quantity_on_Hand']?.errors?.['min']">
+                <p class="validation-notification">Quantity on Hand cannot be negative.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="Low-Level_Warning" class="form-label">Low-Level Warning</label>
+            <input type="number" class="text-input form-control" id="Low-Level_Warning" name="Low-Level_Warning" [(ngModel)]="addUpdateStockRequest.stock_Low_Level_Warning" required min="0">
+            <div *ngIf="form.controls['Low-Level_Warning']?.invalid && (form.controls['Low-Level_Warning']?.dirty || form.controls['Low-Level_Warning']?.touched)">
+              <div *ngIf="form.controls['Low-Level_Warning']?.errors?.['required']">
+                <p class="validation-notification">Low-Level Warning is required.</p>
+              </div>
+              <div *ngIf="form.controls['Low-Level_Warning']?.errors?.['min']">
+                <p class="validation-notification">Low-Level Warning cannot be negative.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="supplier" class="form-label">Select a Supplier</label>
+            <div class="d-flex align-items-center">
+              <select class="form-select" id="supplier" name="supplier" [(ngModel)]="selectedSupplier">
+                <option value="null" selected disabled>Select a Supplier</option>
+                <option *ngFor="let supplier of suppliers" [value]="supplier.supplier_ID">{{ supplier.supplier_Name }}</option>
+              </select>
+          
+              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSupplierToArray()" [disabled]="!selectedSupplier">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>          
+
+          <div class="supplier-table-container">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th><u>Supplier Name</u></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody *ngIf="addUpdateSuppliers.length > 0">
+                <tr *ngFor="let supplier of addUpdateSuppliers">
+                  <td>{{ supplier.supplier_Name }}</td>
+                  <td>
+                    <div class="button-container">
+                      <button class="btn-delete" title="Delete" (click)="deleteSupplierFromArray(supplier)">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="addUpdateSuppliers.length === 0">
+                <tr>
+                  <td colspan="2">No Supplier Listings</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>          
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
+          <button type="button" class="btn-form-add"
+            (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')"
+            [disabled]="isAddMode ? (!form.valid || isSupplierListEmpty) : (!form.dirty || isSupplierListEmpty)"
+            [ngClass]="{'disabled': isAddMode ? (!form.valid || isSupplierListEmpty) : (!form.dirty || isSupplierListEmpty)}">
+            {{ isAddMode ? 'Add Stock' : 'Update Stock' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Stock Modal -->
+  <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Stock' : 'Confirm Update Stock' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} stock's details correct?</b></p>
+      <div class="stock-details">
+        <div class="detail">
+          <span class="label">Stock Name: </span>
+          <span class="value">{{ Stock.stock_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Stock Description: </span>
+          <span class="value">{{ Stock.stock_Description }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Quantity on Hand: </span>
+          <span class="value">{{Stock.stock_Quantity_On_Hand }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Low-Level Warning: </span>
+          <span class="value">{{ Stock.stock_Low_Level_Warning }}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateStockModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new stock has been successfully created!' : 'An existing stock has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- AddUpdate Error -->
+<ng-template #AddUpdateError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this stock's details.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="stock-details">
+      <div class="detail">
+        <span class="label">Stock Name: </span>
+        <span class="value">{{ Stock.stock_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Stock Description: </span>
+        <span class="value">{{ Stock.stock_Description }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Quantity on Hand: </span>
+        <span class="value">{{Stock.stock_Quantity_On_Hand }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Low-Level Warning: </span>
+        <span class="value">{{ Stock.stock_Low_Level_Warning }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteStock(Stock.stock_ID, ConfirmationOfDelete, StockAssociationError, StockDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The stock has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Stock Delete Error -->
+<ng-template #StockDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of stock.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Stock Delete Error -->
+<ng-template #StockAssociationError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This stock is associated with other records and cannot be deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Suppliers Modal -->
+<ng-template #ViewSuppliers let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Suppliers of {{stockName}} </h5>
+  </div>
+  <div class="modal-body">
+    <div class="supplier-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Supplier Name</u></th>
+            <th><u>Phone Number</u></th>
+            <th><u>Email Address</u></th>
+            <th><u>Address</u></th>
+            <th><u>Type</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let supplier of addUpdateStockRequest.stockSupplier">
+            <td>{{ supplier.supplier?.supplier_Name }}</td>
+            <td>{{ supplier.supplier?.supplier_Phone_Number }}</td>
+            <td>{{ supplier.supplier?.supplier_Email_Address }}</td>
+            <td>{{ supplier.supplier?.supplier_Address }}</td>
+            <td>{{ supplier.supplier?.supplierType?.supplierType_Name }}</td>
+            <td>
+              <div class="button-container">
+                <button class="btn-delete" (click)="OpenStockSupplierDeleteModal(DeleteStockSupplierConfirmationModal, supplier.stockSupplier_ID)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="stocks.length === 0">
+          <tr>
+            <td colspan="6">No Supplier Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 
+
+<!-- StockSupplier Delete Confirmation Modal -->
+<ng-template #DeleteStockSupplierConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="stock-details">
+      <div class="detail">
+        <span class="label">Supplier Name: </span>
+        <span class="value">{{ AddUpdateStockSupplierRequest.supplier?.supplier_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Supplier Number: </span>
+        <span class="value">{{ AddUpdateStockSupplierRequest.supplier?.supplier_Phone_Number }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Email Address: </span>
+        <span class="value">{{AddUpdateStockSupplierRequest.supplier?.supplier_Email_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Address: </span>
+        <span class="value">{{ AddUpdateStockSupplierRequest.supplier?.supplier_Address }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Type: </span>
+        <span class="value">{{ AddUpdateStockSupplierRequest.supplier?.supplierType?.supplierType_Name }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); ConfirmStockSupplierDelete(AddUpdateStockSupplierRequest.stockSupplier_ID, StockSupplierConfirmationOfDelete, LastSupplierError, StockSupplierError);">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- StockSupplier Confirmation of delete -->
+<ng-template #StockSupplierConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>A supplier of this stock has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Last Supplier Delete Error -->
+<ng-template #LastSupplierError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There must be atleast one supplier associated with a piece of equiment.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- StockSupplier Delete Error -->
+<ng-template #StockSupplierError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this supplier.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

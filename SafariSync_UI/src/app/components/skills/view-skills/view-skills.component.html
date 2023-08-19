@@ -1,0 +1,226 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>View Skills</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+      <button type="button" class="btn btn-add" (click)="OpenAddModal(addUpdateSkillModal)">
+        <i class="fa-solid fa-plus"></i> Add Skill
+      </button>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Skill Name</u></th>
+        <th><u>Skill Description</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let skill of skills">
+      <tr>
+        <td>{{ skill.skill_Name }}</td>
+        <td>{{ skill.skill_Description }}</td>
+        <td>
+          <div class="button-container">
+            <button class="btn-update" (click)="LoadSkill(skill.skill_ID, addUpdateSkillModal)" title="Update"> 
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="OpenDeleteModal(DeleteConfirmationModal, skill)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="skills.length === 0">
+      <tr>
+        <td colspan="6">No Skill Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add/Update Skill Modal -->
+<form #form="ngForm" (ngSubmit)="isAddMode ? AddSkill(ConfirmationModal, ErrorModal) : UpdateSkill(ConfirmationModal, ErrorModal)">  
+  <ng-template #addUpdateSkillModal let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Add New Skill' : 'Update Existing Skill' }}</h5>
+    </div>
+    
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-3">
+            <label for="skill_Name" class="form-label">Skill Name</label>
+            <input type="text" class="text-input form-control" id="skill_Name" name="skill_Name" [(ngModel)]="addUpdateSkillRequest.skill_Name" required>
+            <div *ngIf="form.controls['skill_Name']?.invalid && (form.controls['skill_Name']?.dirty || form.controls['skill_Name']?.touched)">
+              <div *ngIf="form.controls['skill_Name']?.errors?.['required']">
+                <p class="validation-notification">Skill Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="skill_Description" class="form-label">Skill Description</label>
+            <input type="text" class="text-input form-control" id="skill_Description" name="skill_Description" [(ngModel)]="addUpdateSkillRequest.skill_Description" required>
+            <div *ngIf="form.controls['skill_Description']?.invalid && (form.controls['skill_Description']?.dirty || form.controls['skill_Description']?.touched)">
+              <div *ngIf="form.controls['skill_Description']?.errors?.['required']">
+                <p class="validation-notification">Skill Name is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset()">Cancel</button>
+          <button type="button" class="btn-form-add" (click)="OpenAddUpdateConfirmDetailsModal(OpenAddUpdateModalConfirmation); modal.close('Close click')" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+            {{ isAddMode ? 'Add Skill' : 'Update Skill' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+  <!-- Confirm Add/Update Skill Modal -->
+  <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Skill' : 'Confirm Update Skill' }}</h5>
+    </div>
+    <div class="modal-body">
+      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} skill's details correct?</b></p>
+      <div class="skill-details">
+        <div class="detail">
+          <span class="label">Skill Name: </span>
+          <span class="value">{{ skill.skill_Name }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">Skill Description: </span>
+          <span class="value">{{ skill.skill_Description }}</span>
+        </div>
+      </div>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateSkillModal)">Return</button>
+        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template> 
+</form>
+
+<!-- Add/Update Success Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>{{ isAddMode ? 'A new skill has been successfully created!' : 'An existing skill has been successfully updated!' }}</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Add/Update Error Modal -->
+<ng-template #ErrorModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this skill's details.</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="skill-details">
+      <div class="detail">
+        <span class="label">Skill Name: </span>
+        <span class="value">{{ skill.skill_Name }}</span>
+      </div>
+      <div class="detail">
+        <span class="label">Skill Description: </span>
+        <span class="value">{{ skill.skill_Description }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteSkill(skill.skill_ID, ConfirmationOfDelete, DeleteError, DeleteSkillAssociationError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The skill has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Error -->
+<ng-template #DeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this skill.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete SupplierAssociationError -->
+<ng-template #DeleteSkillAssociationError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This skill is associated with other records and cannot be deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+

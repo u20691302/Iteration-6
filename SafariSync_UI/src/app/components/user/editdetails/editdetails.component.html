@@ -1,0 +1,218 @@
+<div class="mid-panel">
+  <h3>Edit My Profile</h3>
+</div>
+
+<div class="container">
+  <div class="icon-container">
+    <img [src]="profileImage" alt="Profile Image" class="profile-image">
+  </div>
+  <input id="fileInput" type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>
+  <button class="edit-buttons" (click)="fileInput.click()">Update Profile Photo</button>
+
+  <h6><b>Name:</b> {{ fullName }}</h6>
+  <h6><b>Surname:</b> {{ surname }}</h6>
+  <h6><b>ID/Passport Number:</b> {{ idPassport }}</h6>
+  <h6><b>Email:</b> {{ email }}</h6>
+  <h6><b>Cell Phone Number: </b>{{ cellphone }}</h6>
+  <h6><b>User Skills:</b></h6>
+    <ul>
+      <li *ngFor="let skill of userSkills">{{ skill.skill_Name }}</li>
+    </ul>
+
+  <button class="updateinfo-buttons" (click)="openModal(content)">Update Information</button>
+  <button class="btn-return" routerLink="/myprofile">Return</button>
+</div>
+
+<!-- Edit User Information Modal -->
+<ng-template #content let-modal #updateModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit User Information</h5>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="form">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="Username" name="Username"  required [(ngModel)]="fullName" formControlName="Username">
+      </div>
+      <div *ngIf="form.controls['Username']?.invalid && (form.controls['Username']?.dirty || form.controls['Username']?.touched)">
+        <div *ngIf="form.controls['Username']?.errors?.['required']">
+          <p class="validation-notification">Username is required.</p>
+        </div>
+        <div *ngIf="form.controls['Username']?.errors?.['minlength']">
+          <p class="validation-notification">Username should have at least 2 characters.</p>
+        </div>
+      </div>
+
+
+      <div class="mb-3">
+        <label for="surname" class="form-label">Surname</label>
+        <input type="text" class="form-control" id="Surname" name="Surname" required [(ngModel)]="surname" formControlName="Surname">
+      </div>
+      <div *ngIf="form.controls['Surname']?.invalid && (form.controls['Surname']?.dirty || form.controls['Surname']?.touched)">
+        <div *ngIf="form.controls['Surname']?.errors?.['required']">
+          <p class="validation-notification">Surname is required.</p>
+        </div>
+        <div *ngIf="form.controls['Surname']?.errors?.['minlength']">
+          <p class="validation-notification">Surname should have at least 2 characters.</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="idpassport" class="form-label">ID/Passport Number</label>
+        <input type="text" class="form-control" id="IdPassport" name="IdPassport" required [(ngModel)]="idPassport" formControlName="IdPassport">
+      </div>
+      <div *ngIf="form.controls['IdPassport']?.invalid && (form.controls['IdPassport']?.dirty || form.controls['IdPassport']?.touched)">
+        <div *ngIf="form.controls['IdPassport']?.errors?.['required']">
+          <p class="validation-notification">Id or Passport number is required.</p>
+        </div>
+        <div *ngIf="form.controls['IdPassport']?.errors?.['pattern']">
+          <p class="validation-notification">Invalid ID/Passport number</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="Email" name="Email" required [(ngModel)]="email" formControlName="Email">
+      </div>
+      <div *ngIf="form.controls['Email']?.invalid && (form.controls['Email']?.dirty || form.controls['Email']?.touched)">
+        <div *ngIf="form.controls['Email']?.errors?.['required']">
+          <p class="validation-notification">Email is required.</p>
+        </div>
+        <div *ngIf="form.controls['Email']?.errors?.['minlength']">
+          <p class="validation-notification">Email should have at least 5 characters.</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="cellphone" class="form-label">Cell Phone Number</label>
+        <input type="text" class="form-control" id="Cellphone" name="Cellphone" required [(ngModel)]="cellphone" formControlName="Cellphone">
+      </div>
+      <div *ngIf="form.controls['Cellphone']?.invalid && (form.controls['Cellphone']?.dirty || form.controls['Cellphone']?.touched)">
+        <div *ngIf="form.controls['Cellphone']?.errors?.['required']">
+          <p class="validation-notification">Cell phone number is required.</p>
+        </div>
+        <div *ngIf="form.controls['Cellphone']?.errors?.['minlength']">
+          <p class="validation-notification">Cell phone number should have at least 10 numbers.</p>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex align-items-center">
+          <select class="form-select" id="supplier" name="supplier" [(ngModel)]="selectedSkill" formControlName="Skill">
+            <option value="null" selected disabled>Select a Skill</option>
+            <option *ngFor="let skill of skills" [value]="skill.skill_ID">{{ skill.skill_Name }}</option>
+          </select>
+      
+          <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSkillToArray()" [disabled]="!selectedSkill" >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+      </div> 
+
+      <div class="supplier-table-container">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th><u>Skill Name</u></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody *ngIf="userSkills.length > 0">
+            <tr *ngFor="let skill of userSkills">
+              <td>{{ skill.skill_Name }}</td>
+              <td>
+                <div class="button-container">
+                  <button class="btn-delete" title="Delete" (click)="deleteSkillFromArray(skill)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="userSkills.length === 0">
+            <tr>
+              <td colspan="2">No Skills Added</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </form>
+    <button type="button" class="btn-modal-return" (click)="closeEditModal();modal.close('Close click')">Cancel</button>
+    <button type="button" class="btn-form-add" (click)="saveUser(confirmationModal); modal.close('Close click')" [disabled]="!form.valid || userSkills.length === 0">Save</button>
+  </div>
+  <div class="modal-footer">
+    
+  </div>
+</ng-template>
+
+<!-- Confirmation Modal -->
+<ng-template #confirmationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Confirmation</h5>
+    <button type="button" class="btn-close" (click)="cancelUpdate()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <h6><b>Updated Details:</b></h6>
+    <p>Name: <b>{{ editedFullName }}</b></p>
+    <p>Surname: <b>{{ editedSurname }}</b></p>
+    <p>ID/Passport Number: <b>{{ editedIdPassport }}</b></p>
+    <p>Email: <b>{{ editedEmail }}</b></p>
+    <p>Cell Phone Number: <b>{{ editedCellphone }}</b></p>
+    <p><b>Are these details correct?</b></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-modal-return" (click)="cancelUpdate()">No</button>
+    <button type="button" class="btn-form-add" (click)="confirmUpdate()">Yes</button>
+  </div>
+</ng-template>
+
+<!-- Photo confirmation Modal -->
+<ng-template #photoConfirmationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Photo Confirmation</h5>
+    <button type="button" class="btn-close" (click)="cancelPhotoUpdate()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <h6><b>Selected Photo:</b></h6>
+    <!-- Display the selected image here with the 'image-container' class -->
+    <img [src]="selectedImageURL" alt="Selected Image" class="image-container">
+    <p><b>Do you want to update your profile photo with this image?</b></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-modal-return" (click)="cancelPhotoUpdate()">No</button>
+    <button type="button" class="btn-form-add" (click)="confirmPhotoUpdate()">Yes</button>
+  </div>
+</ng-template>
+
+
+
+
+
+<!-- Success Modal -->
+<ng-template #successModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Close click')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>Details have been successfully updated.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-form-ok" (click)="modal.dismiss('Close click')">Ok</button>
+  </div>
+</ng-template>
+
+<!-- Success Modal -->
+<ng-template #photoSuccessModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss('Close click')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>Profile photo has been successfully updated.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-form-ok" (click)="modal.dismiss('Close click')">Ok</button>
+  </div>
+</ng-template>

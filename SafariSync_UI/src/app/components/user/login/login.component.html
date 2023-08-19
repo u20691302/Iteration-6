@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="top-panel">
+    <div class="header">
+      <h3>Welcome to SafariSync</h3>
+      <h5>Please login to your profile</h5>
+    </div>
+  </div>
+
+  <form (ngSubmit)="login()" [formGroup]="form"> <!-- Add [formGroup]="form" here -->
+    <div class="mb-3">
+      <div class="icon-container">
+        <i class="fa-solid fa-circle-user fa-xl"></i>
+      </div>
+      <input type="text" class="form-control" id="IdPassport" name="IdPassport" placeholder="Id/Passport number" [(ngModel)]="user.idPassport" formControlName="IdPassport"> <!-- Add formControlName="Username" here -->
+  
+    </div>
+    <div *ngIf="form.controls['IdPassport']?.invalid && (form.controls['IdPassport']?.dirty || form.controls['IdPassport']?.touched)">
+      <div *ngIf="form.controls['IdPassport']?.errors?.['required']">
+        <p class="validation-notification">Id/Passport number is required</p>
+      </div>
+      <div *ngIf="form.controls['IdPassport']?.errors?.['pattern']">
+        <p class="validation-notification">Id format invalid</p>
+      </div>
+    </div>
+    
+    <div class="mb-3">
+      <div class="icon-container">
+        <i class="fa-solid fa-lock fa-xl"></i>
+      </div>
+      <input type="password" class="form-control" id="Password" name="Password" placeholder="Password" [(ngModel)]="user.password" formControlName="Password">
+      <i class="toggle-password fa-solid fa-eye" (click)="togglePasswordVisibility()"></i>
+    </div>
+
+    <div *ngIf="form.controls['Password']?.invalid && (form.controls['Password']?.dirty || form.controls['Password']?.touched)">
+      <div *ngIf="form.controls['Password']?.errors?.['required']">
+        <p class="validation-notification">Password is required.</p>
+      </div>
+    </div>
+    <div *ngIf="form.controls['Password']?.errors?.['pattern']">
+      <p class="validation-notification">Password requires capital, symbol, number, minimum 5 characters.</p>
+    </div>
+
+    <div class="forgot-password-container">
+      <a class="forgot-password" routerLink="/forgot-password" >Forgot Password?</a>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="submit-button" [disabled]="!form.valid">Login</button>
+    </div>
+  </form>
+
+  <div class="bottom-panel">
+    <img src="\assets\EPI-USE\EPI-USE Logo.jpg" alt="EPI-USE Logo">
+  </div>
+</div>
