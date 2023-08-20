@@ -24,7 +24,8 @@ export class LoginComponent {
     role: '',
     profileImage: '',
     idImage: '',
-    rating_ID: 0
+    rating_ID: 0,
+    regDate: new Date()
   };
 
   form: FormGroup; // Add this line

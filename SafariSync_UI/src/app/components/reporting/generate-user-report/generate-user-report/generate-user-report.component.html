@@ -1,0 +1,109 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>Generate User Report</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/dashboard">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+
+      <div class="d-flex align-items-center">
+        <input type="datetime-local" class="form-control me-2" id="startDateTime" name="startDateTime" [(ngModel)]="startDateTime" (change)="validateDateRange(); OnSearch()">
+        <span class="mx-2">and</span>
+        <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" [(ngModel)]="endDateTime" (change)="validateDateRange(); OnSearch()">
+        </div>
+        <div *ngIf="(form.controls['startDateTime']?.dirty || form.controls['endDateTime']?.dirty) && !isDateRangeValid()">
+            <p class="validation-notification">Please select a valid date and time range.</p>
+        </div>
+    
+    </div>
+  
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Filter..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-filter"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Username</u></th>
+        <th><u>Surname</u></th>
+        <th><u>Email</u></th>
+        <th><u>ID/Passport Number</u></th>
+        <th><u>Cellphone Number</u></th>
+        <th><u>Role</u></th>
+        <th><u>Rating</u></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let user of users">
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.surname }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.idPassport }}</td>
+        <td>{{ user.cellphone }}</td>
+        <td>{{ user.role }}</td>
+        <td>{{ user.ratings?.rating }}</td>
+        <td>
+          <button class="btn-update" (click)="OpenSkillsModal(user.user_ID, SkillsModal, user.username, user.surname)"> 
+            View Skills
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="users.length === 0">
+      <tr>
+        <td colspan="9">No User Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #SkillsModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Skills of {{userName}} </h5>
+  </div>
+  <div class="modal-body">
+    <div class="supplier-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Skill Name</u></th>
+            <th><u>Skill Description</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let skill of userSkill">
+            <td>{{ skill.skills?.skill_Name }}</td>
+            <td>{{ skill.skills?.skill_Description }}</td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="userSkill.length === 0">
+          <tr>
+            <td colspan="6">No Skill Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 

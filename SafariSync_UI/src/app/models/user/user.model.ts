@@ -16,5 +16,6 @@ export interface User {
     password: string;
     profileImage:string;
     idImage: string;
+    regDate: Date;
     skills?: Skills[];
 }

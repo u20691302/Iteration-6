@@ -63,6 +63,7 @@ namespace SafariSync_API.Controllers.UserController
                 Cellphone = userViewModel.Cellphone,
                 ProfileImage = userViewModel.ProfileImage,
                 IDImage = userViewModel.IDImage,
+                RegDate = DateTime.Now,
                 Ratings = rating // Associate the rating with the user
             };
 

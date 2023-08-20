@@ -173,7 +173,8 @@ export class EditdetailsComponent {
       role: "needtochangerole",
       profileImage: "mytextdoggggg",
       idImage: "idimagestringfornow",
-      skills: this.userSkills
+      skills: this.userSkills,
+      regDate: new Date()
     };    
     
     console.log("the id is" , this.userId);

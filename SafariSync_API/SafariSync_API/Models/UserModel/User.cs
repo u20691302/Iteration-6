@@ -35,6 +35,9 @@ namespace SafariSync_API.Models.UserModel
         public string IDImage { get; set; } = string.Empty;
 
         [Required]
+        public DateTime RegDate { get; set; }
+
+        [Required]
         public int Rating_ID { get; set; }
 
         [ForeignKey("Rating_ID")]

@@ -71,9 +71,10 @@ export class ViewScheduleActivityComponent implements OnInit{
         cellphone: '',
         role: '',
         rating_ID: 0,
-        password: '', // Add the password property
-        profileImage: '', // Add the profileImage property
-        idImage: '' // Add the idImage property
+        password: '',
+        profileImage: '', 
+        idImage: '',
+        regDate: new Date()
       },
       activityStatus: {
         activityStatus_ID: 0,
@@ -131,7 +132,8 @@ export class ViewScheduleActivityComponent implements OnInit{
         rating_ID: 0,
         password: '', 
         profileImage: '', 
-        idImage: '' 
+        idImage: '' ,
+        regDate: new Date()
       },
       activityStatus: {
         activityStatus_ID: 0,

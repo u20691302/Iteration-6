@@ -20,17 +20,46 @@ import { RegisterAdminComponent } from './components/user/register-admin/registe
 import { SendRegisterLinkComponent } from './components/user/send-register-link/send-register-link.component';
 import { ViewDashboardComponent } from './components/dashboard/view-dashboard/view-dashboard.component';
 import { RoleGuard } from './components/user/guards/role.guard';
+import { ViewReportsComponent } from './components/reporting/view-reports/view-reports.component';
+import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report/generate-user-report.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'myprofile', component: MyprofileComponent , canActivate: [AuthGuard]},
-  { path: 'editdetails', component: EditdetailsComponent, canActivate: [AuthGuard]},
-  { path: 'register-admin', component: RegisterAdminComponent},
-  { path: 'login', component: LoginComponent},
-  { path: 'help', component: HelpComponent , canActivate: [AuthGuard]},
-  { path: 'page', component: PageComponent, canActivate: [AuthGuard]},
-  { path: 'forgot-password', component: ForgotPasswordComponent},
-  { path: 'send-registration-link' , component:SendRegisterLinkComponent},
+  { 
+    path: '', 
+    redirectTo: '/login', pathMatch: 'full' 
+  },
+  { 
+    path: 'myprofile', 
+    component: MyprofileComponent , canActivate: [AuthGuard]
+  },
+  { 
+    path: 'editdetails', 
+    component: EditdetailsComponent, canActivate: [AuthGuard]
+  },
+  { 
+    path: 'register-admin', 
+    component: RegisterAdminComponent
+  },
+  { 
+    path: 'login', 
+    component: LoginComponent
+  },
+  { 
+    path: 'help', 
+    component: HelpComponent , canActivate: [AuthGuard]
+  },
+  { 
+    path: 'page', 
+    component: PageComponent, canActivate: [AuthGuard]
+  },
+  { 
+    path: 'forgot-password', 
+    component: ForgotPasswordComponent
+  },
+  { 
+    path: 'send-registration-link' , 
+    component:SendRegisterLinkComponent
+  },
   {
     path:'suppliers',
     component: ViewSupplierComponent, canActivate: [AuthGuard, RoleGuard]
@@ -70,6 +99,14 @@ const routes: Routes = [
   {
     path:'dashboard',
     component: ViewDashboardComponent, canActivate: [AuthGuard]
+  },
+  {
+    path:'reporting',
+    component: ViewReportsComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'reporting/userReport',
+    component: GenerateUserReportComponent, canActivate: [AuthGuard, RoleGuard]
   },
 ];
 

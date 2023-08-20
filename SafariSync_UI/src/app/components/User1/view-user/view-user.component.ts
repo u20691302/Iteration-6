@@ -36,6 +36,7 @@ export class ViewUserComponent implements OnInit {
     cellphone: '',
     role: '',
     rating_ID: 0,
+    regDate: new Date(),
     userSkill: [
       {
         userSkill_ID: 0,
@@ -62,6 +63,7 @@ export class ViewUserComponent implements OnInit {
     cellphone: '',
     role: '',
     rating_ID: 0,
+    regDate: new Date(),
     userSkill: [
       {
         userSkill_ID: 0,

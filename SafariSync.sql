@@ -110,6 +110,7 @@ CREATE TABLE [User](
 	ProfileImage nvarchar(MAX),
 	IDImage nvarchar(MAX) NOT NULL,
 	Rating_ID INT NOT NULL,
+	RegDate DATETIME NOT NULL,
 	FOREIGN KEY (Rating_ID) REFERENCES Ratings(Rating_ID)
 );
 
@@ -309,14 +310,15 @@ VALUES
 	(2.5),
 	(2.0);
 
-INSERT INTO [User] (Username, PasswordHash, Email, IdPassport, Surname, Cellphone, [Role], ProfileImage, IDImage, Rating_ID)
+-- Sample data with hashed passwords
+INSERT INTO [User] (Username, PasswordHash, Email, IdPassport, Surname, Cellphone, [Role], ProfileImage, IDImage, Rating_ID, RegDate)
 VALUES
-    ('john_doe', '5f4dcc3b5aa765d61d8327deb882cf99', 'john.doe@example.com', '0106135076086', 'Doe', '1234567890', 'Farm Worker', 'profile_john_doe.jpg', 'profile_john_doe.jpg', 1),
-    ('sarah_smith', 'e99a18c428cb38d5f260853678922e03', 'sarah.smith@example.com', '0106135076086', 'Smith', '9876543210', 'Admin', 'profile_sarah_smith.jpg', 'profile_john_doe.jpg', 2),
-    ('mike_jackson', 'fcea920f7412b5da7be0cf42b8c93759', 'mike.jackson@example.com', '0106135076086', 'Jackson', '5555555555', 'Supervisor', 'profile_mike_jackson.jpg', 'profile_john_doe.jpg', 3),
-    ('jane_williams', '5e884898da28047151d0e56f8dc62927', 'jane.williams@example.com', '0106135076086', 'Williams', '7777777777', 'Supervisor', 'profile_jane_williams.jpg', 'profile_john_doe.jpg', 4),
-    ('alex_harris', 'f1d2d2f924e986ac86fdf7b36c94bcdf', 'alex.harris@example.com', '0106135076086', 'Harris', '8888888888', 'Farm Worker', 'profile_alex_harris.jpg', 'profile_john_doe.jpg', 5),
-    ('emily_taylor', '084e0343a0486ff05530df6c705c8bb4', 'emily.taylor@example.com', '0106135076086', 'Taylor', '9999999999', 'Farm Worker', 'profile_emily_taylor.jpg', 'profile_john_doe.jpg', 6);
+    ('john_doe', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'john.doe@example.com', '0106135076086', 'Doe', '1234567890', 'Farm Worker', 'profile_john_doe.jpg', 'profile_john_doe.jpg', 1, '2023-08-20 12:00:00'),
+    ('sarah_smith', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'sarah.smith@example.com', '0106135076086', 'Smith', '9876543210', 'Admin', 'profile_sarah_smith.jpg', 'profile_john_doe.jpg', 2, '2023-08-20 12:00:00'),
+    ('mike_jackson', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'mike.jackson@example.com', '0106135076086', 'Jackson', '5555555555', 'Supervisor', 'profile_mike_jackson.jpg', 'profile_john_doe.jpg', 3, '2023-08-20 12:00:00'),
+    ('jane_williams', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'jane.williams@example.com', '0106135076086', 'Williams', '7777777777', 'Supervisor', 'profile_jane_williams.jpg', 'profile_john_doe.jpg', 4, '2023-08-20 12:00:00'),
+    ('alex_harris', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'alex.harris@example.com', '0106135076086', 'Harris', '8888888888', 'Farm Worker', 'profile_alex_harris.jpg', 'profile_john_doe.jpg', 5, '2023-08-20 12:00:00'),
+    ('emily_taylor', '$2a$10$HhF2Sc4w7U5g7lKQzmPmyuwTOILv9lLpJIKjC7zCO9KjE3i4NUD7y', 'emily.taylor@example.com', '0106135076086', 'Taylor', '9999999999', 'Farm Worker', 'profile_emily_taylor.jpg', 'profile_john_doe.jpg', 6, '2023-08-20 12:00:00');
 
 INSERT INTO Toolbox (Toolbox_Name, Toolbox_Description)
 VALUES

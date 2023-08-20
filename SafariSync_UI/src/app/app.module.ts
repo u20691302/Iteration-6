@@ -37,6 +37,8 @@ import { EditdetailsComponent } from './components/user/editdetails/editdetails.
 import { RegisterAdminComponent } from './components/user/register-admin/register-admin.component';
 import { ViewDashboardComponent } from './components/dashboard/view-dashboard/view-dashboard.component';
 import { UsernavbarComponent } from './components/usernavbar/usernavbar.component';
+import { ViewReportsComponent } from './components/reporting/view-reports/view-reports.component';
+import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report/generate-user-report.component';
 
 const routes: Routes = [
   // Existing routes...
@@ -69,7 +71,9 @@ const routes: Routes = [
     ForgotPasswordComponent,
     SendRegisterLinkComponent,
     ViewDashboardComponent,
-    UsernavbarComponent
+    UsernavbarComponent,
+    ViewReportsComponent,
+    GenerateUserReportComponent
   ],
   imports: [
     BrowserModule,
