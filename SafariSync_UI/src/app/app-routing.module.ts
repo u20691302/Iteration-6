@@ -21,7 +21,12 @@ import { SendRegisterLinkComponent } from './components/user/send-register-link/
 import { ViewDashboardComponent } from './components/dashboard/view-dashboard/view-dashboard.component';
 import { RoleGuard } from './components/user/guards/role.guard';
 import { ViewReportsComponent } from './components/reporting/view-reports/view-reports.component';
-import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report/generate-user-report.component';
+import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report.component';
+import { ViewPreviousReportsComponent } from './components/reporting/view-previous-reports/view-previous-reports.component';
+import { GenerateStockReportComponent } from './components/reporting/generate-stock-report/generate-stock-report/generate-stock-report.component';
+import { GenerateEquipmentReportComponent } from './components/reporting/generate-equipment-report/generate-equipment-report.component';
+import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
+
 
 const routes: Routes = [
   { 
@@ -107,6 +112,22 @@ const routes: Routes = [
   {
     path:'reporting/userReport',
     component: GenerateUserReportComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'reporting/stockReport',
+    component: GenerateStockReportComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'reporting/equipmentReport',
+    component: GenerateEquipmentReportComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'reporting/inventoryReport',
+    component: GenerateInventoryQuantitiesComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'previousReport',
+    component: ViewPreviousReportsComponent, canActivate: [AuthGuard, RoleGuard]
   },
 ];
 

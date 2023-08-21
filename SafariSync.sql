@@ -195,6 +195,15 @@ CREATE TABLE ScheduledTaskContractor (
     FOREIGN KEY (Contractor_ID) REFERENCES Contractor (Contractor_ID)
 );
 
+CREATE TABLE Report (
+  Report_ID INT PRIMARY KEY IDENTITY,
+  Report_Title VARCHAR(255) NOT NULL,
+  CreatedAt DATETIME NOT NULL,
+  PdfUrl VARCHAR(255) NOT NULL,
+  User_ID INT NOT NULL,
+  FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
+);
+
 INSERT INTO SupplierType (SupplierType_Name)
 VALUES 
     ('Farming Tools Supplier'),
@@ -462,3 +471,7 @@ VALUES
     (6, 10), -- emily_taylor has skill with Skill_ID = 10 (Livestock Handling)
     (6, 7); -- emily_taylor has skill with Skill_ID = 7 (Pest Control)
 
+INSERT INTO Report (Report_Title, CreatedAt, User_ID, PdfUrl) VALUES
+   ('Report 1', '2023-08-01', 2, 'https://example.com/report1.pdf'),
+   ('Report 2', '2023-08-05', 2, 'https://example.com/report2.pdf'),
+   ('Report 3', '2023-08-10', 2, 'https://example.com/report3.pdf');

@@ -334,20 +334,16 @@ namespace SafariSync_API.Controllers.UserController
         [Route("SendRegSMS")]
         public async Task<IActionResult> SendRegSMS(string cellnum)
         {
-
             try
             {
                 string convertedCellNum = "";
                 convertedCellNum = "+27" + cellnum.Substring(1);
                 TwilioClient.Init(accountSid, authToken);
 
-
-                var smsMessage = MessageResource.Create(
+                var smsMessage = await MessageResource.CreateAsync(
                     body: "SafariSync registration link is: " + "www.hello.com",
                     from: new Twilio.Types.PhoneNumber("+14786067955"),  // Replace with your Twilio phone number
-
                     to: new Twilio.Types.PhoneNumber(convertedCellNum)
-
                 );
 
                 // SMS sent successfully
@@ -360,6 +356,7 @@ namespace SafariSync_API.Controllers.UserController
                 return StatusCode(500, "Failed to send SMS. Error: " + ex.Message);
             }
         }
+
 
         /////////////////////////////////
 
@@ -390,17 +387,10 @@ namespace SafariSync_API.Controllers.UserController
         {
             try
             {
-                // Retrieve all users asynchronously from the CRUD repository
-                var results = await iCRUDRepository.ReadAllAsync<User>();
-
-                // Include the Ratings for each user
-                foreach (var user in results)
-                {
-                    user.Ratings = await iCRUDRepository.ReadOneAsync<Ratings>(user.Rating_ID);
-                }
-
-                // Order the users in alphabetical order
-                results = results.OrderBy(user => user.Username).ToArray();
+                var results = await safariSyncDBContext.User
+                    .Include(e => e.UserSkill).ThenInclude(e => e.Skills)
+                    .Include(e => e.Ratings)
+                    .ToListAsync();
 
                 // Return an Ok response with the retrieved users
                 return Ok(results);

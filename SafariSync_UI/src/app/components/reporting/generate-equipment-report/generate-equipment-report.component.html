@@ -1,0 +1,132 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>Generate Equipment Report</h3>
+</div>
+
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/reporting">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+      
+    </div>
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+          <i class="fa-solid fa-times"></i>
+        </span>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><u>Equipment Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Quantity on Hand</u></th>
+        <th><u>Low-Level_Warning</u></th>
+        <th><u>Suppliers</u></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let equipment of equipments">
+      <tr>
+        <td>{{ equipment.equipment_Name }}</td>
+        <td>{{ equipment.equipment_Description }}</td>
+        <td>{{ equipment.equipment_Quantity_On_Hand }}</td>
+        <td>{{ equipment.equipment_Low_Level_Warning }}</td>
+        <td>
+          <div class="button-container">
+            <button (click)="LoadSupplier(equipment.equipment_ID, ViewSuppliers)" class="btn-form-add">View Suppliers</button>
+          </div>
+        </td>
+        
+      </tr>
+    </tbody>
+    <tbody *ngIf="equipments.length === 0">
+      <tr>
+        <td colspan="6">No Equipment Listings</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+<!-- View Suppliers Modal -->
+<ng-template #ViewSuppliers let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Suppliers of {{equipmentName}} </h5>
+  </div>
+  <div class="modal-body">
+    <div class="supplier-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Supplier Name</u></th>
+            <th><u>Phone Number</u></th>
+            <th><u>Email Address</u></th>
+            <th><u>Address</u></th>
+            <th><u>Type</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let supplier of addUpdateEquipmentRequest.equipmentSupplier">
+            <td>{{ supplier.supplier?.supplier_Name }}</td>
+            <td>{{ supplier.supplier?.supplier_Phone_Number }}</td>
+            <td>{{ supplier.supplier?.supplier_Email_Address }}</td>
+            <td>{{ supplier.supplier?.supplier_Address }}</td>
+            <td>{{ supplier.supplier?.supplierType?.supplierType_Name }}</td>
+            <td>
+              
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="equipments.length === 0">
+          <tr>
+            <td colspan="6">No Supplier Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 
+
+
+<div class="button-container">
+    <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)" >Generate PDF</button> 
+  </div>
+  
+  <!-- PDF modal template -->
+  <ng-template #PDFModal let-modal class="modal fade">
+    <div class="modal-header">
+      <h5 class="modal-title">Generated Equipment Report</h5>
+    </div>
+    <div class="modal-body">
+      <!-- Embed the PDF using an iframe -->
+      <iframe [src]="pdfSrc" width="100%" height="500px"></iframe>
+      <div class="modal-button-container">
+        <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+        <!-- Add a download button if needed -->
+        <button class="btn-add" (click)="downloadPDF()">Download PDF</button>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </ng-template>
+
+

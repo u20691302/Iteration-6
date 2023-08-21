@@ -38,7 +38,12 @@ import { RegisterAdminComponent } from './components/user/register-admin/registe
 import { ViewDashboardComponent } from './components/dashboard/view-dashboard/view-dashboard.component';
 import { UsernavbarComponent } from './components/usernavbar/usernavbar.component';
 import { ViewReportsComponent } from './components/reporting/view-reports/view-reports.component';
-import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report/generate-user-report.component';
+
+import { ViewPreviousReportsComponent } from './components/reporting/view-previous-reports/view-previous-reports.component';
+import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report.component';
+import { GenerateStockReportComponent } from './components/reporting/generate-stock-report/generate-stock-report/generate-stock-report.component';
+import { GenerateEquipmentReportComponent } from './components/reporting/generate-equipment-report/generate-equipment-report.component';
+import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
 
 const routes: Routes = [
   // Existing routes...
@@ -73,7 +78,11 @@ const routes: Routes = [
     ViewDashboardComponent,
     UsernavbarComponent,
     ViewReportsComponent,
-    GenerateUserReportComponent
+    GenerateUserReportComponent,
+    GenerateStockReportComponent,
+    GenerateEquipmentReportComponent,
+    GenerateInventoryQuantitiesComponent,
+    ViewPreviousReportsComponent
   ],
   imports: [
     BrowserModule,

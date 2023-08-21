@@ -8,6 +8,7 @@ using SafariSync_API.Models.StockModel;
 using SafariSync_API.Models.SupplierModel;
 using SafariSync_API.Models.ToolboxModel;
 using SafariSync_API.Models.UserModel;
+using SafariSync_API.Models.Reporting;
 
 namespace SafariSync_API.Data
 {
@@ -41,5 +42,6 @@ namespace SafariSync_API.Data
         public DbSet<Toolbox> Toolbox { get; set; }
         public DbSet<ToolboxEquipment> ToolboxEquipment { get; set; }
         public DbSet<ToolboxStock> ToolboxStock { get; set; }
+        public DbSet<Report> Report { get; set; }
     }
 }

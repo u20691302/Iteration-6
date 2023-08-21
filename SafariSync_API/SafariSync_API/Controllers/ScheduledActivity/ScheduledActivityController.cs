@@ -26,23 +26,23 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("ReadAllScheduledActivityAsync")]
         public async Task<IActionResult> ReadAllScheduledActivityAsync()
         {
-            //try
-            //{
-            var scheduledActivity = await safariSyncDBContext.ScheduledActivity
-            .Include(es => es.Users!).ThenInclude(es => es.Ratings)
-            .Include(es => es.ActivityStatus)
-            .Include(es => es.Activity)
-            .Include(es => es.ScheduledActivityScheduledTask!).ThenInclude(es => es.ScheduledTask!)
-                                                              .ThenInclude(es => es.Task!).ThenInclude(es => es.Skill).ToListAsync();
+            try
+            {
+                var scheduledActivity = await safariSyncDBContext.ScheduledActivity
+                .Include(es => es.Users!).ThenInclude(es => es.Ratings)
+                .Include(es => es.ActivityStatus)
+                .Include(es => es.Activity)
+                .Include(es => es.ScheduledActivityScheduledTask!).ThenInclude(es => es.ScheduledTask!)
+                                                                  .ThenInclude(es => es.Task!).ThenInclude(es => es.Skill).ToListAsync();
 
-            // Return the scheduledActivity data with associated scheduledTasks
-            return Ok(scheduledActivity);
-            //}
-            //catch (Exception)
-            //{
-            //    // Handle the exception and return an error response
-            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching scheduledActivity data.");
-            //}
+                // Return the scheduledActivity data with associated scheduledTasks
+                return Ok(scheduledActivity);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching scheduledActivity data.");
+            }
         }
 
         [HttpGet]
