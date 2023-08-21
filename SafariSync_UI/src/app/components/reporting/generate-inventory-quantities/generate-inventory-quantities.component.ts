@@ -15,6 +15,8 @@ import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { EquipmentService } from 'src/app/services/equipment/equipment.service';
 import { Equipment } from 'src/app/models/equipment/equipment.model';
 import { EquipmentSupplier } from 'src/app/models/equipment/equipmentSupplier.model';
+import { Report } from 'src/app/models/report/report.model';
+import { ReportsService } from 'src/app/services/reports/reports.service';
 
 @Component({
   selector: 'app-generate-inventory-quantities',
@@ -23,7 +25,7 @@ import { EquipmentSupplier } from 'src/app/models/equipment/equipmentSupplier.mo
 })
 export class GenerateInventoryQuantitiesComponent {
 
-  constructor(private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
+  constructor(private reportService: ReportsService,private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
 
   stocks: Stock[] = [];
   stockName = "";
@@ -35,10 +37,15 @@ export class GenerateInventoryQuantitiesComponent {
   searchTerm: string = '';
   isAddMode: boolean = true;
   output: string = '';
-  fullName: string = '';
+  
   totalquan: number = 0;
   totalquan1: number = 0;
   totalquan2: number = 0;
+
+  name: string = '';
+  surname: string = '';
+  fullName: string = '';
+  retrievedUserID: number = 0;
 
   generatedPdf: any;
   pdfSrc: SafeResourceUrl = '';
@@ -105,14 +112,34 @@ export class GenerateInventoryQuantitiesComponent {
     supplier_ID: 0
   };
 
+  saveReportRequest: Report = {
+    report_ID: 0,
+    report_Title: '',
+    createdAt: new Date(),
+    user_ID: 0,
+    pdfUrl: ''
+  };
+
   ngOnInit(): void {
     this.GetAllStock();
     this.GetAllEquipment();
-    //get the users name
+
+    this.userStore.getUserIdFromStore().subscribe(val => {
+      let idFromToken = this.userService.getUserIdFromToken();
+      this.retrievedUserID = val || idFromToken;
+    });
+
     this.userStore.getFullNameFromStore().subscribe(val => {
       let fullNameFromToken = this.userService.getFullNameFromToekn();
-      this.fullName = val || fullNameFromToken;
+      this.name = val || fullNameFromToken;
     });
+
+    this.userStore.getSurnameFromStore().subscribe(val => {
+      let fullNameFromToken = this.userService.getSurnameFromToken();
+      this.surname = val || fullNameFromToken;
+    });
+
+    this.fullName = this.name + ' ' + this.surname;
   }
 
   GetAllStock(): void {
@@ -289,8 +316,9 @@ export class GenerateInventoryQuantitiesComponent {
     doc.autoTable({
       startY: startY + 10,
       body: [summaryRow],
-      head: [['', '', 'Quantity']],
-      tableWidth: 'wrap', // Adjust this value as needed
+      head: [['', '', 'Total Quantity']],
+      tableWidth: 'wrap',
+      headStyles: { fillColor: '#869EC3' } // Adjust this value as needed
     });
   
     addFooter(doc);
@@ -330,7 +358,8 @@ generateStockTable(doc: any, startY: number) {
   doc.autoTable({
     head: [header],
     body: tableData.slice(1),
-    startY: startY
+    startY: startY,
+    headStyles: { fillColor: '#869EC3' }
   });
 
   // Update startY for the next table
@@ -364,7 +393,8 @@ generateEquipmentTable(doc: any, startY: number) {
   doc.autoTable({
     head: [header],
     body: tableData.slice(1),
-    startY: startY
+    startY: startY,
+    headStyles: { fillColor: '#869EC3' }
   });
 
   // Update startY for the next table
@@ -378,6 +408,35 @@ OpenPDFModal(content: any) {
     size: 'dialog-centered',
     backdrop: 'static'
   });
+}
+
+async SaveReport() {
+  const blobUrl = URL.createObjectURL(this.generatedPdf);
+
+  // Convert the blob URL to base64
+  const pdfBlob = await fetch(blobUrl).then(response => response.blob());
+  const pdfBlobBuffer = await pdfBlob.arrayBuffer();
+  const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
+
+  this.saveReportRequest = {
+    report_ID: 0,
+    report_Title: 'Employee Report',
+    createdAt: new Date(),
+    user_ID: this.retrievedUserID,
+    pdfUrl: pdfBase64 // Add the serialized PDF data here
+  };
+
+  this.reportService.SaveReport(this.saveReportRequest)
+    .subscribe(
+      (response) => {
+        console.log('Report saved successfully:', response);
+        // Handle success, you can show a success message or perform other actions
+      },
+      (error) => {
+        console.error('Error saving report:', error);
+        // Handle error, you can show an error message or perform other actions
+      }
+    );
 }
 
 downloadPDF() {
@@ -657,8 +716,4 @@ calculateTotalQuantityEquip(items: any[]): number {
   return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
 }
 
-
-
-
-  
 }

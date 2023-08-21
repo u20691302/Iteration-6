@@ -87,11 +87,20 @@ export class ViewPreviousReportsComponent {
     return true;
   }
 
-  OpenPDFModal(content: any, pdfUrl: string) {
-    // Assuming you have retrieved the report's URL in a variable named `pdfUrl`
+  OpenPDFModal(content: any, pdfData: string) {
+    // Assuming you have the base64-encoded PDF data in a variable named `pdfData`
+  
+    // Convert base64 to Uint8Array
+    const pdfArray = new Uint8Array(atob(pdfData).split('').map(char => char.charCodeAt(0)));
+    
+    // Create a Blob from Uint8Array
+    const pdfBlob = new Blob([pdfArray], { type: 'application/pdf' });
+  
+    // Create a blob URL for the PDF
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+  
     this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-    console.log(this.pdfSrc)
-
+  
     const modalRef = this.modalService.open(content, {
       size: 'dialog-centered',
       backdrop: 'static'

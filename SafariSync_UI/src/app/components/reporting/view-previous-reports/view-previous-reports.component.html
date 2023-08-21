@@ -1,6 +1,6 @@
 <!-- Top Panel -->
 <div class="top-panel">
-    <h3>View Previous User Report</h3>
+    <h3>View Previous Report</h3>
 </div>
 
 <!-- Toolbar -->
@@ -71,7 +71,7 @@
     </tbody>
     <tbody *ngIf="reports.length === 0">
       <tr>
-        <td colspan="4">No User Listings</td>
+        <td colspan="4">No Report Listings</td>
       </tr>
     </tbody>
   </table>
@@ -80,7 +80,7 @@
 <!-- PDF modal template -->
 <ng-template #PDFModal let-modal class="modal fade">
   <div class="modal-header">
-    <h5 class="modal-title">Generated Stock Report</h5>
+    <h5 class="modal-title">Previously Generated Report</h5>
   </div>
   <div class="modal-body">
    

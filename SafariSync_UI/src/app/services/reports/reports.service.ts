@@ -21,7 +21,9 @@ export class ReportsService {
         }
         const filteredReports = reports.filter((report: Report) =>
           report.report_Title.toLowerCase().includes(term.toLowerCase()) ||
-          report.createdAt.toString().toLowerCase().includes(term.toLowerCase())
+          report.createdAt.toString().toLowerCase().includes(term.toLowerCase()) ||
+          report.user?.username.toString().toLowerCase().includes(term.toLowerCase()) ||
+          report.user?.surname.toString().toLowerCase().includes(term.toLowerCase())
         );
         return filteredReports;
       }),

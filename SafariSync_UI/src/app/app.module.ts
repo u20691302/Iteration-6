@@ -44,6 +44,7 @@ import { GenerateUserReportComponent } from './components/reporting/generate-use
 import { GenerateStockReportComponent } from './components/reporting/generate-stock-report/generate-stock-report/generate-stock-report.component';
 import { GenerateEquipmentReportComponent } from './components/reporting/generate-equipment-report/generate-equipment-report.component';
 import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
+import { GeneratePerformanceComponent } from './components/reporting/generate-performance/generate-performance.component';
 
 const routes: Routes = [
   // Existing routes...
@@ -82,6 +83,7 @@ const routes: Routes = [
     GenerateStockReportComponent,
     GenerateEquipmentReportComponent,
     GenerateInventoryQuantitiesComponent,
+    GeneratePerformanceComponent,
     ViewPreviousReportsComponent
   ],
   imports: [

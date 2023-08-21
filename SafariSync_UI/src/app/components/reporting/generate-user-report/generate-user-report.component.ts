@@ -467,16 +467,20 @@ downloadPDF(){
   this.downloadReport.save('Stock Report' + ' ' + new Date())
 }
 
-SaveReport() {
-  // Convert the jsPDF object to a URL
+  async SaveReport() {
   const blobUrl = URL.createObjectURL(this.generatedPdf);
+
+  // Convert the blob URL to base64
+  const pdfBlob = await fetch(blobUrl).then(response => response.blob());
+  const pdfBlobBuffer = await pdfBlob.arrayBuffer();
+  const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
 
   this.saveReportRequest = {
     report_ID: 0,
     report_Title: 'Employee Report',
     createdAt: new Date(),
     user_ID: this.retrievedUserID,
-    pdfUrl: blobUrl
+    pdfUrl: pdfBase64 // Add the serialized PDF data here
   };
 
   this.reportsService.SaveReport(this.saveReportRequest)
