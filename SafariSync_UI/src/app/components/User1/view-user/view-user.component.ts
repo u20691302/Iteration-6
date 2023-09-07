@@ -274,6 +274,7 @@ export class ViewUserComponent implements OnInit {
     this.userService.deleteUser(User_ID).subscribe({
       next: (response) => {
         this.users = this.users.filter(user => User_ID !== User_ID);
+        this.ngOnInit();
       },
       error: (response) => {
         if (response && response.status === 500) {

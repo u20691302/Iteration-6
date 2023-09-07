@@ -418,7 +418,7 @@ async SaveReport() {
 
   this.saveReportRequest = {
     report_ID: 0,
-    report_Title: 'Employee Report',
+    report_Title: 'Stock Report',
     createdAt: new Date(),
     user_ID: this.retrievedUserID,
     pdfUrl: pdfBase64 // Add the serialized PDF data here

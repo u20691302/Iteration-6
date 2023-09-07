@@ -382,12 +382,12 @@ export class ViewScheduleActivityComponent implements OnInit{
   AddScheduledActivity(success: any, failed:any) {
     this.ScheduledActivity = {
       scheduledActivity_ID: 0,
-      startDate: new Date(),
-      endDate: new Date(),
-      activity_Location: '',
-      userId: 0,
-      activityStatus_ID: 0,
-      activity_ID: 0,
+      startDate: this.startDateTime,
+      endDate: this.endDateTime,
+      activity_Location: this.addUpdateScheduledActivityRequest.activity_Location,
+      userId: this.selectedSupervisor || 0,
+      activityStatus_ID: 1,
+      activity_ID: this.selectedActivity || 0,
       activity: {
         activity_ID: 0,
         activity_Name: '',
@@ -397,7 +397,7 @@ export class ViewScheduleActivityComponent implements OnInit{
       scheduledActivityScheduledTask: []
     };
     this.scheduledActivityService.AddScheduledActivity(this.ScheduledActivity).subscribe({
-      next: (scheduledActivity: ScheduledActivity) => {
+      next: () => {
         this.ngOnInit();
         const modalRef = this.modalService.open(success, {
           size: 'dialog-centered',

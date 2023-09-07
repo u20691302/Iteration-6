@@ -34,8 +34,8 @@ namespace SafariSync_API.Controllers.SkillController
         [Route("SaveReport")]
         public async Task<IActionResult> SaveReport(ReportViewModel rvm)
         {
-            //try
-            //{
+            try
+            {
                 // Create a new report object using data from the ReportViewModel
                 var report = new Report
                 {
@@ -53,12 +53,12 @@ namespace SafariSync_API.Controllers.SkillController
 
                 // Return an Ok response with the added report
                 return Ok(report);
-            //}
-            //catch (Exception)
-            //{
-            //    // Return a StatusCode 500 response if an exception occurs during the transaction
-            //    return StatusCode(500, "Internal Server Error. Please contact support.");
-            //}
+            }
+            catch (Exception)
+            {
+                // Return a StatusCode 500 response if an exception occurs during the transaction
+                return StatusCode(500, "Internal Server Error. Please contact support.");
+            }
         }
 
         [HttpGet]

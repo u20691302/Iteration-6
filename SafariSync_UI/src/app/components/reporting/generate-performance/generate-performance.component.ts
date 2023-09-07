@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Skills } from 'src/app/models/skills/skills.model';
@@ -7,16 +7,27 @@ import { User } from 'src/app/models/user/user.model';
 import { UserSkill } from 'src/app/models/user/userSkill.model';
 import { SkillService } from 'src/app/services/skills/skills.service';
 import { User1Service } from 'src/app/services/user/User1.service';
-import { CategoryScale } from 'chart.js';
-import { Chart, ChartData, LinearScale } from 'chart.js';
-import { BarController, BarElement } from 'chart.js';
+import { LinearScale, CategoryScale, BarController, BarElement, ChartData } from 'chart.js';
 import { Report } from 'src/app/models/report/report.model';
 import { UserService } from 'src/app/services/user/user.service';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { ReportsService } from 'src/app/services/reports/reports.service';
-import jsPDF, * as jspdf from 'jspdf';
 import 'jspdf-autotable';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import Chart from 'chart.js/auto';
+import { UserOptions } from 'jspdf-autotable';
+import jsPDF, * as jspdf from 'jspdf';
+
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: UserOptions) => jsPDF;
+  }
+}
+
+
+interface jsPDFWithPlugin extends jspdf.jsPDF {
+  autotable: (options: UserOptions) => jspdf.jsPDF;
+}
 
 @Component({
   selector: 'app-generate-performance',
@@ -25,17 +36,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class GeneratePerformanceComponent {
   
-  @ViewChild('barChart') private chartRef!: ElementRef;
-  @ViewChild('chartModal') private chartModal!: ElementRef; 
+  data: any;
+  @ViewChild('myTemp')
+  myTempRef!: ElementRef;
 
-  private chart!: Chart;
- 
-  chartData: ChartData = {
-    labels: [],
-    datasets: []
-  };
-
-  constructor(private sanitizer: DomSanitizer, private reportService: ReportsService, private userService: User1Service, private skillService: SkillService, private modalService: NgbModal, private formBuilder: FormBuilder, private tyService: UserService, private storeService: UserStoreService) {
+  constructor( private reportsService: ReportsService, private renderer: Renderer2, private sanitizer: DomSanitizer, private reportService: ReportsService, private userService: User1Service, private skillService: SkillService, private modalService: NgbModal, private formBuilder: FormBuilder, private tyService: UserService, private storeService: UserStoreService) {
     this.form = this.formBuilder.group({
       startDateTime: ['', Validators.required],
       endDateTime: ['', Validators.required]
@@ -59,7 +64,8 @@ export class GeneratePerformanceComponent {
   surname: string = '';
   fullName: string = '';
   retrievedUserID: number = 0;
-  downloadReport: jsPDF = new jsPDF('portrait', 'px', 'a4');
+  barGraph: any;
+  lineGraph: any;
   
   addUpdateUserRequest: User = {
     user_ID: 0,
@@ -141,6 +147,11 @@ export class GeneratePerformanceComponent {
     pdfUrl: ''
   };
 
+  ngAfterViewInit(): void {
+    // Register Chart.js modules
+    Chart.register(LinearScale, BarController, BarElement);
+  }
+
   ngOnInit(): void {
     this.GetAllUsers();
 
@@ -163,24 +174,16 @@ export class GeneratePerformanceComponent {
   }
 
   GetAllUsers(): void {
-    this.userService.getAllUsers(this.searchTerm).subscribe(
+    this.userService.getAllUsersReport(this.searchTerm).subscribe(
       (users) => {
-        if (this.startDateTime == null || this.endDateTime == null)  {
+        if (this.startDateTime == null || this.endDateTime == null || this.startDateTime > this.endDateTime) {
           this.users = users;
-        }
-        else {
+        } else {
           this.users = users.filter(user => {
-            const userRegTimestamp = new Date(user.regDate).getTime();
-          
-            // Normalize timezones for startDateTime and endDateTime
-            const startTimestamp = this.startDateTime instanceof Date ? this.startDateTime.getTime() : 0;
-            const endTimestamp = this.endDateTime instanceof Date ? this.endDateTime.getTime() : Number.MAX_SAFE_INTEGER;
-          
-            return userRegTimestamp >= startTimestamp && userRegTimestamp <= endTimestamp;
+            const userRegDate = user.regDate;
+            return userRegDate >= this.startDateTime! && userRegDate <= this.endDateTime!;
           });
-        }
-  
-        console.log(this.users);
+        } 
       },
       (error) => {
         console.log(error);
@@ -262,6 +265,10 @@ export class GeneratePerformanceComponent {
     }
   }
 
+  getNumberOfSkillsForUser(user: User): number {
+    return user.userSkill?.length || 0;
+  }
+
   getCurrentDateTime(): string {
     const now = new Date();
     return now.toISOString().slice(0, 16);
@@ -283,20 +290,58 @@ export class GeneratePerformanceComponent {
     return true;
   }
 
+  openPDFModal(content: any): void {
+    // Open the modal
+    const modalRef = this.modalService.open(content, {
+      size: 'dialog-centered',
+      backdrop: 'static'
+    });
 
+    this.createChart(this.users);
+  }
 
-
-
-
-
-
-  createChart(): void {
-    Chart.register(LinearScale); // Register LinearScale here
-    Chart.register(BarController,BarElement); // Register BarController here
-    Chart.register(CategoryScale); // Register CategoryScale here
-    this.chart = new Chart(this.chartRef.nativeElement, {
+  createChart(data: any[]) {
+    let labelsData: string[] = [];
+    let labelsRatings: number[] = [];
+    let labelNumSkills: number[] = [];
+  
+    data.forEach((element: User) => {
+      labelsData.push(element.username);
+      labelsRatings.push(element.ratings?.rating || 0);
+      labelNumSkills.push(element.userSkill?.length || 0);
+    });
+  
+    const canvas = document.getElementById('chart') as HTMLCanvasElement;
+  
+    // Destroy the existing chart if it exists
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+  
+    const chart = new Chart(canvas, {
       type: 'bar',
-      data: this.chartData,
+      data: {
+        labels: labelsData,
+        datasets: [
+          {
+            label: 'Rating',
+            data: labelsRatings,
+            borderWidth: 1,
+            backgroundColor: '#869EC3', // Bar chart color
+            order: 2 // Bar chart will be drawn below
+          },
+          {
+            type: 'line',
+            label: '# of Skills',
+            data: labelNumSkills,
+            borderWidth: 2,
+            borderColor: '#CD1543', // Line chart color
+            fill: false, // Disable fill for the line chart
+            order: 1 // Line chart will be drawn on top
+          }
+        ]
+      },
       options: {
         scales: {
           y: {
@@ -305,54 +350,48 @@ export class GeneratePerformanceComponent {
         }
       }
     });
-  }
 
-
-
-
-
-  openChartModal(): void {
-    if (this.chartModal) {
-      const modalRef = this.modalService.open(this.chartModal, {
-        size: 'lg',
-        centered: true
-      });
+    console.log(chart)
   
-      modalRef.result.then(
-        (result) => {
-          // Modal closed
-        },
-        (reason) => {
-          // Modal dismissed
-        }
-      );
+    // Create a PDF instance
+    const pdf = new jsPDF();
   
-      // Delay chart creation to ensure modal is fully displayed
-      setTimeout(() => {
-        this.createChart();
-      }, 300);
-    }
-  }
-
-  refreshChart(): void {
-    // Update your chart data here if needed
-    this.chart.update();
-  }
-
-
-
-
-
-
-
-
-  OpenPDFModal(content: any) {
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
+    // Define the table data for the PDF
+    const tableData = data.map(element => [element.username, element.ratings?.rating || 0, element.userSkill?.length || 0]);
+  
+    // Add a table to the PDF
+    pdf.autoTable({
+      head: [['Username', 'Rating', '# of Skills']],
+      body: tableData,
+      startY: 10 // Adjust the starting position for the table
     });
-  }
   
+    // Convert the chart to a base64-encoded image
+    const chartImage = canvas.toDataURL('image/png');
+    
+    console.log(chartImage)
+  
+    // Add the chart image to the PDF content
+    pdf.addImage(chartImage, 'PNG', 10, 100, 180, 100); // Adjust the coordinates and dimensions as needed
+  
+    // Output the PDF as a Blob
+    const pdfBlob = pdf.output('blob');
+  
+    // Convert the Blob to a SafeResourceUrl
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+    this.generatedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+  
+    // Get the iframe element
+    const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+  
+    // Check if the pdfViewer element is not null before accessing its properties
+    if (pdfViewer) {
+      // Set the src attribute of the iframe to the PDF URL
+      pdfViewer.src = pdfUrl;
+    }
+  }  
+
   async SaveReport() {
     const blobUrl = URL.createObjectURL(this.generatedPdf);
   
@@ -363,13 +402,13 @@ export class GeneratePerformanceComponent {
   
     this.saveReportRequest = {
       report_ID: 0,
-      report_Title: 'Employee Report',
+      report_Title: 'Performance Report',
       createdAt: new Date(),
       user_ID: this.retrievedUserID,
       pdfUrl: pdfBase64 // Add the serialized PDF data here
     };
   
-    this.reportService.SaveReport(this.saveReportRequest)
+    this.reportsService.SaveReport(this.saveReportRequest)
       .subscribe(
         (response) => {
           console.log('Report saved successfully:', response);
@@ -380,9 +419,5 @@ export class GeneratePerformanceComponent {
           // Handle error, you can show an error message or perform other actions
         }
       );
-  }
-  
-  downloadPDF() {
-    this.downloadReport.save('Equipment Report' + ' ' + new Date());
   }
 }

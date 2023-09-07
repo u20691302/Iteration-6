@@ -68,4 +68,26 @@ export class EquipmentService {
   deleteEquipmentSupplier(equipmentSupplierID: number): Observable<EquipmentSupplier> {
     return this.http.delete<EquipmentSupplier>(this.baseApiUrl + '/api/Equipment/DeleteEquipmentSupplier/' + equipmentSupplierID);
   }
+
+  getAllEquipmentsReport(term: string): Observable<Equipment[]> {
+    return this.http.get<Equipment[]>(`${this.baseApiUrl}/api/Equipment/ReadAllEquipmentAsync`).pipe(
+      map(equipments => {
+        if (term === null) {
+          return equipments;
+        }
+        
+        const filteredEquipments = equipments.filter((equipment: Equipment) =>
+          equipment.equipment_Name.toLowerCase().includes(term.toLowerCase()) ||
+          equipment.equipment_Description.toLowerCase().includes(term.toLowerCase()) ||
+          equipment.equipment_Quantity_On_Hand.toString().toLowerCase().includes(term.toLowerCase())
+        );
+        
+        return filteredEquipments;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
 }

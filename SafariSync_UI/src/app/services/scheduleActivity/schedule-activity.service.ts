@@ -17,6 +17,7 @@ export class ScheduledActivityService {
   constructor(private http: HttpClient) { }
 
   AddScheduledActivity(addScheduledActivityRequest: ScheduledActivity): Observable<ScheduledActivity> {
+    console.log(addScheduledActivityRequest);
     return this.http.post<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivity/',addScheduledActivityRequest);
   }
 

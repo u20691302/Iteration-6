@@ -7,7 +7,7 @@
 <div class="container toolbar">
   <div class="row align-items-center">
     <div class="col d-flex justify-content-start">
-      <button type="button" class="btn btn-return" routerLink="/dashboard">
+      <button type="button" class="btn btn-return" routerLink="/reporting">
         <i class="fa-solid fa-arrow-left"></i> Return
       </button>
 
@@ -43,15 +43,24 @@
       <tr>
         <th><u>Username</u></th>
         <th><u>Surname</u></th>
+        <th>Role</th>
         <th><u>Rating</u></th>
+        <th>Number of Skills</th>
+        <th></th>
       </tr>
     </thead>
     <tbody *ngFor="let user of users">
       <tr>
         <td>{{ user.username }}</td>
         <td>{{ user.surname }}</td>
+        <td>{{ user.role }}</td>
         <td>{{ user.ratings?.rating }}</td>
-      
+        <td>{{ getNumberOfSkillsForUser(user) }}</td>
+        <td>
+          <button class="btn-update" (click)="OpenSkillsModal(user.user_ID, SkillsModal, user.username, user.surname)"> 
+            View Skills
+          </button>
+        </td>
       </tr>
     </tbody>
     <tbody *ngIf="users.length === 0">
@@ -60,6 +69,11 @@
       </tr>
     </tbody>
   </table>
+</div>
+
+<!-- Your existing HTML content -->
+<div class="button-container">
+  <button class="Generate-button" (click)="openPDFModal(PDFModal)">Generate Performance Report</button>
 </div>
 
 <ng-template #SkillsModal let-modal class="modal fade">
@@ -97,26 +111,25 @@
 
 <ng-template #PDFModal let-modal class="modal fade">
   <div class="modal-header">
-    <h5 class="modal-title">Generated Stock Report</h5>
+    <h5 class="modal-title">Generated Performance Report</h5>
   </div>
   <div class="modal-body">
     <!-- Embed the PDF using an iframe -->
-    <div class="chart-container">
-      <canvas #barChart></canvas>
-    </div>
+    <canvas id="chart"></canvas>
+    <iframe id="pdfViewer" width="100%" height="500px"></iframe>
+
     <div class="modal-button-container">
       <button class="btn-return" (click)="modal.close('Close click')">Return</button>
       <!-- Add a download button if needed -->
-      <button class="btn-add" (click)="downloadPDF()">Download PDF</button>
+      <button class="btn-add">Download PDF</button>
     </div>
   </div>
   <div class="modal-footer"></div>
 </ng-template>
 
 
-<!-- Your existing HTML content -->
-<div class="button-container">
-  <button class="Generate-button" (click)="openChartModal()">Generate Performance Report</button>
-</div>
+
+
+
 
 

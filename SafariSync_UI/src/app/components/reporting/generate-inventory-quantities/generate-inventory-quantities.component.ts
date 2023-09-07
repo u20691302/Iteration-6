@@ -10,6 +10,7 @@ import { SupplierService } from 'src/app/services/supplier/supplier.service';
 import { DomSanitizer, SafeResourceUrl, SafeUrl  } from '@angular/platform-browser';
 import jsPDF, * as jspdf from 'jspdf';
 import 'jspdf-autotable';
+
 import { UserService } from 'src/app/services/user/user.service';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { EquipmentService } from 'src/app/services/equipment/equipment.service';
@@ -23,6 +24,7 @@ import { ReportsService } from 'src/app/services/reports/reports.service';
   templateUrl: './generate-inventory-quantities.component.html',
   styleUrls: ['./generate-inventory-quantities.component.scss']
 })
+
 export class GenerateInventoryQuantitiesComponent {
 
   constructor(private reportService: ReportsService,private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
@@ -143,7 +145,7 @@ export class GenerateInventoryQuantitiesComponent {
   }
 
   GetAllStock(): void {
-    this.stockService.getAllStocks(this.searchTerm).subscribe({
+    this.stockService.getAllStocksReport(this.searchTerm).subscribe({
       next: (stock) => {
         this.stocks = stock;
       },
@@ -331,117 +333,117 @@ export class GenerateInventoryQuantitiesComponent {
     this.downloadReport = doc;
   }
 
-generateStockTable(doc: any, startY: number) {
-  const tableData = [];
-  const header = ['Stock ID', 'Stock Name', 'Quantity'];
+  generateStockTable(doc: any, startY: number) {
+    const tableData = [];
+    const header = ['Stock ID', 'Stock Name', 'Quantity'];
 
-  // Push header row
-  tableData.push(header);
+    // Push header row
+    tableData.push(header);
 
-  // Iterate through equipments and add stock rows
-  for (const stock of this.stocks) {
-    const stockRow = [
-      stock.stock_ID.toString(),
-      stock.stock_Name,
-      stock.stock_Quantity_On_Hand.toString()
-    ];
-    tableData.push(stockRow);
-    this.totalquan1 += stock.stock_Quantity_On_Hand; // Accumulate quantities
-    
+    // Iterate through equipments and add stock rows
+    for (const stock of this.stocks) {
+      const stockRow = [
+        stock.stock_ID.toString(),
+        stock.stock_Name,
+        stock.stock_Quantity_On_Hand.toString()
+      ];
+      tableData.push(stockRow);
+      this.totalquan1 += stock.stock_Quantity_On_Hand; // Accumulate quantities
+      
+    }
+    this.totalquan = this.totalquan1;
+
+    // Add total row
+    const totalRow = ['', 'Total', this.totalquan1.toString()];
+    tableData.push(totalRow);
+
+    doc.autoTable({
+      head: [header],
+      body: tableData.slice(1),
+      startY: startY,
+      headStyles: { fillColor: '#869EC3' }
+    });
+
+    // Update startY for the next table
+    return doc.autoTable.previous.finalY + 20;
   }
-  this.totalquan = this.totalquan1;
 
-  // Add total row
-  const totalRow = ['', 'Total', this.totalquan1.toString()];
-  tableData.push(totalRow);
+  generateEquipmentTable(doc: any, startY: number) {
+    const tableData = [];
+    const header = ['Equipment ID', 'Equipment Name', 'Quantity'];
 
-  doc.autoTable({
-    head: [header],
-    body: tableData.slice(1),
-    startY: startY,
-    headStyles: { fillColor: '#869EC3' }
-  });
+    // Push header row
+    tableData.push(header);
 
-  // Update startY for the next table
-  return doc.autoTable.previous.finalY + 20;
-}
+    // Iterate through equipments and add equipment rows
+    for (const equipment of this.equipments) {
+      const equipmentRow = [
+        equipment.equipment_ID.toString(),
+        equipment.equipment_Name,
+        equipment.equipment_Quantity_On_Hand.toString()
+      ];
+      tableData.push(equipmentRow);
 
-generateEquipmentTable(doc: any, startY: number) {
-  const tableData = [];
-  const header = ['Equipment ID', 'Equipment Name', 'Quantity'];
+      this.totalquan2 += equipment.equipment_Quantity_On_Hand;
+    }
+    this.totalquan += this.totalquan2;
 
-  // Push header row
-  tableData.push(header);
+    // Add total row
+    const totalRow = ['', 'Total', this.totalquan2.toString()];
+    tableData.push(totalRow);
 
-  // Iterate through equipments and add equipment rows
-  for (const equipment of this.equipments) {
-    const equipmentRow = [
-      equipment.equipment_ID.toString(),
-      equipment.equipment_Name,
-      equipment.equipment_Quantity_On_Hand.toString()
-    ];
-    tableData.push(equipmentRow);
+    doc.autoTable({
+      head: [header],
+      body: tableData.slice(1),
+      startY: startY,
+      headStyles: { fillColor: '#869EC3' }
+    });
 
-    this.totalquan2 += equipment.equipment_Quantity_On_Hand;
+    // Update startY for the next table
+    return doc.autoTable.previous.finalY + 20;
   }
-  this.totalquan += this.totalquan2;
-
-  // Add total row
-  const totalRow = ['', 'Total', this.totalquan2.toString()];
-  tableData.push(totalRow);
-
-  doc.autoTable({
-    head: [header],
-    body: tableData.slice(1),
-    startY: startY,
-    headStyles: { fillColor: '#869EC3' }
-  });
-
-  // Update startY for the next table
-  return doc.autoTable.previous.finalY + 20;
-}
 
 
 
-OpenPDFModal(content: any) {
-  const modalRef = this.modalService.open(content, {
-    size: 'dialog-centered',
-    backdrop: 'static'
-  });
-}
+  OpenPDFModal(content: any) {
+    const modalRef = this.modalService.open(content, {
+      size: 'dialog-centered',
+      backdrop: 'static'
+    });
+  }
 
-async SaveReport() {
-  const blobUrl = URL.createObjectURL(this.generatedPdf);
+  async SaveReport() {
+    const blobUrl = URL.createObjectURL(this.generatedPdf);
 
-  // Convert the blob URL to base64
-  const pdfBlob = await fetch(blobUrl).then(response => response.blob());
-  const pdfBlobBuffer = await pdfBlob.arrayBuffer();
-  const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
+    // Convert the blob URL to base64
+    const pdfBlob = await fetch(blobUrl).then(response => response.blob());
+    const pdfBlobBuffer = await pdfBlob.arrayBuffer();
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
 
-  this.saveReportRequest = {
-    report_ID: 0,
-    report_Title: 'Employee Report',
-    createdAt: new Date(),
-    user_ID: this.retrievedUserID,
-    pdfUrl: pdfBase64 // Add the serialized PDF data here
-  };
+    this.saveReportRequest = {
+      report_ID: 0,
+      report_Title: 'Inventory Report',
+      createdAt: new Date(),
+      user_ID: this.retrievedUserID,
+      pdfUrl: pdfBase64 // Add the serialized PDF data here
+    };
 
-  this.reportService.SaveReport(this.saveReportRequest)
-    .subscribe(
-      (response) => {
-        console.log('Report saved successfully:', response);
-        // Handle success, you can show a success message or perform other actions
-      },
-      (error) => {
-        console.error('Error saving report:', error);
-        // Handle error, you can show an error message or perform other actions
-      }
-    );
-}
+    this.reportService.SaveReport(this.saveReportRequest)
+      .subscribe(
+        (response) => {
+          console.log('Report saved successfully:', response);
+          // Handle success, you can show a success message or perform other actions
+        },
+        (error) => {
+          console.error('Error saving report:', error);
+          // Handle error, you can show an error message or perform other actions
+        }
+      );
+  }
 
-downloadPDF() {
-  this.downloadReport.save('Equipment Report' + ' ' + new Date());
-}
+  downloadPDF() {
+    this.downloadReport.save('Inventory Report' + ' ' + new Date());
+  }
 
 
 
@@ -525,7 +527,7 @@ equipments: Equipment[] = [];
 
 
   GetAllEquipment(): void {
-    this.equipmentService.getAllEquipments(this.searchTermEquip).subscribe({
+    this.equipmentService.getAllEquipmentsReport(this.searchTermEquip).subscribe({
       next: (equipment) => {
         this.equipments = equipment;
       },
@@ -710,10 +712,10 @@ equipments: Equipment[] = [];
 
   calculateTotalQuantity(items: any[]): number {
     return items.reduce((total, item) => total + item.stock_Quantity_On_Hand, 0);
-}
+  }
 
-calculateTotalQuantityEquip(items: any[]): number {
-  return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
-}
+  calculateTotalQuantityEquip(items: any[]): number {
+    return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
+  }
 
 }

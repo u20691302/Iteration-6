@@ -66,4 +66,28 @@ export class User1Service {
   deleteUser(userID: number): Observable<User> {
     return this.http.delete<User>(this.baseApiUrl + '/api/User/DeleteUser/' + userID);
   }
+
+  getAllUsersReport(term: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseApiUrl}/api/User/ReadAllUsersAsync`).pipe(
+      map(users => {
+        if (term === null) {
+          return users;
+        }
+        
+        const filteredUsers = users.filter((user: User) =>
+          user.username.toLowerCase().includes(term.toLowerCase()) ||
+          user.surname.toLowerCase().includes(term.toLowerCase()) ||
+          user.role.toLowerCase().includes(term.toLowerCase()) ||
+          user.ratings?.rating.toString().toLowerCase().includes(term.toLowerCase()) ||
+          user.userSkill?.length.toString().includes(term.toLowerCase())
+        );
+        
+        return filteredUsers;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
 }

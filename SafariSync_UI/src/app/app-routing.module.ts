@@ -27,6 +27,7 @@ import { GenerateStockReportComponent } from './components/reporting/generate-st
 import { GenerateEquipmentReportComponent } from './components/reporting/generate-equipment-report/generate-equipment-report.component';
 import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
 import { GeneratePerformanceComponent } from './components/reporting/generate-performance/generate-performance.component';
+import { GeneratePersonnelReportComponent } from './components/reporting/generate-personnel-report/generate-personnel-report.component';
 
 
 const routes: Routes = [
@@ -129,6 +130,10 @@ const routes: Routes = [
   {
     path:'reporting/performanceReport',
     component: GeneratePerformanceComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'reporting/personnelReport',
+    component: GeneratePersonnelReportComponent, canActivate: [AuthGuard, RoleGuard]
   },
   {
     path:'previousReport',

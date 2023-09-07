@@ -68,4 +68,26 @@ export class StockService {
   deleteStockSupplier(stockSupplierID: number): Observable<StockSupplier> {
     return this.http.delete<StockSupplier>(this.baseApiUrl + '/api/Stock/DeleteStockSupplier/' + stockSupplierID);
   }
+
+  getAllStocksReport(term: string): Observable<Stock[]> {
+    return this.http.get<Stock[]>(`${this.baseApiUrl}/api/Stock/ReadAllStockAsync`).pipe(
+      map(stocks => {
+        if (term === null) {
+          return stocks;
+        }
+        
+        const filteredStocks = stocks.filter((stock: Stock) =>
+          stock.stock_Name.toLowerCase().includes(term.toLowerCase()) ||
+          stock.stock_Description.toLowerCase().includes(term.toLowerCase()) ||
+          stock.stock_Quantity_On_Hand.toString().toLowerCase().includes(term.toLowerCase())
+        );
+        
+        return filteredStocks;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
 }
