@@ -5,11 +5,30 @@
   <div class="container">
     
     <form [formGroup]="form" (ngSubmit)="sendResetPasswordLink()"> 
+
+      <div class="mb-3">
+        <select id="employeeType" name="employeeType" class="form-control" formControlName="employeeType" [(ngModel)]="role" required>
+            <option *ngIf="!form.get('employeeType')?.value" value="" disabled selected>Employee Type</option>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+            <option value="Farm Worker">Farm Worker</option>
+        </select>
+    </div>
+
+    <div *ngIf="form.controls['employeeType']?.invalid && (form.controls['employeeType']?.dirty || form.controls['employeeType']?.touched)">
+      <div *ngIf="form.controls['employeeType']?.errors?.['required']">
+        <p class="validation-notification">Employee type is required</p>
+      </div>
+      <div *ngIf="form.controls['employeeType']?.errors?.['pattern']">
+        <p class="validation-notification">Invalid phone number</p>
+      </div>
+  </div>
+
     <div class="mb-3">
         <div class="icon-container">
         <i class="fa-solid fa-mobile-alt fa-xl"></i>
         </div>
-        <input type="text" class="form-control" id="Cellphone" name="Cellphone" placeholder="Cell Phone Number" formControlName="Cellphone" [(ngModel)]="cellnum"> 
+        <input type="text" class="form-control" id="Cellphone" name="Cellphone" placeholder="Cell Phone Number" formControlName="Cellphone" [(ngModel)]="cellnum" required> 
     </div>
 
     <div *ngIf="form.controls['Cellphone']?.invalid && (form.controls['Cellphone']?.dirty || form.controls['Cellphone']?.touched)">
@@ -21,14 +40,13 @@
         </div>
     </div>
 
-
-
     
-        <button type="submit" class="submit-button">Send Link</button>
-        <button class="btn-return">Return</button>
+        <button type="submit" class="submit-button" [disabled]="!form.valid">Send Link</button>
+        
 
     
 </form>
+<button class="btn-return" routerLink="/dashboard">Return</button>
   
 
   

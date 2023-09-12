@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using SafariSync_API.Data;
 using SafariSync_API.Models.SkillsModel;
 using SafariSync_API.Repositories.CRUD;
 using SafariSync_API.ViewModels.SkillsViewModel;

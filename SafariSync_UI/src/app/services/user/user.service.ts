@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/app/environments/environment';
 import { User } from 'src/app/models/user/user.model';
+import { RatingSettings } from 'src/app/models/user/ratingsettings.model';
 
 @Injectable()
 export class UserService {
   private users: User[] = [];
   private userPayload:any;
   private token: string = "";
-  baseApiUrl: string = environment.baseApiUrl
+  private Token: string = "";
+
+  baseApiUrl: string = environment.baseApiUrl;
 
   constructor(private http: HttpClient, private router: Router) {
     this.userPayload = this.decodedToken();
@@ -69,9 +72,14 @@ export class UserService {
     return this.http.post<any>(`${this.baseApiUrl}/api/user/SendRegistration`, email);
   }
 
-  SendRegSMS(cellnum: string): Observable<any> {
-    return this.http.post<any>(`${this.baseApiUrl}/api/user/SendRegSMS?cellnum=${cellnum}`, {});
+  SendRegSMS(role: string, cellnum: string): Observable<any> {
+    const params = new HttpParams()
+      .set('role', role)
+      .set('cellnum', cellnum);
+  
+    return this.http.post<any>(`${this.baseApiUrl}/api/user/SendRegSMS`, {}, { params });
   }
+  
   
   //indian mandem
   storeToken(tokenValue: string){
@@ -204,5 +212,14 @@ export class UserService {
 
   getUser(): User[] {
     return this.users;
+  }
+
+  readAllRatingSettings(): Observable<RatingSettings[]> {
+    return this.http.get<RatingSettings[]>(`${this.baseApiUrl}/api/Dashboard/ReadAllRatingsAsync`);
+  }
+
+  updateRatingSettings(ratingID: number, updatedRatingSetting: RatingSettings): Observable<RatingSettings> {
+    console.log(updatedRatingSetting, ratingID)
+    return this.http.put<RatingSettings>(this.baseApiUrl + '/api/Dashboard/UpdateRatingAsync/' + ratingID, updatedRatingSetting);
   }
 }

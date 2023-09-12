@@ -1,0 +1,125 @@
+<!-- Top Panel -->
+<div class="top-panel">
+    <h3>Generate Supplier Report</h3>
+</div>
+
+
+<div *ngIf="selectedSupplier2">
+  <h3>Selected Supplier: {{ selectedSupplier2.supplier_Name }}</h3>
+</div>
+<!-- Toolbar -->
+<div class="container toolbar">
+  <div class="row align-items-center">
+    <div class="col d-flex justify-content-start">
+      <button type="button" class="btn btn-return" routerLink="/reporting">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </button>
+    </div>
+   
+    <div class="col-md-4 d-flex justify-content-end">
+      <div class="input-group">
+        <select class="form-select" [(ngModel)]="selectedsupp" (ngModelChange)="OnSearch()">
+          <option value="" disabled selected>Select a Supplier</option>
+          <option *ngFor="let supplier of suppliers" [value]="supplier.supplier_Name">{{ supplier.supplier_Name}}</option>
+        </select>
+        <span class="input-group-text" *ngIf="!searchTerm">
+          <i class="fa-solid fa-filter"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table List -->
+<div class="table-container" >
+  <table class="table table-hover" #pdfContent>
+    <thead>
+      <tr>
+        <th><u>Stock Name</u></th>
+        <th><u>Description</u></th>
+        <th><u>Quantity on Hand</u></th>
+        <th><u>Low-Level_Warning</u></th>
+       
+      </tr>
+    </thead>
+    <tbody *ngFor="let stock of stocks">
+      <tr>
+        <td>{{ stock.stock_Name }}</td>
+        <td>{{ stock.stock_Description }}</td>
+        <td>{{ stock.stock_Quantity_On_Hand }}</td>
+        <td>{{ stock.stock_Low_Level_Warning }}</td>
+       
+        
+      </tr>
+    </tbody>
+    <tbody *ngIf="stocks.length === 0">
+      <tr>
+        <td colspan="6">No Stock Listings</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div class="button-container">
+  <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)" >Generate PDF</button> 
+</div>
+
+<!-- PDF modal template -->
+<ng-template #PDFModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Generated Stock Report</h5>
+  </div>
+  <div class="modal-body">
+    <!-- Embed the PDF using an iframe -->
+    <iframe [src]="pdfSrc" width="100%" height="500px"></iframe>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+      <!-- Add a download button if needed -->
+      <button class="btn-add" (click)="downloadPDF()">Download PDF</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Suppliers Modal -->
+<ng-template #ViewSuppliers let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Suppliers of {{stockName}} </h5>
+  </div>
+  <div class="modal-body">
+    <div class="supplier-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Supplier Name</u></th>
+            <th><u>Phone Number</u></th>
+            <th><u>Email Address</u></th>
+            <th><u>Address</u></th>
+            <th><u>Type</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let supplier of addUpdateStockRequest.stockSupplier">
+            <td>{{ supplier.supplier?.supplier_Name }}</td>
+            <td>{{ supplier.supplier?.supplier_Phone_Number }}</td>
+            <td>{{ supplier.supplier?.supplier_Email_Address }}</td>
+            <td>{{ supplier.supplier?.supplier_Address }}</td>
+            <td>{{ supplier.supplier?.supplierType?.supplierType_Name }}</td>
+            
+          </tr>
+        </tbody>
+        <tbody *ngIf="stocks.length === 0">
+          <tr>
+            <td colspan="6">No Supplier Listings</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template> 

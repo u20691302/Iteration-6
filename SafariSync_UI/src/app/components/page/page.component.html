@@ -57,7 +57,22 @@
   
   
   
-  
+  <!-- Help video Modal -->
+<ng-template #videoModal let-modal modal-fade autofocus="false">
+  <div class="modal-header">
+      <h4 class="modal-title">Help Video</h4>
+  </div>
+  <div class="modal-body" autofocus="false">
+      <video width="100%" controls>
+          <source src="/assets/Videos/Test4.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <button autofocus="false" type="button" class="modal-button" (click)="modal.close('Close click')">Close</button>
+  </div>
+  <div class="modal-footer">
+      <!-- Modal footer content -->
+  </div>
+</ng-template>
   
   
 

@@ -62,47 +62,47 @@ export class PageComponent implements OnInit {
     let pdfName: string;
 
     switch (entry) {
-      case 'Dashboard':
-        pdfName = 'PDF1.pdf';
-        break;
-      case 'My Profile':
-        pdfName = 'PDF2.pdf';
-        break;
-      case 'Scheduled Activities':
-        pdfName = 'Bootcamp day 2 memo.pdf';
-        break;
-      case 'Activities':
-        pdfName = 'Technical requirements.pdf';
-        break;
-        case 'Skills':
-        pdfName = 'Technical ERD 2022(2).pdf';
-        break;
-        case 'Employees':
-        pdfName = 'PDF1.pdf';
-        break;
-      case 'Toolboxes':
-        pdfName = 'Tuesday Memo.pdf';
-        break;
-      case 'Equipment':
-        pdfName = 'Bootcamp day 2 memo.pdf';
-        break;
-      case 'Stock':
-        pdfName = 'Technical requirements.pdf';
-        break;
-        case 'Suppliers':
-        pdfName = 'Technical ERD 2022(2).pdf';
-        break;
-        case 'Contractors':
-        pdfName = 'Tuesday Memo.pdf';
-        break;
-      case 'Reports':
-        pdfName = 'Bootcamp day 2 memo.pdf';
-        break;
-      case 'Settings':
-        pdfName = 'Technical requirements.pdf';
-        break;     
+      // case 'Dashboard':
+      //   pdfName = '1PDF1.pdf';
+      //   break;
+      // case 'My Profile':
+      //   pdfName = '1PDF2.pdf';
+      //   break;
+      // case 'Scheduled Activities':
+      //   pdfName = '1Bootcamp day 2 memo.pdf';
+      //   break;
+      // case 'Activities':
+      //   pdfName = '1Technical requirements.pdf';
+      //   break;
+      //   case 'Skills':
+      //   pdfName = '1Technical ERD 2022(2).pdf';
+      //   break;
+      //   case 'Employees':
+      //   pdfName = '1PDF1.pdf';
+      //   break;
+      // case 'Toolboxes':
+      //   pdfName = '1Tuesday Memo.pdf';
+      //   break;
+      // case 'Equipment':
+      //   pdfName = '1Bootcamp day 2 memo.pdf';
+      //   break;
+      // case 'Stock':
+      //   pdfName = '1Technical requirements.pdf';
+      //   break;
+      //   case 'Suppliers':
+      //   pdfName = '1Technical ERD 2022(2).pdf';
+      //   break;
+      //   case 'Contractors':
+      //   pdfName = '1Tuesday Memo.pdf';
+      //   break;
+      // case 'Reports':
+      //   pdfName = '1Bootcamp day 2 memo.pdf';
+      //   break;
+      // case 'Settings':
+      //   pdfName = '1Technical requirements.pdf';
+      //   break;     
         case 'Entry 14':
-        pdfName = 'PDF1.pdf';
+        pdfName = 'Complete.pdf';
         break;
       // Add more cases for other entries as needed
 

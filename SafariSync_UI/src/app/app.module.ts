@@ -38,14 +38,20 @@ import { RegisterAdminComponent } from './components/user/register-admin/registe
 import { ViewDashboardComponent } from './components/dashboard/view-dashboard/view-dashboard.component';
 import { UsernavbarComponent } from './components/usernavbar/usernavbar.component';
 import { ViewReportsComponent } from './components/reporting/view-reports/view-reports.component';
-
-import { ViewPreviousReportsComponent } from './components/reporting/view-previous-reports/view-previous-reports.component';
 import { GenerateUserReportComponent } from './components/reporting/generate-user-report/generate-user-report.component';
 import { GenerateStockReportComponent } from './components/reporting/generate-stock-report/generate-stock-report/generate-stock-report.component';
 import { GenerateEquipmentReportComponent } from './components/reporting/generate-equipment-report/generate-equipment-report.component';
 import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
 import { GeneratePerformanceComponent } from './components/reporting/generate-performance/generate-performance.component';
 import { GeneratePersonnelReportComponent } from './components/reporting/generate-personnel-report/generate-personnel-report.component';
+import { RegisterUserComponent } from './components/user/register-user/register-user.component';
+import { RegisterFarmworkerComponent } from './components/user/register-farmworker/register-farmworker.component';
+import { RatingSettingsComponent } from './components/rating-settings/rating-settings.component';
+import { NgChartsModule } from 'ng2-charts'; // Import ng2-charts
+import { ViewPreviousReportsComponent } from './components/reporting/view-previous-reports/view-previous-reports.component';
+import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
+
+
 
 const routes: Routes = [
   // Existing routes...
@@ -85,8 +91,15 @@ const routes: Routes = [
     GenerateEquipmentReportComponent,
     GenerateInventoryQuantitiesComponent,
     GeneratePerformanceComponent,
+    GeneratePersonnelReportComponent,
+    RegisterUserComponent,
+    RegisterFarmworkerComponent,
+    RatingSettingsComponent,
     ViewPreviousReportsComponent,
-    GeneratePersonnelReportComponent
+    GenerateStockReportComponent,
+    GenerateDynamicStockReportComponent,
+    GenerateUserReportComponent
+
   ],
   imports: [
     BrowserModule,
@@ -99,7 +112,9 @@ const routes: Routes = [
     CommonModule,
     NgxExtendedPdfViewerModule,
     PdfViewerModule,
-    NgToastModule
+    NgToastModule,
+    NgChartsModule,
+    
   ],
   providers: [UserService, AuthGuard],
   bootstrap: [AppComponent]

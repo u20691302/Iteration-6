@@ -82,5 +82,14 @@
     font-weight: bold;
   }
 
+  .submit-button:disabled {
+    background-color: #001844; 
+    border-color: #001844;
+    box-shadow: none; 
+    opacity: 0.7; 
+    cursor: not-allowed;
+    
+  }
+
 
  

@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SafariSync_API.Models.ActivityModel;
 using SafariSync_API.Models;
+using SafariSync_API.Models.ActivityModel;
 using SafariSync_API.Models.ContractorModel;
 using SafariSync_API.Models.EquipmentModel;
+using SafariSync_API.Models.NotificationModel;
+using SafariSync_API.Models.RatingSettings;
+using SafariSync_API.Models.Reporting;
 using SafariSync_API.Models.SkillsModel;
 using SafariSync_API.Models.StockModel;
 using SafariSync_API.Models.SupplierModel;
 using SafariSync_API.Models.ToolboxModel;
 using SafariSync_API.Models.UserModel;
-using SafariSync_API.Models.Reporting;
 
 namespace SafariSync_API.Data
 {
@@ -35,6 +37,7 @@ namespace SafariSync_API.Data
         public DbSet<ActivityTask> ActivityTask { get; set; }
         public DbSet<ScheduledActivity> ScheduledActivity { get; set; }
         public DbSet<ActivityStatus> ActivityStatus { get; set; }
+        public DbSet<TaskStatus> TaskStatus { get; set; }
         public DbSet<ScheduledTask> ScheduledTask { get; set; }
         public DbSet<ScheduledTaskUser> ScheduledTaskUser { get; set; }
         public DbSet<ScheduledTaskContractor> ScheduledTaskContractor { get; set; }
@@ -43,5 +46,8 @@ namespace SafariSync_API.Data
         public DbSet<ToolboxEquipment> ToolboxEquipment { get; set; }
         public DbSet<ToolboxStock> ToolboxStock { get; set; }
         public DbSet<Report> Report { get; set; }
+        public DbSet<RatingSettings> RatingSettings { get; set; }
+        public DbSet<Notification> Notification { get; set; }
+        public DbSet<NotificationStatus> NotificationStatus { get; set; }
     }
 }

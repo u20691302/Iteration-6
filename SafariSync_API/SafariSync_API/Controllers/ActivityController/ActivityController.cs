@@ -130,8 +130,8 @@ namespace SafariSync_API.Controllers.ActivityController
         [Route("UpdateActivityAsync")]
         public async Task<IActionResult> UpdateActivityAsync(ActivityViewModel activityViewModel)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input activity data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -158,12 +158,12 @@ namespace SafariSync_API.Controllers.ActivityController
 
                 // Return the successful response
                 return Ok(existingActivity);
-            }
-            catch (Exception)
-            {
-                // Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    // Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
+            //}
         }
 
         [HttpDelete]

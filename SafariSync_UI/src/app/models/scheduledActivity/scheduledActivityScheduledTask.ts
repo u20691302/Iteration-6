@@ -1,4 +1,4 @@
-import { ScheduledTask } from "./ScheduledTask.model";
+import { ScheduledTask } from "./scheduledTask.model";
 
 export interface ScheduledActivityScheduledTask {
   scheduledActivityScheduledTask_ID: number;

@@ -1,0 +1,128 @@
+.top-panel {
+    background-color: #869EC3;
+    height:80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    left: 0;
+    right: 0; 
+  }
+
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Adjust the gap between columns as needed */
+    height: 50vh; /* Make the dashboard fill 90% of the viewport height */
+    margin: 2vh auto; /* Center the dashboard vertically */
+    border: 1px solid lightgray;
+    background-color: lightgray;
+
+  }
+  
+  .column {
+    display: flex;
+    flex-direction: column; 
+    grid-template-rows: repeat(2, 1fr); /* Two sections underneath each other */
+    gap: 5px; /* Adjust the gap between sections as needed */
+    padding: 5px;
+    border: 1px solid #ccc;
+    height: calc(50vh - 10px); /* Subtract the padding and border to fit */
+    
+  }
+
+  .section {
+    /* Add styling for each section as needed */
+    max-height: calc(25vh - 40px); /* Set the maximum height for scrolling */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds the height */
+    border: 1px solid #ccc;
+    padding: 10px;    
+    background-color: lightgray;
+  }
+  
+  .middle-column {
+    display: flex;
+    flex-direction: column; 
+  }
+  
+  .notification-center {
+    max-height: calc(50vh - 40px); /* Set the maximum height for scrolling */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds the height */
+    border: 1px solid #ccc;
+    padding: 10px;
+  
+    ul.notification-list {
+      list-style-type: none;
+      padding: 0;
+  
+      li {
+        /* Add styling for notification list items */
+        margin-bottom: 10px;
+      }
+    }
+  }
+
+  
+  .table.table-hover  {
+    max-width: 99.9%;
+    margin: auto;
+    color: black;
+    border: 1px solid #869EC3;
+  }
+  
+  .table.table-hover thead th {
+    background-color: #001844;
+    color: white;
+  }
+  
+  .table.table-hover tbody td {
+    background-color: #001844;
+    border: 1px solid #869EC3;
+    padding: 8px;
+    color: white;
+  }
+  
+  .table.table-hover tbody tr:hover {
+    background-color: rgba(134, 158, 195, 0.55);
+  }
+
+  .bar-graph {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+
+  }
+  
+  .bar {
+    background-color: lightgray; /* Customize the color */
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .bar:nth-child(2) {
+    background-color: lightgray; /* Customize the color for the second bar */
+  }
+  
+  .bar:nth-child(3) {
+    background-color: lightgray; /* Customize the color for the third bar */
+  }
+  
+  .user-name {
+    font-weight: bold;
+    color: black;
+  }
+  
+  .user-rating {
+    font-size: 18px;
+    color: black;
+  }
+  
+  .rating-bar {
+    height: 20px; /* Customize the height of the rating bars */
+    background-color: #CD1543; /* Customize the background color of the bars */
+  }

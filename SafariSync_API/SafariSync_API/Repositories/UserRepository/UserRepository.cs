@@ -48,7 +48,6 @@ namespace SafariSync_API.Repositories.UserRepository
             return await _dbContext.Users.FindAsync(id);
         }
 
-
         public async Task RemoveUserSkills(int userId)
         {
             try

@@ -1,5 +1,4 @@
 ﻿using SafariSync_API.Models.SkillsModel;
-using SafariSync_API.Models.SupplierModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace SafariSync_API.ViewModels.UserViewModel
@@ -21,7 +20,7 @@ namespace SafariSync_API.ViewModels.UserViewModel
 
         [Required]
         public string Password { get; set; } = string.Empty;
-        
+
         public string Role { get; set; } = string.Empty;
 
         public string ProfileImage { get; set; } = string.Empty;

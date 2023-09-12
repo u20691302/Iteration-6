@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using SafariSync_API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
-using SafariSync_API.Repositories.UserRepository;
-using System;
+using SafariSync_API.Data;
 using SafariSync_API.Repositories.CRUD;
-using Microsoft.Extensions.Configuration;
+using SafariSync_API.Repositories.UserRepository;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

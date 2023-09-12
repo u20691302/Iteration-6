@@ -42,7 +42,6 @@
         <th><u>Activity Status</u></th>
         <th></th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
     <tbody *ngFor="let scheduledActivity of scheduledActivities">
@@ -56,22 +55,15 @@
         <td>{{ scheduledActivity.activityStatus?.activity_Status }}</td>
         <td>
           <div class="button-container">
-            <button  class="btn-form-add" (click)="openTaskModal(scheduledActivity.activity_ID, ViewTasks)">Schedule Tasks</button>
-            
+            <button  class="btn-form-add" (click)="openScheduledTaskModal(scheduledActivity.scheduledActivity_ID, ViewTasks)">View Scheduled Tasks</button>
           </div>
         </td>
         <td>
           <div class="button-container">
-            <button  class="btn-form-add" (click)="openTaskModal(scheduledActivity.activity_ID, ViewTasks)">Full Details</button>
-            
-          </div>
-        </td>
-        <td>
-          <div class="button-container">
-            <button class="btn-update"  title="Update">                
+            <button class="btn-update"  title="Update" (click)="loadScheduledActivities(addUpdateScheduledActivityModal, scheduledActivity.scheduledActivity_ID)">                
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn-delete"  title="Delete">
+            <button class="btn-delete"  title="Delete" (click)="OpenDeleteModal(DeleteConfirmationModal, this.scheduledActivity)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
@@ -89,12 +81,17 @@
 <!-- View Tasks Modal -->
 <ng-template #ViewTasks let-modal class="modal fade">
     <div class="modal-header">
-      <h5 class="modal-title">Tasks of {{activityName}}</h5>
+      <h5 class="modal-title">Scheduled Tasks of {{activityName}}</h5>
     </div>
     <div class="modal-body">
       <!-- Toolbar -->
       <div class="task container toolbar">
         <div class="row align-items-center">
+          <div class="col d-flex justify-content-start">
+            <button type="button" class="btn btn-add" (click)="OpenScheduleTaskModal(addUpdateScheduledTaskModal, ActivityID)">
+              <i class="fa-solid fa-plus"></i>  Schedule Task
+            </button>
+          </div>
           <div class="col-md-4 d-flex justify-content-end">
             <div class="input-group">
               <input type="text" class="text-input input form-control flex-fill" placeholder="Search..." name="searchString" autocomplete="off" [(ngModel)]="searchTaskTerm" (ngModelChange)="filterTasksBySearchTerm(addUpdateScheduledActivityRequest.scheduledActivityScheduledTask)">
@@ -118,6 +115,7 @@
               <th><u>End Date</u></th>
               <th><u>Task Status</u></th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -126,10 +124,20 @@
               <td>{{ task.scheduledTask.task.task_Description }}</td>
               <td>{{ task.scheduledTask.startDate }}</td>
               <td>{{ task.scheduledTask.endDate }}</td>
-              <td>{{ task.scheduledTask.taskStatus }}</td>
+              <td>{{ task.scheduledTask.taskStatus?.task_Status }}</td>
               <td>
                 <div class="button-container">
                   <button  class="btn-form-add" (click)="openEmployeeModal(ViewEmployees, task.scheduledTask.scheduledTask_ID, task.scheduledTask.task.task_Name )">View Employees/Contractors</button>
+                </div>
+              </td>
+              <td>
+                <div class="button-container">
+                  <button class="btn-update"  title="Update" (click)="loadScheduledTask(ScheduledTaskModal, task.scheduledTask.scheduledTask_ID)">                
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-delete"  title="Delete" (click)="OpenTaskDeleteModal(DeleteTaskConfirmationModal, task.scheduledTask)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -269,20 +277,62 @@
           </div>
 
           <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
-          <button type="button" class="btn-form-add" (click)="modal.close('Close click')" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+          <button type="button" class="btn-form-add" (click)="isAddMode ? AddScheduledActivity(ConfirmationModal, AddUpdateError) : UpdateScheduledActivity(ConfirmationModal, AddUpdateError); modal.close('Close click');" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
             {{ isAddMode ? 'Add Activity' : 'Update Activity' }}
           </button>
+
         </div>
       </div>
     </div>
     <div class="modal-footer"></div>
   </ng-template>
 
-  <!-- Add/Update Schedule Task Modal -->
-  <!-- <form #form="ngForm">  
+  <!-- Add/Update Schedule Task Modal -->  
     <ng-template #addUpdateScheduledTaskModal let-modal class="modal fade" >
       <div class="modal-header">
         <h5 class="modal-title">{{ isAddMode ? 'Scheduled New Task' : 'Update Existing Scheduled Task' }}</h5>
+      </div>
+      
+      <div class="modal-body">
+
+        <div class="task-table-container">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th><u>Task Name</u></th>
+                <th><u>Task Description</u></th>
+                <th><u> Required Skill</u></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let task of addUpdateActivityRequest.activityTask">
+                <td>{{ task.task?.task_Name }}</td>
+                <td>{{ task.task?.task_Description }}</td>
+                <td>{{ task.task?.skill?.skill_Name }}</td>
+                <td><div class="button-container">
+                  <button  class="btn-form-add" (click)="openScheduleTaskModal(task.task?.task_ID||0, ScheduledTaskModal, task.task?.task_Name||'' )">Schedule Task</button>
+                </div></td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="addUpdateActivityRequest.activityTask?.length === 0">
+              <tr>
+                <td colspan="4">No Task Listings</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Return</button>
+      </div>
+      <div class="modal-footer"></div>
+    </ng-template>
+
+
+  <!-- Schedule Task Modal -->
+  <form #task="ngForm">  
+    <ng-template #ScheduledTaskModal let-modal class="modal fade" >
+      <div class="modal-header">
+        <h5 class="modal-title">Scheduled Task {{task_Name}}</h5>
       </div>
       
       <div class="modal-body">
@@ -292,36 +342,21 @@
             <div class="mb-3">
               <label class="form-label">Select Date Range</label>
               <div class="d-flex align-items-center">
-                <input type="datetime-local" class="form-control me-2" id="startDateTime" name="startDateTime" [(ngModel)]="startDateTime" required (blur)="validateDateRange()">
+                <input type="datetime-local" class="form-control me-2" id="taskstartDateTime" name="taskstartDateTime" [(ngModel)]="taskstartDateTime" required (blur)="validateTaskDateRange()">
                 <span class="mx-2">to</span>
-                <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" [(ngModel)]="endDateTime" required (blur)="validateDateRange()">
+                <input type="datetime-local" class="form-control" id="taskendDateTime" name="taskendDateTime" [(ngModel)]="taskendDateTime" required (blur)="validateTaskDateRange()">
               </div>
-              <div *ngIf="(form.controls['startDateTime']?.dirty || form.controls['endDateTime']?.dirty) && !isDateRangeValid()">
+              <div *ngIf="(task.controls['taskstartDateTime']?.dirty || task.controls['taskendDateTime']?.dirty) && !isDateTaskRangeValid()">
                 <p class="validation-notification">Please select a valid date and time range.</p>
               </div>
             </div>                                                 
-
-            <div class="mb-3">
-              <label for="supervisor" class="form-label">Select a Employee</label>
-              <div class="d-flex align-items-center">
-                <select class="form-select" id="employee" name="employee" [(ngModel)]="selectedSupervisor" required>
-                  <option value="null" selected disabled>Select a Supervisor</option>
-                  <option *ngFor="let supervisor of users" [value]="supervisor.userId">{{ supervisor.username }}</option>
-                </select>
-              </div>
-              <div *ngIf="(form.controls['employee']?.dirty || form.controls['employee']?.touched) && form.controls['employee']?.invalid">
-                <div *ngIf="form.controls['employee']?.errors?.['required']">
-                  <p class="validation-notification">Employee selection is required.</p>
-                </div>
-              </div>
-            </div>
-
+    
             <div class="mb-3">
               <label for="employee" class="form-label">Select a Employee</label>
               <div class="d-flex align-items-center">
                 <select class="form-select" id="employee" name="employee" [(ngModel)]="selectedEmployee">
                   <option value="null" selected disabled>Select a Employee</option>
-                  <option *ngFor="let employee of employees" [value]="employee.userId">{{ employee.username }}</option>
+                  <option *ngFor="let employee of users" [value]="employee.user_ID">{{ employee.username }}</option>
                 </select>
             
                 <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addEmployeeToArray()" [disabled]="!selectedEmployee">
@@ -334,7 +369,7 @@
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th><u>Supplier Name</u></th>
+                    <th><u>Employee Name</u></th>
                     <th></th>
                   </tr>
                 </thead>
@@ -356,71 +391,186 @@
                   </tr>
                 </tbody>
               </table>
-            </div>         
-
+            </div>   
+            
+            <div class="mb-3">
+              <label for="contractor" class="form-label">Select a Contractor</label>
+              <div class="d-flex align-items-center">
+                <select class="form-select" id="contractor" name="contractor" [(ngModel)]="selectedContractor">
+                  <option value="null" selected disabled>Select a Contractor</option>
+                  <option *ngFor="let contractor of contractors" [value]="contractor.contractor_ID">{{ contractor.contractor_Name }}</option>
+                </select>
+            
+                <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addContractorToArray()" [disabled]="!selectedContractor">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+            </div>    
+            
+            <div class="task-table-container">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th><u>Contractor Name</u></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="addUpdateContractor.length > 0">
+                  <tr *ngFor="let contractor of addUpdateContractor">
+                    <td>{{ contractor.contractor_Name }}</td>
+                    <td>
+                      <div class="button-container">
+                        <button class="btn-delete" title="Delete" (click)="deleteContractorFromArray(contractor)">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="addUpdateContractor.length === 0">
+                  <tr>
+                    <td colspan="2">No Contractor Listings</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>   
+    
             <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Cancel</button>
-            <button type="button" class="btn-form-add" (click)="modal.close('Close click')" [disabled]="isAddMode ? !form.valid : (isAddMode && !form.dirty)" [ngClass]="{'disabled': isAddMode ? !form.valid : (!isAddMode && !form.dirty)}">
+            <button type="button" class="btn-form-add" (click)="modal.close('Close click'); AddScheduledTask(ConfirmationModal, AddUpdateError);"  [disabled]="isAddMode ? !task.valid : (isAddMode && !task.dirty)" [ngClass]="{'disabled': isAddMode ? !task.valid : (!isAddMode && !task.dirty)}">
               {{ isAddMode ? 'Add Activity' : 'Update Activity' }}
             </button>
           </div>
         </div>
       </div>
       <div class="modal-footer"></div>
-    </ng-template> -->
-
-  <!-- Confirm Add/Update Activity Modal -->
-  <!-- <ng-template #OpenAddUpdateModalConfirmation let-modal class="modal fade">
-    <div class="modal-header">
-      <h5 class="modal-title">{{ isAddMode ? 'Confirm Add Activity' : 'Confirm Update Activity' }}</h5>
-    </div>
-    <div class="modal-body">
-      <p><b>Are these {{ isAddMode ? 'new' : 'updated' }} activity's details correct?</b></p>
-      <div class="activity-details">
-        <div class="detail">
-          <span class="label">Activity Name: </span>
-          <span class="value">{{ Activity.activity_Name }}</span>
-        </div>
-        <div class="detail">
-          <span class="label">Activity Description: </span>
-          <span class="value">{{ Activity.activity_Description }}</span>
-        </div>
-      </div>
-      <div class="modal-button-container">
-        <button class="btn-return" (click)="modal.close('Close click'); OpenUpdateModal(addUpdateActivityModal)">Return</button>
-        <button type="submit" class="btn-add" (click)="modal.close('Close click'); form.ngSubmit.emit();">Confirm</button>
-      </div>
-    </div>
-    <div class="modal-footer"></div>
-  </ng-template> 
-</form> -->
+    </ng-template>
 
 <!-- Add/Update Success Confirmation Modal -->
-<!-- <ng-template #ConfirmationModal let-modal class="modal fade">
+<ng-template #ConfirmationModal let-modal class="modal fade">
   <div class="modal-header">
     <h5 class="modal-title" id="ConfirmationModal">Success</h5>
   </div>
   <div class="modal-body">
-    <p><b>{{ isAddMode ? 'A new activity has been successfully created!' : 'An existing activity has been successfully updated!' }}</b></p>
+    <p><b>A new activity has been successfully created!</b></p>
     <div class="text-center">
       <button class="btn-add" (click)="modal.close('Close click')">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>
-</ng-template> -->
+</ng-template>
 
 <!-- AddUpdate Error -->
-<!-- <ng-template #AddUpdateError let-modal class="modal fade">
+<ng-template #AddUpdateError let-modal class="modal fade">
   <div class="modal-header">
     <h5 class="modal-title">Error</h5>
   </div>
   <div class="modal-body">
-    <p><b>There was and error {{ isAddMode ? 'adding' : 'updating' }} this activity's details.</b></p>
+    <p><b>There was and error adding this activity's details.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>
-</ng-template> -->
+</ng-template>
+
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="activity-details">
+      <div class="detail">
+        <span class="label">Activity Name: </span>
+        <span class="value">{{ ScheduledActivity.activity.activity_Name }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteActivity(ScheduledActivity.scheduledActivity_ID, ConfirmationOfDelete, ActivityDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #ConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The activity has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #ActivityDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of activity.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #DeleteTaskConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Warning</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Are you sure you want to delete this record?</b></p>
+    <div class="activity-details">
+      <div class="detail">
+        <span class="label">Task Name: </span>
+        <span class="value">{{ scheduledTask.task.task_Name }}</span>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteTaskActivity(scheduledTask.task.task_ID, TaskConfirmationOfDelete, TaskDeleteError );">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #TaskConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>The activity has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #TaskDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this piece of activity.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
 
 <!-- Delete Confirmation Modal -->
 <!-- <ng-template #DeleteConfirmationModal let-modal class="modal fade">
@@ -633,19 +783,7 @@
   </ng-template> 
 </form> -->
 
-<!-- Add/Update Success Confirmation Modal -->
-<!-- <ng-template #TaskConfirmationModal let-modal class="modal fade">
-  <div class="modal-header">
-    <h5 class="modal-title" id="ConfirmationModal">Success</h5>
-  </div>
-  <div class="modal-body">
-    <p><b>{{ isAddMode ? 'A new task has been successfully created!' : 'An existing task has been successfully updated!' }}</b></p>
-    <div class="text-center">
-      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
-    </div>
-  </div>
-  <div class="modal-footer"></div>
-</ng-template> -->
+
 
 <!-- AddUpdate Error -->
 <!-- <ng-template #AddUpdateTaskError let-modal class="modal fade">

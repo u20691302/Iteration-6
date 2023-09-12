@@ -2,7 +2,7 @@
   <div class="top-panel">
     <div class="header">
       <h3>Welcome to SafariSync</h3>
-      <h5>Please register your profile</h5>
+      <h5>Please register your admin profile</h5>
     </div>
   </div>
 
@@ -115,7 +115,7 @@
       <div class="icon-container">
         <i class="fa-solid fa-circle-user fa-xl"></i>
       </div>
-      <input type="text" class="form-control" id="Role" name="Role" placeholder="Role" [(ngModel)]="user.role" formControlName="Role">
+      <input type="text" class="form-control" id="Role" name="Role" placeholder="Role" [(ngModel)]="user.role" formControlName="Role" [disabled]="true" readonly>
     </div>
     <div *ngIf="form.controls['Role']?.invalid && (form.controls['Role']?.dirty || form.controls['Role']?.touched)">
       <div *ngIf="form.controls['Role']?.errors?.['required']">
@@ -125,7 +125,7 @@
         <p class="validation-notification">Role should have at least 3 characters.</p>
       </div>
     </div>
-  </div>
+    </div>
 
 
    <div class="form-column">  

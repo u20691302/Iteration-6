@@ -329,19 +329,31 @@ namespace SafariSync_API.Controllers.UserController
         }
 
         /////////////////////////////////
+        private string GenerateUniqueToken()
+        {
+            // Generate a unique token (you can use a library or create your own logic)
+            // For simplicity, I'm using a random 10-character alphanumeric string
+            string token = Guid.NewGuid().ToString("N").Substring(0, 10);
+            return token;
+        }
 
         [HttpPost]
         [Route("SendRegSMS")]
-        public async Task<IActionResult> SendRegSMS(string cellnum)
+        public async Task<IActionResult> SendRegSMS(string cellnum, string role)
         {
             try
             {
-                string convertedCellNum = "";
-                convertedCellNum = "+27" + cellnum.Substring(1);
+                string convertedCellNum = "+27" + cellnum.Substring(1);
                 TwilioClient.Init(accountSid, authToken);
 
-                var smsMessage = await MessageResource.CreateAsync(
-                    body: "SafariSync registration link is: " + "www.hello.com",
+                // Generate a unique token for this registration request
+                string token = GenerateUniqueToken();
+
+                // Compose the message body with the token
+                string messageBody = GetMessageBodyBasedOnRole(role, token);
+
+                var smsMessage = MessageResource.Create(
+                    body: messageBody,
                     from: new Twilio.Types.PhoneNumber("+14786067955"),  // Replace with your Twilio phone number
                     to: new Twilio.Types.PhoneNumber(convertedCellNum)
                 );
@@ -354,6 +366,21 @@ namespace SafariSync_API.Controllers.UserController
             {
                 // Error occurred while sending SMS
                 return StatusCode(500, "Failed to send SMS. Error: " + ex.Message);
+            }
+        }
+
+        private string GetMessageBodyBasedOnRole(string role, string token)
+        {
+            switch (role)
+            {
+                case "User":
+                    return $"Hello, you are registered as a user. Your registration link is: http://localhost:4200/register-user?token={token}";
+                case "Admin":
+                    return $"Hello, you are registered as an admin. Your registration link is: http://localhost:4200/register-admin?token={token}";
+                case "Farm Worker":
+                    return $"Hello, you are registered as a worker. Your registration link is: http://localhost:4200/register-farmworker?token={token}";
+                default:
+                    return "Hello, you are registered. Your registration link is: www.hello.com";
             }
         }
 

@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using SafariSync_API.Models.SkillsModel;
 using System.ComponentModel.DataAnnotations;
-using SafariSync_API.Models.SkillsModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SafariSync_API.Models.UserModel
 {

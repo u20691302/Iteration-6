@@ -8,8 +8,10 @@ namespace SafariSync_API.Models.Reporting
     {
         [Key]
         public int Report_ID { get; set; }
+
         [Required]
         public string Report_Title { get; set; } = string.Empty;
+
         [Required]
         public DateTime CreatedAt { get; set; }
 

@@ -46,5 +46,4 @@ namespace SafariSync_API.Models.UserModel
         [ForeignKey("User_ID")]
         public ICollection<UserSkill> UserSkill { get; set; } = new List<UserSkill>();
     }
-
 }

@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using SafariSync_API.Data;
 using SafariSync_API.Models.Reporting;
-using SafariSync_API.Models.SkillsModel;
 using SafariSync_API.Repositories.CRUD;
 using SafariSync_API.ViewModels.ReportViewModel;
-using SafariSync_API.ViewModels.SkillsViewModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace SafariSync_API.Controllers.SkillController
 {
@@ -42,7 +37,7 @@ namespace SafariSync_API.Controllers.SkillController
                     Report_Title = rvm.Report_Title,
                     CreatedAt = rvm.CreatedAt,
                     User_ID = rvm.User_ID,
-                    PdfUrl  = rvm.PdfUrl,
+                    PdfUrl = rvm.PdfUrl,
                 };
 
                 // Add the report to the CRUD repository

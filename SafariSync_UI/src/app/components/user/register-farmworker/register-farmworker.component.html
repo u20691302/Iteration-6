@@ -1,0 +1,187 @@
+<div class="container">
+    <div class="top-panel">
+      <div class="header">
+        <h3>Welcome to SafariSync</h3>
+        <h5>Please register your farm worker profile</h5>
+      </div>
+    </div>
+  
+    <form (ngSubmit)="registerAdmin()" [formGroup]="form">
+      <div class="form-columns">
+        <div class="form-column">
+  
+  
+      <div class="mb-3">
+        <div class="icon-container">
+          <i class="fa-solid fa-circle-user fa-xl"></i>
+        </div>
+        <input type="text" class="form-control" id="Username" name="Username" placeholder="Username" [(ngModel)]="user.username" formControlName="Username">
+      </div>
+      <div *ngIf="form.controls['Username']?.invalid && (form.controls['Username']?.dirty || form.controls['Username']?.touched)">
+        <div *ngIf="form.controls['Username']?.errors?.['required']">
+          <p class="validation-notification">Username is required.</p>
+        </div>
+        <div *ngIf="form.controls['Username']?.errors?.['minlength']">
+          <p class="validation-notification">Username should have at least 2 characters.</p>
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <div class="icon-container">
+          <i class="fa-solid fa-circle-user fa-xl"></i>
+        </div>
+        <input type="text" class="form-control" id="Surname" name="Surname" placeholder="Surname" [(ngModel)]="user.surname" formControlName="Surname">
+      </div>
+      <div *ngIf="form.controls['Surname']?.invalid && (form.controls['Surname']?.dirty || form.controls['Surname']?.touched)">
+        <div *ngIf="form.controls['Surname']?.errors?.['required']">
+          <p class="validation-notification">Surname is required.</p>
+        </div>
+        <div *ngIf="form.controls['Surname']?.errors?.['minlength']">
+          <p class="validation-notification">Surname should have at least 2 characters.</p>
+        </div>
+      </div>
+      
+  
+      <div class="mb-3">
+        <div class="icon-container">
+          <i class="fa-solid fa-id-card fa-xl"></i>
+        </div>
+        <input type="text" class="form-control" id="IdPassport" name="IdPassport" placeholder="Id/Passport Number" [(ngModel)]="user.idPassport" formControlName="IdPassport">
+      </div>
+      <div *ngIf="form.controls['IdPassport']?.invalid && (form.controls['IdPassport']?.dirty || form.controls['IdPassport']?.touched)">
+        <div *ngIf="form.controls['IdPassport']?.errors?.['required']">
+          <p class="validation-notification">Id or Passport number is required.</p>
+        </div>
+        <div *ngIf="form.controls['IdPassport']?.errors?.['pattern']">
+          <p class="validation-notification">Invalid ID/Passport number</p>
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <div class="icon-container">
+          <i class="fa-sharp fa-solid fa-phone fa-lg"></i>
+        </div>
+        <input type="text" class="form-control" id="Cellphone" name="Cellphone" placeholder="Cellphone Number" [(ngModel)]="user.cellphone" formControlName="Cellphone">
+      </div>
+      <div *ngIf="form.controls['Cellphone']?.invalid && (form.controls['Cellphone']?.dirty || form.controls['Cellphone']?.touched)">
+        <div *ngIf="form.controls['Cellphone']?.errors?.['required']">
+          <p class="validation-notification">Cell phone number is required.</p>
+        </div>
+        <div *ngIf="form.controls['Cellphone']?.errors?.['pattern']">
+          <p class="validation-notification">Phone Number must be a 10-digit number.</p>
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <div class="password-container">
+          <div class="icon-container">
+            <i class="fa-solid fa-lock fa-xl"></i>
+          </div>
+          <input type="password" class="form-control" id="Password" name="Password" placeholder="Password" [(ngModel)]="user.password" formControlName="Password">
+          <i class="toggle-password fa-solid fa-eye" (click)="togglePasswordVisibility()"></i>
+        </div>
+        
+              
+      </div>
+      
+      <div *ngIf="form.controls['Password']?.invalid && (form.controls['Password']?.dirty || form.controls['Password']?.touched)">
+        <div *ngIf="form.controls['Password']?.errors?.['required']">
+          <p class="validation-notification">Password is required.</p>
+        </div>
+        <div *ngIf="form.controls['Password']?.errors?.['minlength']">
+          <p class="validation-notification">Password should have at least 5 characters.</p>
+        </div>
+        <div *ngIf="form.controls['Password']?.errors?.['pattern']">
+          <p class="validation-notification">Password requires capital, symbol, number, minimum 5 characters.</p>
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <div class="icon-container">
+          <i class="fa-solid fa-circle-user fa-xl"></i>
+        </div>
+        <input type="text" class="form-control" id="Role" name="Role" placeholder="Role" [(ngModel)]="user.role" formControlName="Role" [disabled]="true" readonly>
+      </div>
+      <div *ngIf="form.controls['Role']?.invalid && (form.controls['Role']?.dirty || form.controls['Role']?.touched)">
+        <div *ngIf="form.controls['Role']?.errors?.['required']">
+          <p class="validation-notification">Role is required.</p>
+        </div>
+        <div *ngIf="form.controls['Role']?.errors?.['minlength']">
+          <p class="validation-notification">Role should have at least 3 characters.</p>
+        </div>
+      </div>
+      </div>
+      
+      
+  
+  
+     <div class="form-column">  
+      <div class="mb-3">
+        <div class="d-flex align-items-center">
+          <select class="form-select" id="supplier" name="supplier" [(ngModel)]="selectedSkill" formControlName="Skill">
+            <option value="null" selected disabled>Select a Skill</option>
+            <option *ngFor="let skill of skills" [value]="skill.skill_ID">{{ skill.skill_Name }}</option>
+          </select>
+      
+          <button class="my-btn" style="margin-left:10px;" title="Add" (click)="addSkillToArray()" [disabled]="!selectedSkill" >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+      </div>  
+    
+      <div class="supplier-table-container">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th><u>Skill Name</u></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody *ngIf="addUpdateSkills.length > 0">
+            <tr *ngFor="let skill of addUpdateSkills">
+              <td>{{ skill.skill_Name }}</td>
+              <td>
+                <div class="button-container">
+                  <button class="btn-delete" title="Delete" (click)="deleteSkillFromArray(skill)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="addUpdateSkills.length === 0">
+            <tr>
+              <td colspan="2">No Skills Added</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+  
+      <div class="mb-3">
+        <input type="file" (change)="onImageSelected($event)" accept="image/*" style="display: none" #imageInput required [(ngModel)]="user.idImage" formControlName="IdImage">
+        <div *ngIf="selectedImageName">
+          <p>{{ selectedImageName }}</p>
+        </div>
+        <div class="image-container">
+          <button type="button" class="upload-button" (click)="imageInput.click()">Upload ID/Passport Photo</button>
+        </div>
+        <div *ngIf="!selectedImageName">
+          <p class="validation-notification">Image is required.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+      <div class="mb-3">
+        <button type="submit" class="submit-button" [disabled]="!form.valid || !user.profileImage">Register</button>
+      </div>
+      
+    </form>
+  
+   
+  
+    <div class="bottom-panel">
+      <img src="\assets\EPI-USE\EPI-USE Logo.jpg" alt="EPI-USE Logo">
+    </div>
+  </div> 

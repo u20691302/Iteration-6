@@ -1,5 +1,4 @@
 ﻿using SafariSync_API.Models.ContractorModel;
-using SafariSync_API.Models.UserModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

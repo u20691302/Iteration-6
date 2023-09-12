@@ -15,14 +15,19 @@ public class ScheduledTask
     public DateTime EndDate { get; set; }
 
     [Required]
-    public string TaskStatus { get; set; } = string.Empty;
+    public int TaskStatus_ID { get; set; }
 
     [Required]
     public int Task_ID { get; set; }
+
+    [ForeignKey("TaskStatus_ID")]
+    public TaskStatus? TaskStatus { get; set; }
 
     [ForeignKey("Task_ID")]
     public TaskS? Task { get; set; }
 
     [ForeignKey("ScheduledTask_ID")]
     public ICollection<ScheduledTaskUser> ScheduledTaskUser { get; set; } = new List<ScheduledTaskUser>();
+    [ForeignKey("ScheduledTask_ID")]
+    public ICollection<ScheduledTaskContractor> ScheduledTaskContractor { get; set; } = new List<ScheduledTaskContractor>();
 }

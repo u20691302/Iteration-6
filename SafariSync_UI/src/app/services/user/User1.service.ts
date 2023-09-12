@@ -42,6 +42,26 @@ export class User1Service {
     );
   }
 
+  getAllUserForTasks(term: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseApiUrl}/api/User/ReadAllUsersAsync`).pipe(
+      map(users => {
+        if (term === null) {
+          return users;
+        }
+        
+        const filteredUsers = users.filter((user: User) =>
+          user.role.toLowerCase().includes(term.toLowerCase())
+        );
+        
+        return filteredUsers;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
+
   getAllRatings(): Observable<Ratings[]> {
     return this.http.get<Ratings[]>(`${this.baseApiUrl}/api/User/ReadAllRatingsAsync`).pipe(
       catchError(error => {

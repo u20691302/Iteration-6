@@ -149,6 +149,11 @@ CREATE TABLE ActivityStatus (
     Activity_Status NVARCHAR(255) NOT NULL
 );
 
+CREATE TABLE TaskStatus (
+    TaskStatus_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Task_Status NVARCHAR(255) NOT NULL
+);
+
 CREATE TABLE ScheduledActivity (
     ScheduledActivity_ID INT IDENTITY(1,1) PRIMARY KEY,
     StartDate DATETIME NOT NULL,
@@ -166,9 +171,10 @@ CREATE TABLE ScheduledTask (
     ScheduledTask_ID INT IDENTITY(1,1) PRIMARY KEY,
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
-    TaskStatus NVARCHAR(50) NOT NULL,
     Task_ID INT NOT NULL,
-	FOREIGN KEY (Task_ID) REFERENCES TaskS (Task_ID)
+	TaskStatus_ID INT NOT NULL,
+	FOREIGN KEY (Task_ID) REFERENCES TaskS (Task_ID),
+	FOREIGN KEY (TaskStatus_ID) REFERENCES TaskStatus (TaskStatus_ID),
 );
 
 CREATE TABLE ScheduledActivityScheduledTask (
@@ -202,6 +208,30 @@ CREATE TABLE Report (
   PdfUrl VARCHAR(Max) NOT NULL,
   User_ID INT NOT NULL,
   FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
+);
+
+CREATE TABLE RatingSettings (
+    RatingSettings_ID INT IDENTITY(1,1) PRIMARY KEY,
+    RatingSettings_Upper INT NOT NULL,
+	RatingSettings_Lower INT NOT NULL
+);
+
+CREATE TABLE NotificationStatus (
+    NotificationStatus_ID INT IDENTITY(1,1) PRIMARY KEY,
+    NotificationStatus_Name NVARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Notification (
+    Notification_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Date DATETIME NOT NULL,
+	User_ID INT NOT NULL,
+	NotificationStatus_ID INT NOT NULL,
+	ScheduledTask_ID INT NOT NULL,
+	ScheduledActivity_ID INT NOT NULL,
+	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
+	FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
+	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
+	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
 );
 
 INSERT INTO SupplierType (SupplierType_Name)
@@ -397,22 +427,28 @@ VALUES
     ('In Progress'),
     ('Completed');
 
+INSERT INTO TaskStatus (Task_Status)
+VALUES
+    ('Not Started'),
+    ('In Progress'),
+    ('Completed');
+
 INSERT INTO ScheduledActivity (StartDate, EndDate, Activity_Location, User_ID, ActivityStatus_ID, Activity_ID)
 VALUES
     ('2023-07-29 09:00:00', '2023-07-29 12:00:00', 'Field A', 1, 1, 1),
     ('2023-07-30 10:00:00', '2023-07-30 13:00:00', 'Barn', 2, 1, 2),
     ('2023-07-31 08:30:00', '2023-07-31 11:30:00', 'Field B', 3, 1, 3);
 
-INSERT INTO ScheduledTask (StartDate, EndDate, TaskStatus, Task_ID)
+INSERT INTO ScheduledTask (StartDate, EndDate, TaskStatus_ID, Task_ID)
 VALUES
-    ('2023-07-29 09:00:00', '2023-07-29 10:30:00', 'In Progress', 1),
-    ('2023-07-29 11:00:00', '2023-07-29 12:00:00', 'Completed', 2),
-    ('2023-07-30 10:30:00', '2023-07-30 11:30:00', 'In Progress', 3),
-    ('2023-07-30 12:00:00', '2023-07-30 13:00:00', 'Completed', 4),
-    ('2023-07-31 08:30:00', '2023-07-31 09:30:00', 'In Progress', 5),
-    ('2023-07-31 10:00:00', '2023-07-31 11:00:00', 'Completed', 6),
-    ('2023-07-31 09:00:00', '2023-07-31 10:00:00', 'In Progress', 7),
-    ('2023-07-31 10:30:00', '2023-07-31 11:30:00', 'Completed', 8);
+    ('2023-07-29 09:00:00', '2023-07-29 10:30:00', 1, 1),
+    ('2023-07-29 11:00:00', '2023-07-29 12:00:00', 1, 2),
+    ('2023-07-30 10:30:00', '2023-07-30 11:30:00', 2, 3),
+    ('2023-07-30 12:00:00', '2023-07-30 13:00:00', 3, 4),
+    ('2023-07-31 08:30:00', '2023-07-31 09:30:00', 1, 5),
+    ('2023-07-31 10:00:00', '2023-07-31 11:00:00', 3, 6),
+    ('2023-07-31 09:00:00', '2023-07-31 10:00:00', 3, 7),
+    ('2023-07-31 10:30:00', '2023-07-31 11:30:00', 2, 8);
 
 INSERT INTO ScheduledActivityScheduledTask (ScheduledActivity_ID, ScheduledTask_ID)
 VALUES

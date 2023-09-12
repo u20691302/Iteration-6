@@ -20,7 +20,5 @@ namespace SafariSync_API.Repositories.UserRepository
         Task RemoveUserSkills(int userId);
 
         Task<List<Skills>> GetSkillsByUserId(int userId);
-
-
     }
 }

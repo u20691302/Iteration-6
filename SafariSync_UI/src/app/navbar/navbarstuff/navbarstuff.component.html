@@ -69,7 +69,6 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item" routerLink="/users">View Employees</a></li>
-              <li><a class="dropdown-item" href="#">Employee Training</a></li>
               <li><a class="dropdown-item" href="#" routerLink="send-registration-link">Send Registration Link</a></li>
             </ul>
           </li>
@@ -91,7 +90,6 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item" routerLink="/equipment">View Equipment</a></li>
-              <li><a class="dropdown-item" href="#">Order Equipment</a></li>
             </ul>
           </li>
 
@@ -102,7 +100,6 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item" routerLink="/stock">View Stock</a></li>
-              <li><a class="dropdown-item" href="#">Order Stock</a></li>
             </ul>
           </li>
 
@@ -143,9 +140,7 @@
               <i class="fas fa-cog"></i>Settings
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="#">Backup/Restore</a></li>
-              <li><a class="dropdown-item" href="#">Rating Settings</a></li>
-              <li><a class="dropdown-item" href="#">Stock/Equipment Settings</a></li>
+              <li><a class="dropdown-item" routerLink="ratingSettings">Rating Settings</a></li>
             </ul>
           </li>
   
@@ -157,7 +152,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                 <li>
                     <!-- Help Video Modal -->
-                    <button class="dropdown-item" autofocus="false" (click)="openModal(videoModal)">View Current Page Help</button>
+                    <button class="dropdown-item" autofocus="false" (click)="openModal()">View Current Page Help</button>
                 </li>
                 <li><a class="dropdown-item" routerLink="/page" href="#">View Help Document</a></li>
             </ul>
@@ -169,21 +164,22 @@
           
 
 <!-- Help video Modal -->
-<ng-template #videoModal let-modal modal-fade autofocus="false">
+<ng-template #videoModal let-modal modal-fade>
   <div class="modal-header">
-      <h4 class="modal-title">Help Video</h4>
+    <h4 class="modal-title">Help Video</h4>
   </div>
-  <div class="modal-body" autofocus="false">
-      <video width="100%" controls>
-          <source src="/assets/Test4.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-      </video>
-      <button autofocus="false" type="button" class="modal-button" (click)="modal.close('Close click')">Close</button>
+  <div class="modal-body">
+    <video width="100%" controls>
+      <source [src]="videoSrc" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <button type="button" class="modal-button" (click)="modal.close('Close click')">Close</button>
   </div>
   <div class="modal-footer">
-      <!-- Modal footer content -->
+    <!-- Modal footer content -->
   </div>
 </ng-template>
+
 
 <router-outlet></router-outlet>
 

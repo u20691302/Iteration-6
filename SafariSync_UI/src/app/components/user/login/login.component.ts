@@ -59,7 +59,7 @@ export class LoginComponent {
           this.userStore.setRatingFromStore(tokePayload.rating);
           
           this.toast.success({detail: "SUCCESS", summary: "Logged in Successfully", duration: 5000})
-          this.router.navigate(['/myprofile']);
+          this.router.navigate(['/dashboard']);
         },
         error => {
           // Handle login error

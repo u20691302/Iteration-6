@@ -27,3 +27,17 @@
     margin: 10px;
     cursor: pointer;
 }
+
+.container.toolbar {
+    margin-top: 20px;
+    max-width: 70%;
+  }
+
+  .btn-return {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border: none;
+  }
