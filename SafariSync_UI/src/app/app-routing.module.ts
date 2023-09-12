@@ -30,6 +30,9 @@ import { GeneratePerformanceComponent } from './components/reporting/generate-pe
 import { GeneratePersonnelReportComponent } from './components/reporting/generate-personnel-report/generate-personnel-report.component';
 import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
 import { RatingSettingsComponent } from './components/rating-settings/rating-settings.component';
+import { RegisterGuard } from './components/user/guards/register.guard';
+import { RegisterUserComponent } from './components/user/register-user/register-user.component';
+import { RegisterFarmworkerComponent } from './components/user/register-farmworker/register-farmworker.component';
 
 
 const routes: Routes = [
@@ -47,7 +50,15 @@ const routes: Routes = [
   },
   { 
     path: 'register-admin', 
-    component: RegisterAdminComponent
+    component: RegisterAdminComponent, canActivate: [RegisterGuard]
+  },
+  { 
+    path: 'register-user', 
+    component: RegisterUserComponent, canActivate: [RegisterGuard]
+  },
+  { 
+    path: 'register-farmworker', 
+    component: RegisterFarmworkerComponent, canActivate: [RegisterGuard]
   },
   { 
     path: 'login', 

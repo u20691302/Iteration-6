@@ -511,3 +511,19 @@ INSERT INTO Report (Report_Title, CreatedAt, User_ID, PdfUrl) VALUES
    ('Report 1', '2023-08-01', 2, 'https://example.com/report1.pdf'),
    ('Report 2', '2023-08-05', 2, 'https://example.com/report2.pdf'),
    ('Report 3', '2023-08-10', 2, 'https://example.com/report3.pdf');
+
+INSERT INTO NotificationStatus (NotificationStatus_Name)
+VALUES
+    ('Accepted'),
+    ('Rejected'),
+    ('Pending');
+
+INSERT INTO Notification (Date, User_ID, NotificationStatus_ID, ScheduledTask_ID, ScheduledActivity_ID)
+VALUES
+    ('2023-09-12 10:00:00', 1, 1, 1, 1),
+    ('2023-09-12 11:00:00', 2, 2, 2, 2),
+    ('2023-09-12 12:00:00', 4, 3, 3, 3),
+	('2023-09-12 12:00:00', 5, 3, 3, 3),
+	('2023-09-12 12:00:00', 6, 3, 3, 3),
+	('2023-09-12 12:00:00', 3, 3, 3, 3),
+	('2023-09-12 12:00:00', 3, 3, 3, 3);
