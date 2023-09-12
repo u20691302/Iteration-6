@@ -526,8 +526,8 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("UpdateScheduledTask")]
         public async Task<IActionResult> UpdateScheduledTask(ScheduledTaskViewModel scheduledTaskViewModel)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input activity data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -597,12 +597,12 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
 
                 // Return the successful response
                 return Ok(existingScheduledTask);
-            }
-            catch (Exception)
-            {
-                // Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    // Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
+            //}
         }
     }
 }

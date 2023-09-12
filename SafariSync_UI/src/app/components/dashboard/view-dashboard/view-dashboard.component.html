@@ -1,6 +1,6 @@
 <!-- Top Panel -->
-<div class="top-panel">
-  <h3>Tyron's Dashboard</h3>
+<div class="top-panel" style="z-index: 2;">
+  <h3>{{fullName}}'s Dashboard</h3>
 </div>
 
 
@@ -14,10 +14,6 @@
       <div style="width: 400px; height: 400px;">
         <canvas id="MyChart"></canvas>
       </div>
-      
-   
- 
-      
     </div>
     
     <!-- Section 2 -->
@@ -33,7 +29,7 @@
   <div class="column middle-column">
     <h4 style="color: #CD1543; font-weight: bold; align-self: center;">Activity Stream</h4>
     <div class="notification-center">
-      <table>
+      <table class= "middle-table">
         <thead>
           <tr>
             <th>Date</th>
@@ -44,12 +40,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let notification of notifications">
-            <td>{{ notification.date }}</td>
+            <td>{{ notification.date | date }}</td>
             <td>{{ notification.users.username }}</td>
             <td>{{ notification.scheduledActivity.activity.activity_Name }}</td>
             <td>
-              <button>Accept</button>
-              <button>Reject</button>
+              <button class="button-but">Accept</button>
+              <button class="button-reject">Reject</button>
             </td>
           </tr>
         </tbody>

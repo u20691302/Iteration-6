@@ -12,6 +12,7 @@ import { ScheduledActivityService } from 'src/app/services/scheduleActivity/sche
 import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
 import { NotificationService } from 'src/app/services/notification/notification.service';
 import { Notification } from 'src/app/models/Notification/Notification.model';
+import { UserStoreService } from 'src/app/services/user/user-store.service';
 
 
 @Component({
@@ -23,6 +24,8 @@ export class ViewDashboardComponent implements OnInit {
 
   public chart: any;
   barChart: any;
+  public fullName: string = "";
+
 
   ngOnInit(): void {
     this.fetchRatingSettings();
@@ -30,7 +33,10 @@ export class ViewDashboardComponent implements OnInit {
     this.GetAllUsers();
     this.GetAllScheduledActivities();
     this.readAllNotifications();
-
+    this.userStore.getFullNameFromStore().subscribe(val => {
+      let fullNameFromToken = this.userTyService.getFullNameFromToekn();
+      this.fullName = val || fullNameFromToken;
+    });
     
   }
 
@@ -43,7 +49,7 @@ export class ViewDashboardComponent implements OnInit {
 
   scheduledActivities: ScheduledActivity [] = [];
 
-  constructor(private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
+  constructor(private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
 
   readAllNotifications(): void {
     this.notificationService.readAllNotifications().subscribe(

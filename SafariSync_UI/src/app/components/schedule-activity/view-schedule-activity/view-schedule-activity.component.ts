@@ -363,11 +363,10 @@ export class ViewScheduleActivityComponent implements OnInit{
     this.loadEmployeesIntoArray();
     this.loadContractorIntoArray();
 
-    this.scheduledTask.scheduledTask_ID= id;
-    this.scheduledTask.users = this.addUpdateEmployee;
+    this.addUpdateEmployee = this.scheduledTask.users||[];
     this.taskstartDateTime = this.addUpdateScheduledActivityRequest.startDate;
     this.taskendDateTime = this.addUpdateScheduledActivityRequest.endDate;
-    this.scheduledTask.contractors = this.addUpdateContractor;
+    this.addUpdateContractor = this.scheduledTask.contractors||[];
 
     const modalRef = this.modalService.open(content, {
       size: 'xl',
@@ -737,17 +736,17 @@ export class ViewScheduleActivityComponent implements OnInit{
   }
 
   loadEmployeesIntoArray() {
-    console.log(this.scheduledTask.users)
     if (this.scheduledTask.users) {
       console.log(1)
       this.addUpdateEmployee = this.scheduledTask.users
         .filter((employee): employee is User => employee !== undefined)
-        .map(supplierItem => supplierItem);
+        .map(employeeItem => employeeItem);
     } else {
       this.addUpdateEmployee = [];
     }
     this.isEmployeeListEmpty = this.addUpdateEmployee.length === 0;
   }
+  
 
   addContractorToArray() {
     if (this.selectedContractor) {
