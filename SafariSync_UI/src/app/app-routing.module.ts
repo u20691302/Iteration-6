@@ -50,7 +50,7 @@ const routes: Routes = [
   },
   { 
     path: 'register-admin', 
-    component: RegisterAdminComponent, canActivate: [RegisterGuard]
+    component: RegisterAdminComponent
   },
   { 
     path: 'register-user', 
