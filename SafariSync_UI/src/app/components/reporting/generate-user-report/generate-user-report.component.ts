@@ -165,7 +165,7 @@ export class GenerateUserReportComponent {
           this.users = users;
         } else {
           this.users = users.filter(user => {
-            const userRegDate = user.regDate;
+            const userRegDate = user.regDate || 0;
             return userRegDate >= this.startDateTime! && userRegDate <= this.endDateTime!;
           });
         }

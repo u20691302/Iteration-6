@@ -13,9 +13,9 @@ export interface User {
     rating_ID: number;
     ratings?: Ratings;
     userSkill?: UserSkill[];
-    password: string;
-    profileImage:string;
-    idImage: string;
-    regDate: Date;
+    password?: string;
+    profileImage?:string;
+    idImage?: string;
+    regDate?: Date;
     skills?: Skills[];
 }

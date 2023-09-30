@@ -298,7 +298,6 @@ export class ViewToolboxComponent implements OnInit {
     this.equipmentService.getAllEquipments(filler).subscribe({
       next: (equipment) => {
         this.Equipment = equipment;
-        console.log(this.Equipment)
       },
       error: (response) => {
         console.log(response);
@@ -407,20 +406,46 @@ export class ViewToolboxComponent implements OnInit {
   }
 
   AddToolboxEquipment(success: any, failed: any) {
+
     const id = this.Toolbox.toolbox_ID;
-    this.AddUpdateToolboxEquipmentRequest = {
-      toolboxEquipment_ID: 0,
-      toolbox_ID: this.Toolbox.toolbox_ID,
-      equipment_ID: this.selectedEquipment,
-      quantity: this.equipmentQuantity,
-      equipment: {
-        equipment_ID: 0,
-        equipment_Name: this.Equipment.find(equipment => equipment.equipment_ID === this.selectedEquipment)?.equipment_Name || '',
-        equipment_Description: '',
-        equipment_Quantity_On_Hand: 0,
-        equipment_Low_Level_Warning: 0
-      },
-    };
+
+    if (this.Toolbox.toolboxEquipment.some(e => e.equipment_ID === Number(this.selectedEquipment))) {
+      this.AddUpdateToolboxEquipmentRequest = {
+        toolboxEquipment_ID: 0,
+        toolbox_ID: this.Toolbox.toolbox_ID,
+        equipment_ID: this.selectedEquipment,
+        quantity: this.equipmentQuantity + (this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.quantity||0),
+        equipment: {
+          equipment_ID: 0,
+          equipment_Name: this.Equipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.equipment_Name || '',
+          equipment_Description: '',
+          equipment_Quantity_On_Hand: 0,
+          equipment_Low_Level_Warning: 0
+        },
+      };
+
+      this.toolboxService.deleteToolboxEquipment(this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.toolboxEquipment_ID || 0).subscribe({
+        next: (response) => {
+          this.LoadToolboxItems(this.Toolbox.toolbox_ID);
+        },
+      })
+    }
+    else {
+      this.AddUpdateToolboxEquipmentRequest = {
+        toolboxEquipment_ID: 0,
+        toolbox_ID: this.Toolbox.toolbox_ID,
+        equipment_ID: this.selectedEquipment,
+        quantity: this.equipmentQuantity,
+        equipment: {
+          equipment_ID: 0,
+          equipment_Name: this.Equipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.equipment_Name || '',
+          equipment_Description: '',
+          equipment_Quantity_On_Hand: 0,
+          equipment_Low_Level_Warning: 0
+        },
+      };
+    }
+
     this.toolboxService.AddToolboxEquipment(this.AddUpdateToolboxEquipmentRequest).subscribe({
       next: (toolboxEquipment: ToolboxEquipment) => {
         this.LoadToolboxItems(id);
@@ -442,21 +467,47 @@ export class ViewToolboxComponent implements OnInit {
   }
 
   AddToolboxStock(success: any, failed: any) {
+
     const id = this.Toolbox.toolbox_ID;
-    this.AddUpdateToolboxStockRequest = {
-      toolboxStock_ID: 0,
-      toolbox_ID: this.Toolbox.toolbox_ID,
-      stock_ID: this.selectedStock,
-      quantity: this.stockQuantity,
-      stock: {
-        stock_ID: 0,
-        stock_Name: this.Stock.find(stock => stock.stock_ID === this.selectedEquipment)?.stock_Name || '',
-        stock_Description: '',
-        stock_Quantity_On_Hand: 0,
-        stock_Low_Level_Warning: 0
-      },
-    };
+
+    if (this.Toolbox.toolboxEquipment.some(e => e.equipment_ID === Number(this.selectedEquipment))) {
     
+      this.AddUpdateToolboxStockRequest = {
+        toolboxStock_ID: 0,
+        toolbox_ID: this.Toolbox.toolbox_ID,
+        stock_ID: this.selectedStock,
+        quantity: this.equipmentQuantity + (this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.quantity||0),
+        stock: {
+          stock_ID: 0,
+          stock_Name: this.Stock.find(stock => stock.stock_ID === Number(this.selectedStock))?.stock_Name || '',
+          stock_Description: '',
+          stock_Quantity_On_Hand: 0,
+          stock_Low_Level_Warning: 0
+        },
+      };
+
+      this.toolboxService.deleteToolboxEquipment(this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.toolboxEquipment_ID || 0).subscribe({
+        next: (response) => {
+          this.LoadToolboxItems(this.Toolbox.toolbox_ID);
+        },
+      })
+    }
+    else {
+      this.AddUpdateToolboxStockRequest = {
+        toolboxStock_ID: 0,
+        toolbox_ID: this.Toolbox.toolbox_ID,
+        stock_ID: this.selectedStock,
+        quantity: this.stockQuantity,
+        stock: {
+          stock_ID: 0,
+          stock_Name: this.Stock.find(stock => stock.stock_ID === this.selectedEquipment)?.stock_Name || '',
+          stock_Description: '',
+          stock_Quantity_On_Hand: 0,
+          stock_Low_Level_Warning: 0
+        },
+      };
+    }
+   
     this.toolboxService.AddToolboxStock(this.AddUpdateToolboxStockRequest).subscribe({
       next: (toolboxStock: ToolboxStock) => {
         this.LoadToolboxItems(id);

@@ -51,8 +51,14 @@ export class ScheduledActivityService {
             scheduledTask_ID: this.scheduledtasks,
             contractors: addScheduledTaskRequest.contractors
           };
-
-          return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskContractor/', contractorTask);
+        
+          if (contractorTask.contractors && contractorTask.contractors.length > 0) {
+            // Send the request only if the contractors array is not empty
+            return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskContractor/', contractorTask);
+          } else {
+            // Return an observable that immediately completes if the contractors array is empty
+            return of(null);
+          }
         }),
         tap(() => {
           console.log('TaskContractor and TaskUser created successfully!');
@@ -115,6 +121,7 @@ export class ScheduledActivityService {
   }
 
   updateScheduledTask(updateScheduledActivityRequest: ScheduledTask): Observable<ScheduledTask> {
+    console.log(updateScheduledActivityRequest)
     return this.http.put<ScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/UpdateScheduledTask/', updateScheduledActivityRequest);
   }
    

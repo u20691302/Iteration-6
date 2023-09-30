@@ -435,8 +435,8 @@ VALUES
 
 INSERT INTO ScheduledActivity (StartDate, EndDate, Activity_Location, User_ID, ActivityStatus_ID, Activity_ID)
 VALUES
-    ('2023-07-29 09:00:00', '2023-07-29 12:00:00', 'Field A', 1, 1, 1),
-    ('2023-07-30 10:00:00', '2023-07-30 13:00:00', 'Barn', 2, 1, 2),
+    ('2023-07-29 09:00:00', '2023-07-29 12:00:00', 'Field A', 3, 1, 1),
+    ('2023-07-30 10:00:00', '2023-07-30 13:00:00', 'Barn', 3, 1, 2),
     ('2023-07-31 08:30:00', '2023-07-31 11:30:00', 'Field B', 3, 1, 3);
 
 INSERT INTO ScheduledTask (StartDate, EndDate, TaskStatus_ID, Task_ID)

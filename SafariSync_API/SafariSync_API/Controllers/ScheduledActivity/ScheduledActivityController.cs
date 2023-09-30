@@ -526,8 +526,8 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("UpdateScheduledTask")]
         public async Task<IActionResult> UpdateScheduledTask(ScheduledTaskViewModel scheduledTaskViewModel)
         {
-            //try
-            //{
+            try
+            {
                 // Validate the input activity data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -535,7 +535,7 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 }
 
                 // Fetch the existing activity by ID using SafariSyncDBContext
-                var existingScheduledTask = await safariSyncDBContext.ScheduledTask
+                var existingScheduledTask = await safariSyncDBContext.ScheduledTask.Include(e => e.ScheduledTaskUser).Include(e => e.ScheduledTaskContractor)
                     .FirstOrDefaultAsync(e => e.ScheduledTask_ID == scheduledTaskViewModel.ScheduledTask_ID);
 
                 // If activity with the given ID is not found, return a not found response
@@ -556,7 +556,7 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                     existingScheduledTask.ScheduledTaskUser.Remove(existingUser);
                 }
 
-                List<ScheduledTaskUser> scheduledTasks = new List<ScheduledTaskUser>();
+                List<ScheduledTaskUser> scheduledTaskUsers = new List<ScheduledTaskUser>();
 
                 foreach (var user in scheduledTaskViewModel.Users)
                 {
@@ -568,14 +568,14 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                     iCRUDRepository.Add(scheduledTaskUser);
 
                     // Add the newly created ScheduledTaskUser to the list
-                    scheduledTasks.Add(scheduledTaskUser);
+                    scheduledTaskUsers.Add(scheduledTaskUser);
                 }
 
                 // Remove existing EquipmentSupplier records associated with this equipment
                 foreach (var existingUser in existingScheduledTask.ScheduledTaskContractor.ToList())
                 {
-                    existingScheduledTask.ScheduledTaskContractor.Remove(existingUser);
-                }
+                        existingScheduledTask.ScheduledTaskContractor.Remove(existingUser);
+                }             
 
                 List<ScheduledTaskContractor> scheduledTask = new List<ScheduledTaskContractor>();
 
@@ -595,14 +595,16 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 // Save changes asynchronously in the CRUD repository
                 await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response
-                return Ok(existingScheduledTask);
-            //}
-            //catch (Exception)
-            //{
-            //    // Handle the exception and return an error response
-            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
-            //}
+
+
+            // Return the successful response
+            return Ok(existingScheduledTask);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
+            }
         }
     }
 }

@@ -60,6 +60,7 @@ export class ViewScheduleActivityComponent implements OnInit{
   taskstartDateTime: Date = new Date();
   taskendDateTime: Date = new Date();
   task_ID: number = 0;
+  scheduledTask_ID: number = 0;
   task_Name: string = '';
   scheduledActivity_ID: number = 0;
 
@@ -247,29 +248,48 @@ export class ViewScheduleActivityComponent implements OnInit{
         skill_Description: ''
       }
     },
+    scheduledTaskUser: [{
+      scheduledTaskUser_ID: 0,
+      userId: 0,
+      scheduledTask_ID: 0,
+      user: {
+        user_ID: 0,
+        username: '',
+        surname: '',
+        email: '',
+        idPassport: '',
+        cellphone: '',
+        role: '',
+        rating_ID: 0,
+        ratings: {
+          rating_ID: 0,
+          rating: 0,
+        },
+      },
+    }],
     users: [],
     contractors: []
   }
 
-  // scheduledTaskUser: ScheduledTaskUser = {
-  //   scheduledTaskUser_ID: 0,
-  //   userId: 0,
-  //   scheduledTask_ID: 0,
-  //   user: {
-  //     userId: 0,
-  //     username: '',
-  //     surname: '',
-  //     email: '',
-  //     idPassport: '',
-  //     cellphone: '',
-  //     role: '',
-  //     rating_ID: 0,
-  //     ratings: {
-  //       rating_ID: 0,
-  //       rating: 0,
-  //     },
-  //   },
-  // };
+  ScheduledTaskUser: ScheduledTaskUser[] = [{
+    scheduledTaskUser_ID: 0,
+    userId: 0,
+    scheduledTask_ID: 0,
+    user: {
+      user_ID: 0,
+      username: '',
+      surname: '',
+      email: '',
+      idPassport: '',
+      cellphone: '',
+      role: '',
+      rating_ID: 0,
+      ratings: {
+        rating_ID: 0,
+        rating: 0,
+      },
+    },
+  }];
 
   ngOnInit(): void {
     this.GetAllScheduledActivities();
@@ -342,10 +362,13 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  loadScheduledTask(content: any, id: number): void {
+  loadScheduledTask(content: any, id: number, taskID: number): void {
     this.scheduledActivityService.getOneScheduledTask(id).subscribe({
       next: (scheduledTask) => {
         this.scheduledTask = scheduledTask;
+        this.task_ID = taskID;
+        this.taskstartDateTime = this.scheduledTask.startDate;
+        this.taskendDateTime = this.scheduledTask.endDate;
         this.openTaskUpdateModal(content, id)
       },
       error: (response) => {
@@ -358,15 +381,14 @@ export class ViewScheduleActivityComponent implements OnInit{
     this.searchTerm = '';
     this.filtered = [];
     this.isAddMode = false;
+    this.selectedEmployee = null;
+    this.selectedContractor = null;
     this.GetAllContractors();
     this.GetAllUsers();
     this.loadEmployeesIntoArray();
     this.loadContractorIntoArray();
 
-    this.addUpdateEmployee = this.scheduledTask.users||[];
-    this.taskstartDateTime = this.addUpdateScheduledActivityRequest.startDate;
-    this.taskendDateTime = this.addUpdateScheduledActivityRequest.endDate;
-    this.addUpdateContractor = this.scheduledTask.contractors||[];
+    this.scheduledTask_ID = id;
 
     const modalRef = this.modalService.open(content, {
       size: 'xl',
@@ -377,7 +399,7 @@ export class ViewScheduleActivityComponent implements OnInit{
 
   UpdateScheduledTask(success: any, failed:any) {
     this.scheduledTask = {
-      scheduledTask_ID: 0,
+      scheduledTask_ID: this.scheduledTask_ID,
       startDate: this.taskstartDateTime,
       endDate: this.taskendDateTime,
       taskStatus_ID: 1,
@@ -398,6 +420,7 @@ export class ViewScheduleActivityComponent implements OnInit{
     }
     this.scheduledActivityService.updateScheduledTask(this.scheduledTask).subscribe({
       next: () => {
+        this.GetOneScheduledActivities(this.scheduledActivity_ID)
         const modalRef = this.modalService.open(success, {
           size: 'xl',
           centered: true,
@@ -666,6 +689,7 @@ export class ViewScheduleActivityComponent implements OnInit{
       users: this.addUpdateEmployee,
       contractors: this.addUpdateContractor
     }
+
     this.scheduledActivityService.AddScheduledTask(this.scheduledTask, this.scheduledActivity_ID).subscribe({
       next: () => {
         this.GetOneScheduledActivities(this.scheduledActivity_ID);
@@ -716,48 +740,78 @@ export class ViewScheduleActivityComponent implements OnInit{
     );
   }
 
-  addEmployeeToArray() {
-    if (this.selectedEmployee) {
-      const employeeToAdd = this.users.find(employee => employee.user_ID === Number(this.selectedEmployee));
+ addEmployeeToArray(content: any) {
+  if (this.selectedEmployee) {
+    const employeeIdToAdd = Number(this.selectedEmployee);
+
+    // Check if the user with the specified ID is already in the array
+    const isUserAlreadyAdded = this.addUpdateEmployee.some(employee => employee.user_ID === employeeIdToAdd);
+
+    if (!isUserAlreadyAdded) {
+      const employeeToAdd = this.users.find(employee => employee.user_ID === employeeIdToAdd);
       if (employeeToAdd) {
         this.addUpdateEmployee.push(employeeToAdd);
+        console.log(this.addUpdateEmployee);
         this.selectedEmployee = null;
         this.isEmployeeListEmpty = this.addUpdateEmployee.length === 0;
       }
+    } else {
+      this.selectedEmployee = null;
+      const modalRef = this.modalService.open(content, {
+        size: 'dialog-centered',
+        backdrop: 'static'
+      });
     }
   }
+}
+
 
   deleteEmployeeFromArray(employee: User) {
     const index = this.addUpdateEmployee.findIndex(s => s.user_ID === employee.user_ID);
     if (index !== -1) {
       this.addUpdateEmployee.splice(index, 1);
+      console.log(this.addUpdateEmployee)
     }
     this.isEmployeeListEmpty = this.addUpdateEmployee.length === 0;
   }
 
   loadEmployeesIntoArray() {
-    if (this.scheduledTask.users) {
-      console.log(1)
-      this.addUpdateEmployee = this.scheduledTask.users
-        .filter((employee): employee is User => employee !== undefined)
-        .map(employeeItem => employeeItem);
+    if (this.scheduledTask) {
+      this.addUpdateEmployee = this.scheduledTask.scheduledTaskUser
+        ?.filter((scheduledTaskUser: ScheduledTaskUser) => scheduledTaskUser.user !== undefined)
+        .map((userItem: any) => userItem.user) || [];
     } else {
       this.addUpdateEmployee = [];
     }
     this.isEmployeeListEmpty = this.addUpdateEmployee.length === 0;
   }
   
+  
 
-  addContractorToArray() {
+  addContractorToArray(content: any) {
     if (this.selectedContractor) {
-      const contractorToAdd = this.contractors.find(contractor => contractor.contractor_ID === Number(this.selectedContractor));
-      if (contractorToAdd) {
-        this.addUpdateContractor.push(contractorToAdd);
+      const contractorIdToAdd = Number(this.selectedContractor);
+  
+      // Check if the contractor with the specified ID is already in the array
+      const isContractorAlreadyAdded = this.addUpdateContractor.some(contractor => contractor.contractor_ID === contractorIdToAdd);
+  
+      if (!isContractorAlreadyAdded) {
+        const contractorToAdd = this.contractors.find(contractor => contractor.contractor_ID === contractorIdToAdd);
+        if (contractorToAdd) {
+          this.addUpdateContractor.push(contractorToAdd);
+          this.selectedContractor = null;
+          this.isContractorListEmpty = this.addUpdateContractor.length === 0;
+        }
+      } else {
         this.selectedContractor = null;
-        this.isContractorListEmpty = this.addUpdateContractor.length === 0;
+        const modalRef = this.modalService.open(content, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
       }
     }
   }
+  
 
   deleteContractorFromArray(contractor: Contractor) {
     const index = this.addUpdateContractor.findIndex(s => s.contractor_ID === contractor.contractor_ID);
@@ -768,10 +822,10 @@ export class ViewScheduleActivityComponent implements OnInit{
   }
 
   loadContractorIntoArray() {
-    if (this.scheduledTask.contractors) {
-      this.addUpdateContractor = this.scheduledTask.contractors
-        .filter((supplier): supplier is Contractor => supplier !== undefined)
-        .map(supplierItem => supplierItem);
+    if (this.scheduledTask) {
+      this.addUpdateContractor = this.scheduledTask.scheduledTaskContractor
+        ?.filter((scheduledTaskContractor: ScheduledTaskContractor) => scheduledTaskContractor.contractor !== undefined)
+        .map((userItem: any) => userItem.contractor) || [];
     } else {
       this.addUpdateContractor = [];
     }
@@ -788,7 +842,7 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  OpenScheduleTaskModal(content: any, id: number){
+  ScheduleTaskModal(content: any, id: number){
     this.loadTask(id);
     this.isAddMode = true;
     const modalRef = this.modalService.open(content, {
@@ -798,16 +852,36 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  openScheduleTaskModal(id: number, content: any, name: string){
-    this.task_ID = id;
-    this.task_Name = name;
-    this.GetAllUsers();
-    this.GetAllContractors();
-    const modalRef = this.modalService.open(content, {
-      size: 'xl',
-      centered: true,
-      backdrop: 'static'
-    });
+  checkTaskSchedule(id: number): boolean {
+    for (const scheduledTask of this.addUpdateScheduledActivityRequest.scheduledActivityScheduledTask) {
+      if (scheduledTask.scheduledTask.task_ID === id) {
+        return true;
+      }
+    }
+    return false;
+  }
+  openScheduleTaskModal(id: number, content: any, exists: any, name: string){
+    this.GetOneScheduledActivities(this.scheduledActivity_ID);
+    if(this.checkTaskSchedule(id)){
+      const modalRef = this.modalService.open(exists, {
+        size: 'xl',
+        centered: true,
+        backdrop: 'static'
+      });
+    }
+    else{
+      this.addUpdateEmployee = [];
+      this.addUpdateContractor = [];
+      this.task_ID = id;
+      this.task_Name = name;
+      this.GetAllUsers();
+      this.GetAllContractors();
+      const modalRef = this.modalService.open(content, {
+        size: 'xl',
+        centered: true,
+        backdrop: 'static'
+      });
+    }
   }
 
   GetAllUsers(): void {
@@ -871,6 +945,7 @@ export class ViewScheduleActivityComponent implements OnInit{
   DeleteTaskActivity(scheduledTaskID: number, success: any, failed: any) {
     this.scheduledActivityService.deleteScheduledActivityScheduledTask(scheduledTaskID).subscribe({
       next: (response) => {
+        this.GetOneScheduledActivities(this.scheduledActivity_ID)
         const modalRef = this.modalService.open(success, {
           size: 'dialog-centered',
           backdrop: 'static'
