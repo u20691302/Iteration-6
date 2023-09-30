@@ -16,6 +16,10 @@ import { UserService } from 'src/app/services/user/user.service';
 import { ScheduledTask } from 'src/app/models/scheduledActivity/scheduledTask.model';
 import { Contractor } from 'src/app/models/contractor/contractor.model';
 import { ContractorService } from 'src/app/services/contractor/contractor.service';
+import { NotificationSupervisor } from 'src/app/models/notifications/notificationSupervisor.model';
+import { NotificationAdmin } from 'src/app/models/notifications/notificationAdmin.model';
+import { NotificationUser } from 'src/app/models/notifications/notificationUser.model';
+import { NotificationService } from 'src/app/services/notification/notification.service';
 
 @Component({
   selector: 'app-view-schedule-activity',
@@ -25,7 +29,7 @@ import { ContractorService } from 'src/app/services/contractor/contractor.servic
 
 export class ViewScheduleActivityComponent implements OnInit{
 
-  constructor(private contractorService: ContractorService, private userService: User1Service, private scheduledActivityService: ScheduledActivityService, private activityService: ActivityService, private modalService: NgbModal, private formBuilder: FormBuilder, private route: ActivatedRoute, private userTyService: UserService) { 
+  constructor(private notificationService: NotificationService, private contractorService: ContractorService, private userService: User1Service, private scheduledActivityService: ScheduledActivityService, private activityService: ActivityService, private modalService: NgbModal, private formBuilder: FormBuilder, private route: ActivatedRoute, private userTyService: UserService) { 
     this.form = this.formBuilder.group({
       startDateTime: ['', Validators.required],
       endDateTime: ['', Validators.required],
@@ -290,6 +294,33 @@ export class ViewScheduleActivityComponent implements OnInit{
       },
     },
   }];
+
+  notificationSupervisor: NotificationSupervisor = {
+      notification_ID: 0,
+      date: new Date(),
+      user_ID: 0,
+      notification_Message: '',
+      notificationStatus_ID: 0,
+      scheduledActivity_ID: 0,
+  };
+
+  notificationAdmin: NotificationAdmin = {
+    notification_ID: 0,
+    date: new Date(),
+    user_ID: 0,
+    notification_Message: '',
+    notificationStatus_ID: 0,
+    scheduledActivity_ID: 0,
+  };
+
+  notificationUser: NotificationUser= {
+    notification_ID: 0,
+    date: new Date(),
+    user_ID: 0,
+    notification_Message: '',
+    notificationStatus_ID: 0,
+    scheduledTask_ID: 0,
+  };
 
   ngOnInit(): void {
     this.GetAllScheduledActivities();
@@ -652,6 +683,25 @@ export class ViewScheduleActivityComponent implements OnInit{
       next: (ScheduledActivity:ScheduledActivity) => {
         this.scheduledActivity_ID = ScheduledActivity.scheduledActivity_ID;
         this.ngOnInit();
+
+        const username = (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.username) + ' '
+         + (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.surname)
+
+
+        this.notificationSupervisor= {
+          notification_ID: 0,
+          date: new Date(),
+          user_ID: this.selectedSupervisor || 0,
+          notification_Message: 'You, (' + username + ') have been assigned as a supervisor on a scheduled activity.',
+          notificationStatus_ID: 3,
+          scheduledActivity_ID: this.scheduledActivity_ID
+        }
+        this.notificationService.AddNotifcationSupervisor(this.notificationSupervisor).subscribe({
+          next: () => {
+           
+          }
+        });
+
         const modalRef = this.modalService.open(success, {
           size: 'xl',
           centered: true,

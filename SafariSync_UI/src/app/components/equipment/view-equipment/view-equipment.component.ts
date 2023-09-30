@@ -351,13 +351,26 @@ export class ViewEquipmentComponent implements OnInit {
     );
   }
 
-  addSupplierToArray() {
+  addSupplierToArray(content: any) {
     if (this.selectedSupplier) {
-      const supplierToAdd = this.suppliers.find(supplier => supplier.supplier_ID === Number(this.selectedSupplier));
-      if (supplierToAdd) {
-        this.addUpdateSuppliers.push(supplierToAdd);
+      const supplierIdToAdd = Number(this.selectedSupplier);
+      const isUserAlreadyAdded = this.addUpdateSuppliers.some(supplier => supplier.supplier_ID === supplierIdToAdd);
+
+      if (!isUserAlreadyAdded) {
+        const supplierToAdd = this.suppliers.find(supplier => supplier.supplier_ID === Number(this.selectedSupplier));
+        if (supplierToAdd) {
+          this.addUpdateSuppliers.push(supplierToAdd);
+          this.selectedSupplier = null;
+          this.isSupplierListEmpty = this.addUpdateSuppliers.length === 0;
+        }
+      }
+      else {
         this.selectedSupplier = null;
-        this.isSupplierListEmpty = this.addUpdateSuppliers.length === 0;
+        const modalRef = this.modalService.open(content, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+
       }
     }
   }

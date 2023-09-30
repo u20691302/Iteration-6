@@ -47,7 +47,9 @@ namespace SafariSync_API.Data
         public DbSet<ToolboxStock> ToolboxStock { get; set; }
         public DbSet<Report> Report { get; set; }
         public DbSet<RatingSettings> RatingSettings { get; set; }
-        public DbSet<Notification> Notification { get; set; }
         public DbSet<NotificationStatus> NotificationStatus { get; set; }
+        public DbSet<NotificationSupervisor> NotificationSupervisor { get; set; }
+        public DbSet<NotificationUser> NotificationUser { get; set; }
+        public DbSet<NotificationAdmin> NotificationAdmin { get; set; }
     }
 }

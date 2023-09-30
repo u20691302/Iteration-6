@@ -17,7 +17,7 @@ namespace SafariSync_API.Controllers.Dashboard
     [Route("/api/[controller]")]
     public class DashboardController : Controller
     {
-        
+
         // Declaration of a private read-only field of type ICRUDRepository.
         private readonly ICRUDRepository iCRUDRepository;
         private readonly SafariSyncDBContext safariSyncDBContext;
@@ -85,34 +85,7 @@ namespace SafariSync_API.Controllers.Dashboard
                 // Return a StatusCode 500 response if an exception occurs during the operation
                 return StatusCode(500, "Internal Server Error. Please contact support.");
             }
-}
 
-
-        /////////////////////////////////////////
-        /////////////////////////////////////
-        ///notifications
-        [HttpGet]
-        [Route("GetAllNotifications")]
-        public async Task<ActionResult> GetAllNotifications()
-        {
-            try
-            {
-                // Retrieve all skills asynchronously from the CRUD repository
-                var notification = await safariSyncDBContext.Notification
-                    .Include(es => es.Users).ThenInclude(es => es.Ratings)
-                    .Include(es => es.NotificationStatus)
-                    .Include(es => es.ScheduledActivity).ThenInclude(es => es.Activity)
-                    .Include(es => es.ScheduledTask).ToListAsync();
-
-                // Return an Ok response with the retrieved skills
-                return Ok(notification);
-            }
-            catch (Exception)
-            {
-                // Return a StatusCode 500 response if an exception occurs during the operation
-                return StatusCode(500, "Internal Server Error. Please contact support.");
-            }
         }
-
     }
 }

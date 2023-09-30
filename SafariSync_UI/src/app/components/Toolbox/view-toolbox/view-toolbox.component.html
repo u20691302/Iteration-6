@@ -364,7 +364,7 @@
     <div class="toolbox-details">
       <div class="detail">
         <span class="label">Equipment Name: </span>
-        <span class="value">{{ AddUpdateToolboxEquipmentRequest.equipment?.equipment_Name }}</span>
+        <span class="value">{{ this.equipmentName }}</span>
       </div>
       <div class="detail">
         <span class="label">Equipment Qunatity: </span>
@@ -373,7 +373,7 @@
     </div>
     <div class="modal-button-container">
       <button class="btn-return" (click)="modal.close('Close click')">Return</button>
-      <button type="button" class="btn-add" (click)="modal.close('Close click'); AddToolboxEquipment(ConfirmationItemModal, AddError)">Confirm</button>
+      <button type="button" class="btn-add" (click)="modal.close('Close click'); AddToolboxEquipment(ConfirmationItemModal, AddError, failedQuantityError)">Confirm</button>
     </div>
   </div>
   <div class="modal-footer"></div>
@@ -389,7 +389,7 @@
     <div class="toolbox-details">
       <div class="detail">
         <span class="label">Stock Name: </span>
-        <span class="value">{{ AddUpdateToolboxStockRequest.stock?.stock_Name }}</span>
+        <span class="value">{{ this.stockName }}</span>
       </div>
       <div class="detail">
         <span class="label">Equipment Qunatity: </span>
@@ -517,6 +517,20 @@
   </div>
   <div class="modal-body">
     <p><b>There was an error deleting this toolbox item.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- ToolboxTask Delete Error -->
+<ng-template #failedQuantityError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>You cannot add a quantity of equipment to a toolbox exceeding the quantity on hand.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
     </div>

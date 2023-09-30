@@ -137,7 +137,7 @@
                 <option *ngFor="let supplier of suppliers" [value]="supplier.supplier_ID">{{ supplier.supplier_Name }}</option>
               </select>
           
-              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSupplierToArray()" [disabled]="!selectedSupplier">
+              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSupplierToArray(alreadyExistsSupplier)" [disabled]="!selectedSupplier">
                 <i class="fa-solid fa-plus"></i>
               </button>
             </div>
@@ -442,6 +442,20 @@
     <p><b>There was an error deleting this supplier.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Task Exists Error Modal -->
+<ng-template #alreadyExistsSupplier let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This supplier has already been added to this stock.</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>

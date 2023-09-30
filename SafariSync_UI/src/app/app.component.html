@@ -18,8 +18,8 @@
   <div class="translucent-overlay"></div>
 </div>
 
-<ng-container *ngIf="currentRoute !== 'register-admin' && currentRoute !== 'login' && currentRoute !== 'forgot-password' && currentRoute !== 'register-user' && currentRoute !== 'register-farmworker'">
-  <ng-container *ngIf="userRole === 'User'; else adminNavbar">
+<ng-container *ngIf="currentRoute !== 'register-admin' && currentRoute !== 'login' && currentRoute !== 'forgot-password' && currentRoute !== 'register-supervisor' && currentRoute !== 'register-farmworker'">
+  <ng-container *ngIf="userRole === 'Supervisor' || userRole === 'Farm Worker'; else adminNavbar">
     <app-usernavbar></app-usernavbar>
   </ng-container>
   <ng-template #adminNavbar>
@@ -28,7 +28,7 @@
 </ng-container>
 
 
-<router-outlet *ngIf="currentRoute === 'register-admin' || currentRoute === 'login' || currentRoute === 'forgot-password' || currentRoute === 'register-user' || currentRoute === 'register-farmworker'"></router-outlet>
+<router-outlet *ngIf="currentRoute === 'register-admin' || currentRoute === 'login' || currentRoute === 'forgot-password' || currentRoute === 'register-supervisor' || currentRoute === 'register-farmworker'"></router-outlet>
 <ng-toast></ng-toast>
 
 <router-outlet></router-outlet>

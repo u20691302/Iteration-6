@@ -221,15 +221,38 @@ CREATE TABLE NotificationStatus (
     NotificationStatus_Name NVARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Notification (
+CREATE TABLE NotificationSupervisor (
     Notification_ID INT IDENTITY(1,1) PRIMARY KEY,
     Date DATETIME NOT NULL,
 	User_ID INT NOT NULL,
+	Notification_Message VARCHAR(255) NOT NULL,
 	NotificationStatus_ID INT NOT NULL,
-	ScheduledTask_ID INT NOT NULL,
 	ScheduledActivity_ID INT NOT NULL,
 	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
+	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
+	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
+);
+
+CREATE TABLE NotificationUser (
+    Notification_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Date DATETIME NOT NULL,
+	User_ID INT NOT NULL,
+	Notification_Message VARCHAR(255) NOT NULL,
+	NotificationStatus_ID INT NOT NULL,
+	ScheduledTask_ID INT NOT NULL,
+	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
 	FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
+	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
+);
+
+CREATE TABLE NotificationAdmin (
+    Notification_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Date DATETIME NOT NULL,
+	User_ID INT NOT NULL,
+	ScheduledActivity_ID INT NOT NULL,
+	Notification_Message VARCHAR(255) NOT NULL,
+	NotificationStatus_ID INT NOT NULL,
+	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
 	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
 	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
 );
@@ -517,13 +540,3 @@ VALUES
     ('Accepted'),
     ('Rejected'),
     ('Pending');
-
-INSERT INTO Notification (Date, User_ID, NotificationStatus_ID, ScheduledTask_ID, ScheduledActivity_ID)
-VALUES
-    ('2023-09-12 10:00:00', 1, 1, 1, 1),
-    ('2023-09-12 11:00:00', 2, 2, 2, 2),
-    ('2023-09-12 12:00:00', 4, 3, 3, 3),
-	('2023-09-12 12:00:00', 5, 3, 3, 3),
-	('2023-09-12 12:00:00', 6, 3, 3, 3),
-	('2023-09-12 12:00:00', 3, 3, 3, 3),
-	('2023-09-12 12:00:00', 3, 3, 3, 3);

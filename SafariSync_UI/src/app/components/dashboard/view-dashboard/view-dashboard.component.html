@@ -3,11 +3,10 @@
   <h3>{{fullName}}'s Dashboard</h3>
 </div>
 
-
 <div class="dashboard">
   <!-- First Column -->
   <div class="column" >
-    <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Activity Status</h5>
+    <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Scheduled Activity Status</h5>
     <!-- Section 1 -->
     <div class="section">
       <!-- Content for Section 1 -->
@@ -33,28 +32,28 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>User</th>
-            <th>Activity</th>
-            <th>Actions</th>
+            <th>Message</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let notification of notifications">
             <td>{{ notification.date | date }}</td>
-            <td>{{ notification.users.username }}</td>
-            <td>{{ notification.scheduledActivity.activity.activity_Name }}</td>
+            <td>{{ notification.notification_Message }}</td>
             <td>
               <button class="button-but">Accept</button>
               <button class="button-reject">Reject</button>
             </td>
           </tr>
         </tbody>
+        <tbody *ngIf="notifications.length === 0">
+          <tr>
+            <td colspan="2">No Recent Updates</td>
+          </tr>
+        </tbody>
       </table>
-      
     </div>
-</div>
-
-
+  </div>
 
   <!-- Third Column -->
   <div class="column">
@@ -62,7 +61,6 @@
     <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Stock Items Near Depeletion</h5>
     <div class="section">
       <!-- Content for Section 4 -->
-
         <table class="table table-hover">
           <thead>
             <tr>
@@ -76,18 +74,17 @@
               <td>{{ stock.quantity }}</td>
             </tr>
           </tbody>
-          <tbody *ngIf="stocks.length === 0">
+          <tbody *ngIf="lowStock.length === 0">
             <tr>
-              <td colspan="6">No Low Stock Listings</td>
+              <td colspan="2">No Low Stock Listings</td>
             </tr>
           </tbody>
         </table>
-    
-
-
     </div>
+
+    
     <!-- Section 5 -->
-    <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Top Monthly Performers</h5>
+    <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Top Performers</h5>
     <div class="section">
       <!-- Content for Section 5 -->
       <div *ngIf="users && users.length >= 3" class="bar-graph">
@@ -102,11 +99,5 @@
         </div>
       </div>
     </div>
-  </div>
-      
-      
-      
-      
-      
-      
-    </div>
+  </div> 
+</div>

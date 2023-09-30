@@ -61,7 +61,6 @@ export class ToolboxService {
   }
 
   loadToolboxStock(toolboxStockID: number): Observable<ToolboxStock> {
-    console.log(toolboxStockID)
     return this.http.get<ToolboxStock>(this.baseApiUrl + '/api/Toolbox/ReadOneToolboxStockAsync/' + toolboxStockID)
   }
 
@@ -70,7 +69,6 @@ export class ToolboxService {
   }
 
   deleteToolboxStock(toolboxStockID: number): Observable<ToolboxStock> {
-    console.log(toolboxStockID)
     return this.http.delete<ToolboxStock>(this.baseApiUrl + '/api/Toolbox/DeleteToolboxStock/' + toolboxStockID);
   }
 

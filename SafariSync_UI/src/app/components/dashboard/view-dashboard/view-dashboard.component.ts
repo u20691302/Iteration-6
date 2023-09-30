@@ -10,9 +10,8 @@ import { Chart } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts'; // Import ng2-charts
 import { ScheduledActivityService } from 'src/app/services/scheduleActivity/schedule-activity.service';
 import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
-import { NotificationService } from 'src/app/services/notification/notification.service';
-import { Notification } from 'src/app/models/Notification/Notification.model';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
+import { NotificationService } from 'src/app/services/notification/notification.service';
 
 
 @Component({
@@ -26,47 +25,99 @@ export class ViewDashboardComponent implements OnInit {
   barChart: any;
   public fullName: string = "";
 
+  totalActivities: number = 0;
+  inProgressActivities:number = 0;
+
+  pendingScheduling:number = 0;
+  completedActivities:number = 0;
+  notifications: any[] = [];
+
+  scheduledActivities: ScheduledActivity [] = [];
+
+  stocks: Stock[] = [];
+  lowStock: { name: string; quantity: number }[] = []; // Initialize the lowStock array
+  users: User[] = [];
+  maxValue: number = 8; // Customize this based on your data
+  ratingSettings: RatingSettings[] = [];
+  actualUpper: number = 0;
+  actualLower: number = 0;
+
+  updatedRatingSetting: RatingSettings = {
+    ratingSettings_ID: 1,
+    ratingSettings_Upper: 4,
+    ratingSettings_Lower: 2
+  };
+
+  userRole: string = "";
+  userID: number = 0;
+
+  constructor(private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.fetchRatingSettings();
     this.GetAllStock();
     this.GetAllUsers();
     this.GetAllScheduledActivities();
-    this.readAllNotifications();
+
     this.userStore.getFullNameFromStore().subscribe(val => {
       let fullNameFromToken = this.userTyService.getFullNameFromToekn();
       this.fullName = val || fullNameFromToken;
     });
-    
+
+    this.userStore.getRoleFromStore().subscribe(val =>{
+      let userRole = this.userTyService.getRoleFromToken();
+        this.userRole = userRole;
+    });
+
+    this.userStore.getUserIdFromStore().subscribe(val =>{
+      let userid = this.userTyService.getUserIdFromToken();
+        this.userID = userid;
+    });
+
+    if (this.userRole === "Admin"){
+      this.ReadAllNotificationAdmin();
+    }
+    else if (this.userRole === "Supervisor"){
+      this.ReadAllNotificationSupervisor();
+    }
+    else if (this.userRole === "Farm Worker"){
+      this.ReadAllNotificationUser();
+    }
   }
 
-  totalActivities: number = 0;
-  inProgressActivities:number = 0;
-
-  pendingScheduling:number = 0;
-  completedActivities:number = 0;
-  notifications: Notification[] = [];
-
-  scheduledActivities: ScheduledActivity [] = [];
-
-  constructor(private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
-
-  readAllNotifications(): void {
-    this.notificationService.readAllNotifications().subscribe(
-      (notifications) => {
-        // Assign the fetched notifications to the component's notifications array
-        this.notifications = notifications;
-        console.log(notifications); // This log should display the data correctly
+  ReadAllNotificationSupervisor(): void {
+    this.notificationService.getNotificationSupervisor().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
       },
-      (error) => {
-        // Handle errors if any
-        console.error('Error fetching notifications:', error);
+      error: (response) => {
+        console.log(response);
       }
-    );
+    });
+  }
+
+  ReadAllNotificationUser(): void {
+    this.notificationService.getNotificationUser().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
+      },
+      error: (response) => {
+        console.log(response);
+      }
+    });
+  }
+
+  ReadAllNotificationAdmin(): void {
+    this.notificationService.getNotificationAdmin().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
+      },
+      error: (response) => {
+        console.log(response);
+      }
+    });
   }
   
-  
-
   createChart() {
     this.chart = new Chart('MyChart', {
       type: 'pie', // This denotes the type of chart
@@ -112,22 +163,6 @@ export class ViewDashboardComponent implements OnInit {
     });
   }
 
-
-  stocks: Stock[] = [];
-  lowStock: { name: string; quantity: number }[] = []; // Initialize the lowStock array
-  users: User[] = [];
-  maxValue: number = 8; // Customize this based on your data
-  ratingSettings: RatingSettings[] = [];
-  actualUpper: number = 0;
-  actualLower: number = 0;
-
-  updatedRatingSetting: RatingSettings = {
-    ratingSettings_ID: 1,
-    ratingSettings_Upper: 4,
-    ratingSettings_Lower: 2
-  };
-
-
   GetAllScheduledActivities(): void {
     this.scheduledActivityService.getAllScheduledActivities("").subscribe({
       next: (scheduledActivities) => {
@@ -158,8 +193,6 @@ export class ViewDashboardComponent implements OnInit {
          this.pendingScheduling = notstartact.length;
         console.log(`Number of not started activities: ${this.pendingScheduling}`);
         this.createChart();
-
-
       },
       error: (response) => {
         console.log(response);
@@ -167,7 +200,6 @@ export class ViewDashboardComponent implements OnInit {
     });
   }
   
-
   fetchRatingSettings(): void {
     this.userTyService.readAllRatingSettings().subscribe(
       (data: RatingSettings[]) => {
@@ -200,7 +232,6 @@ export class ViewDashboardComponent implements OnInit {
             user.ratings.rating >= this.actualUpper
           );
         });
-                console.log(this.users);
       },
       error: (response) => {
         console.log(response);
@@ -208,13 +239,10 @@ export class ViewDashboardComponent implements OnInit {
     });
   }
   
-
   GetAllStock(): void {
     this.stockService.getAllStocks("").subscribe({
       next: (stock) => {
         this.stocks = stock;
-        console.log(this.stocks);
-        
         // Clear the lowStock array before populating it
         this.lowStock = [];
 
@@ -224,14 +252,10 @@ export class ViewDashboardComponent implements OnInit {
             this.lowStock.push({ name: item.stock_Name, quantity: item.stock_Quantity_On_Hand });
           }
         });
-
-        console.log(this.lowStock); // Display low stock items
       },
       error: (response) => {
         console.log(response);
       }
     });
   }
-
-
 }

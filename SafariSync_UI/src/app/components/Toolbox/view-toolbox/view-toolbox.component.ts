@@ -36,6 +36,8 @@ export class ViewToolboxComponent implements OnInit {
   equipmentQuantity: number = 0;
   selectedStock: number = 0;
   stockQuantity: number = 0;
+  equipmentName: string = "";
+  stockName: string = "";
 
   addUpdateToolboxRequest: Toolbox = {
     toolbox_ID: 0,
@@ -399,13 +401,16 @@ export class ViewToolboxComponent implements OnInit {
   }
 
   openAddItemConfirmationModal(content: any){
+
+    this.equipmentName = this.Equipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.equipment_Name||"";
+    this.stockName = this.Stock.find(stock => stock.stock_ID === Number(this.selectedStock))?.stock_Name||"";
     this.modalService.open(content, {
       size: 'dialog-centered',
       backdrop: 'static'
     });
   }
 
-  AddToolboxEquipment(success: any, failed: any) {
+  AddToolboxEquipment(success: any, failed: any, quantityError: any) {
 
     const id = this.Toolbox.toolbox_ID;
 
@@ -424,11 +429,41 @@ export class ViewToolboxComponent implements OnInit {
         },
       };
 
-      this.toolboxService.deleteToolboxEquipment(this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.toolboxEquipment_ID || 0).subscribe({
-        next: (response) => {
-          this.LoadToolboxItems(this.Toolbox.toolbox_ID);
-        },
-      })
+      if (this.AddUpdateToolboxEquipmentRequest.quantity > (this.Equipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.equipment_Quantity_On_Hand || 0)){
+        this.selectedEquipment = 0;
+        this.equipmentQuantity = 0;
+        this.modalService.open(quantityError, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+      }
+      else {
+        this.toolboxService.AddToolboxEquipment(this.AddUpdateToolboxEquipmentRequest).subscribe({
+          next: (toolboxEquipment: ToolboxEquipment) => {
+
+            this.toolboxService.deleteToolboxEquipment(this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.toolboxEquipment_ID || 0).subscribe({
+              next: (response) => {
+                this.LoadToolboxItems(this.Toolbox.toolbox_ID);
+              },
+            })
+
+            this.LoadToolboxItems(id);
+            this.selectedEquipment = 0;
+            this.equipmentQuantity = 0;
+    
+            this.modalService.open(success, {
+              size: 'dialog-centered',
+              backdrop: 'static'
+            });
+          },
+          error: (response: any) => {
+            this.modalService.open(failed, {
+              size: 'dialog-centered',
+              backdrop: 'static'
+            });
+          }
+        });
+      } 
     }
     else {
       this.AddUpdateToolboxEquipmentRequest = {
@@ -444,39 +479,49 @@ export class ViewToolboxComponent implements OnInit {
           equipment_Low_Level_Warning: 0
         },
       };
-    }
 
-    this.toolboxService.AddToolboxEquipment(this.AddUpdateToolboxEquipmentRequest).subscribe({
-      next: (toolboxEquipment: ToolboxEquipment) => {
-        this.LoadToolboxItems(id);
+      if (this.AddUpdateToolboxEquipmentRequest.quantity > (this.Equipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.equipment_Quantity_On_Hand || 0)){
         this.selectedEquipment = 0;
         this.equipmentQuantity = 0;
-
-        this.modalService.open(success, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      },
-      error: (response: any) => {
-        this.modalService.open(failed, {
+        this.modalService.open(quantityError, {
           size: 'dialog-centered',
           backdrop: 'static'
         });
       }
-    });
+      else {
+        this.toolboxService.AddToolboxEquipment(this.AddUpdateToolboxEquipmentRequest).subscribe({
+          next: (toolboxEquipment: ToolboxEquipment) => {
+            this.LoadToolboxItems(id);
+            this.selectedEquipment = 0;
+            this.equipmentQuantity = 0;
+    
+            this.modalService.open(success, {
+              size: 'dialog-centered',
+              backdrop: 'static'
+            });
+          },
+          error: (response: any) => {
+            this.modalService.open(failed, {
+              size: 'dialog-centered',
+              backdrop: 'static'
+            });
+          }
+        });
+      } 
+    }
   }
 
   AddToolboxStock(success: any, failed: any) {
 
     const id = this.Toolbox.toolbox_ID;
 
-    if (this.Toolbox.toolboxEquipment.some(e => e.equipment_ID === Number(this.selectedEquipment))) {
+    if (this.Toolbox.toolboxStock.some(e => e.stock_ID === Number(this.selectedStock))) {
     
       this.AddUpdateToolboxStockRequest = {
         toolboxStock_ID: 0,
         toolbox_ID: this.Toolbox.toolbox_ID,
         stock_ID: this.selectedStock,
-        quantity: this.equipmentQuantity + (this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.quantity||0),
+        quantity: this.stockQuantity + (this.Toolbox.toolboxStock.find(stock => stock.stock_ID === Number(this.selectedStock))?.quantity||0),
         stock: {
           stock_ID: 0,
           stock_Name: this.Stock.find(stock => stock.stock_ID === Number(this.selectedStock))?.stock_Name || '',
@@ -486,7 +531,7 @@ export class ViewToolboxComponent implements OnInit {
         },
       };
 
-      this.toolboxService.deleteToolboxEquipment(this.Toolbox.toolboxEquipment.find(equipment => equipment.equipment_ID === Number(this.selectedEquipment))?.toolboxEquipment_ID || 0).subscribe({
+      this.toolboxService.deleteToolboxStock(this.Toolbox.toolboxStock.find(stock => stock.stock_ID === Number(this.selectedStock))?.toolboxStock_ID || 0).subscribe({
         next: (response) => {
           this.LoadToolboxItems(this.Toolbox.toolbox_ID);
         },
@@ -500,7 +545,7 @@ export class ViewToolboxComponent implements OnInit {
         quantity: this.stockQuantity,
         stock: {
           stock_ID: 0,
-          stock_Name: this.Stock.find(stock => stock.stock_ID === this.selectedEquipment)?.stock_Name || '',
+          stock_Name: this.Stock.find(stock => stock.stock_ID === this.selectedStock)?.stock_Name || '',
           stock_Description: '',
           stock_Quantity_On_Hand: 0,
           stock_Low_Level_Warning: 0

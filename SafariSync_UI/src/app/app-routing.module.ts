@@ -31,8 +31,8 @@ import { GeneratePersonnelReportComponent } from './components/reporting/generat
 import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
 import { RatingSettingsComponent } from './components/rating-settings/rating-settings.component';
 import { RegisterGuard } from './components/user/guards/register.guard';
-import { RegisterUserComponent } from './components/user/register-user/register-user.component';
 import { RegisterFarmworkerComponent } from './components/user/register-farmworker/register-farmworker.component';
+import { RegisterSupervisorComponent } from './components/user/register-supervisor/register-supervisor.component';
 
 
 const routes: Routes = [
@@ -53,12 +53,12 @@ const routes: Routes = [
     component: RegisterAdminComponent
   },
   { 
-    path: 'register-user', 
-    component: RegisterUserComponent, canActivate: [RegisterGuard]
+    path: 'register-supervisor', 
+    component: RegisterSupervisorComponent
   },
   { 
     path: 'register-farmworker', 
-    component: RegisterFarmworkerComponent, canActivate: [RegisterGuard]
+    component: RegisterFarmworkerComponent
   },
   { 
     path: 'login', 
@@ -167,3 +167,5 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+
+// , canActivate: [RegisterGuard]

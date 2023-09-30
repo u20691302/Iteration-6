@@ -44,7 +44,7 @@ import { GenerateEquipmentReportComponent } from './components/reporting/generat
 import { GenerateInventoryQuantitiesComponent } from './components/reporting/generate-inventory-quantities/generate-inventory-quantities.component';
 import { GeneratePerformanceComponent } from './components/reporting/generate-performance/generate-performance.component';
 import { GeneratePersonnelReportComponent } from './components/reporting/generate-personnel-report/generate-personnel-report.component';
-import { RegisterUserComponent } from './components/user/register-user/register-user.component';
+import { RegisterSupervisorComponent} from './components/user/register-supervisor/register-supervisor.component';
 import { RegisterFarmworkerComponent } from './components/user/register-farmworker/register-farmworker.component';
 import { RatingSettingsComponent } from './components/rating-settings/rating-settings.component';
 import { NgChartsModule } from 'ng2-charts'; // Import ng2-charts
@@ -92,8 +92,8 @@ const routes: Routes = [
     GenerateInventoryQuantitiesComponent,
     GeneratePerformanceComponent,
     GeneratePersonnelReportComponent,
-    RegisterUserComponent,
     RegisterFarmworkerComponent,
+    RegisterSupervisorComponent,
     RatingSettingsComponent,
     ViewPreviousReportsComponent,
     GenerateStockReportComponent,
