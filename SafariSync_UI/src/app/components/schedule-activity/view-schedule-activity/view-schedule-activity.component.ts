@@ -685,8 +685,7 @@ export class ViewScheduleActivityComponent implements OnInit{
         this.ngOnInit();
 
         const username = (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.username) + ' '
-         + (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.surname)
-
+         + (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.surname);
 
         this.notificationSupervisor= {
           notification_ID: 0,
@@ -696,9 +695,14 @@ export class ViewScheduleActivityComponent implements OnInit{
           notificationStatus_ID: 3,
           scheduledActivity_ID: this.scheduledActivity_ID
         }
+
         this.notificationService.AddNotifcationSupervisor(this.notificationSupervisor).subscribe({
           next: () => {
-           
+            this.selectedActivity = null;
+            this.selectedSupervisor = null;
+            this.startDateTime = new Date();
+            this.endDateTime = new Date();
+            this.addUpdateScheduledActivityRequest.activity_Location = '';
           }
         });
 

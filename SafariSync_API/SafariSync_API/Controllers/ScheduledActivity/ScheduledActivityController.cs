@@ -203,45 +203,45 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("AddScheduledTask")]
         public async Task<IActionResult> AddScheduledTask(ScheduledTaskViewModel scheduledTaskViewModel)
         {
-            //try
-            //{
-            // Validate the input equipment data if necessary
-            if (!ModelState.IsValid)
+            try
             {
+                // Validate the input equipment data if necessary
+                if (!ModelState.IsValid)
+                {
                 return BadRequest(ModelState);
+                }
+
+                // Create the Equipment entity from the view model
+                var scheduledTask = new ScheduledTask
+                {
+                    StartDate = scheduledTaskViewModel.StartDate,
+                    EndDate = scheduledTaskViewModel.EndDate,
+                    TaskStatus_ID = scheduledTaskViewModel.TaskStatus_ID,
+                    Task_ID = scheduledTaskViewModel.Task_ID,
+                };
+
+                // Add the equipment to the database using ICRUDRepository
+                iCRUDRepository.Add(scheduledTask);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(scheduledTask);
             }
-
-            // Create the Equipment entity from the view model
-            var scheduledTask = new ScheduledTask
+            catch (Exception)
             {
-                StartDate = scheduledTaskViewModel.StartDate,
-                EndDate = scheduledTaskViewModel.EndDate,
-                TaskStatus_ID = scheduledTaskViewModel.TaskStatus_ID,
-                Task_ID = scheduledTaskViewModel.Task_ID,
-            };
-
-            // Add the equipment to the database using ICRUDRepository
-            iCRUDRepository.Add(scheduledTask);
-
-            // Save changes asynchronously in the CRUD repository
-            await iCRUDRepository.SaveChangesAsync();
-
-            // Return the successful response
-            return Ok(scheduledTask);
-            //}
-            //catch (Exception)
-            //{
-            //    //Handle the exception and return an error response
-            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the equipment.");
-            //}
+                //Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the equipment.");
+            }
         }
 
         [HttpPost]
         [Route("AddScheduledActivityScheduledTask")]
         public async Task<IActionResult> AddScheduledActivityScheduledTask(ScheduledActivityScheduledTaskViewModel scheduledActivityScheduledTaskViewModel)
         {
-            //try
-            //{
+            try
+            {
                 // Create the activityTask entity from the view model
                 var scheduledActivityScheduledTask = new ScheduledActivityScheduledTask
                 {
@@ -257,12 +257,12 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
 
                 // Return the successful response
                 return Ok(scheduledActivityScheduledTask);
-            //}
-            //catch (Exception)
-            //{
-            //    //Handle the exception and return an error response
-            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the scheduledActivityScheduledTask.");
-            //}
+            }
+            catch (Exception)
+            {
+                //Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the scheduledActivityScheduledTask.");
+            }
         }
 
         [HttpPost]
@@ -349,6 +349,20 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         {
             try
             {
+                var notificationSupervisor = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == id);
+
+                if (notificationSupervisor != null)
+                {
+                    iCRUDRepository.Delete(notificationSupervisor);
+                }
+                
+                var notificationAdmin = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == id);
+
+                if (notificationAdmin != null)
+                {
+                    iCRUDRepository.Delete(notificationAdmin);
+                }
+                
                 // Fetch the existing activity by ID using SafariSyncDBContext
                 var existingScheduledActivity = await safariSyncDBContext.ScheduledActivity
                     .Include(e => e.ScheduledActivityScheduledTask)
@@ -439,8 +453,7 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("DeleteScheduledActivityScheduledTask/{id}")]
         public async Task<IActionResult> DeleteScheduledActivityScheduledTask(int id)
         {
-            //try
-            //{
+           
                 // Fetch the existing activity by ID using SafariSyncDBContext
                 var existingScheduledTask = await safariSyncDBContext.ScheduledActivityScheduledTask
                     .Include(e => e.ScheduledTask!.ScheduledTaskUser)

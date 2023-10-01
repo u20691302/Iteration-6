@@ -99,8 +99,8 @@ namespace SafariSync_API.Controllers.NotificationController
         [Route("AddNotificationSupervisor")]
         public async Task<IActionResult> AddNotificationSupervisor(NotificationSupervisor notificationSupervisor)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input activity data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -125,13 +125,13 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response
                 return Ok(noticiationSupervisor);
+                //}
+                //        catch (Exception)
+                //        {
+                //            //Handle the exception and return an error response
+                //            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
+                //}
             }
-            catch (Exception)
-            {
-                //Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
-            }
-        }
 
         [HttpPost]
         [Route("AddNotificationUser")]
