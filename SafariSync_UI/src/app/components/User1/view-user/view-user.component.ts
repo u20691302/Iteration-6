@@ -108,7 +108,6 @@ export class ViewUserComponent implements OnInit {
     this.userService.getAllUsers(this.searchTerm).subscribe({
       next: (users) => {
         this.users = users;
-        console.log(this.users)
       },
       error: (response) => {
         console.log(response);

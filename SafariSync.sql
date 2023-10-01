@@ -540,3 +540,7 @@ VALUES
     ('Accepted'),
     ('Rejected'),
     ('Pending');
+
+INSERT INTO RatingSettings ( RatingSettings_Upper, RatingSettings_Lower) VALUES
+    (2.5, 4);
+

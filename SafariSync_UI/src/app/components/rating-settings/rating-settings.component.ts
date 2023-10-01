@@ -41,7 +41,6 @@ export class RatingSettingsComponent implements OnInit {
           ratingSettings_Upper: this.ratingSettings[0].ratingSettings_Upper,
           ratingSettings_Lower: this.ratingSettings[0].ratingSettings_Lower
         };
-        console.log(this.ratingSettings);
       },
       (error: any) => {
         console.error('Error fetching rating settings:', error);

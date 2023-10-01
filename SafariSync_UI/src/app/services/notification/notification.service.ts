@@ -31,6 +31,11 @@ export class NotificationService {
     return this.http.post<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/AddNotificationSupervisor/', addNotificationSupervisorRequest);
   }
 
+  UpdateNotificationSupervisor(updateNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
+    console.log(updateNotificationSupervisorRequest)
+    return this.http.put<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/UpdateNotificationSupervisor/',updateNotificationSupervisorRequest);
+  }
+
   AddNotifcationAdmin(addNotificationAdminRequest: NotificationAdmin): Observable<NotificationAdmin> {
     return this.http.post<NotificationAdmin>(this.baseApiUrl + '/api/Notification/AddNotificationAdmin/', addNotificationAdminRequest);
   }

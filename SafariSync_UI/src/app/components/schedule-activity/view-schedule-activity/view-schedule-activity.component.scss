@@ -226,4 +226,11 @@
     align-items: center;
     overflow-y: scroll;
   }
+
+  @media screen and (max-width: 768px) {
+    /* Adjust styles for screens up to 768px wide (typical tablet portrait) */
+    .container {
+        width: 80%; /* Adjust the width for smaller screens */
+    }
+  }
   

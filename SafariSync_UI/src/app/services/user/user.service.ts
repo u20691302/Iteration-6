@@ -28,7 +28,6 @@ export class UserService {
     return this.http.post<any>(`${this.baseApiUrl}/api/User/login`, user).pipe(
       tap(response => {
         this.token = response.Token; // Save the token
-        console.log(this.token)
       })
     );
   }
@@ -80,19 +79,14 @@ export class UserService {
     return this.http.post<any>(`${this.baseApiUrl}/api/user/SendRegSMS`, {}, { params });
   }
   
-  
-  //indian mandem
   storeToken(tokenValue: string){
     localStorage.setItem('token', tokenValue);
-    return console.log(localStorage.getItem('token'));
-
-    
+    return;
   }
 
   storeRole(theRole: string){
     localStorage.setItem('role', theRole);
-    return console.log("the stored role from the service is", localStorage.getItem('role'));
-
+    return;
   }
 
   getToken(){
@@ -107,15 +101,11 @@ export class UserService {
     var role = localStorage.getItem('role');
     if (role == "Admin")
     {
-      console.log("the oak is authorized for sho")
       return true;
     }
     else{
       return false;
     }
-
-
-
   }
 
   getCurrentPath(){
@@ -124,8 +114,7 @@ export class UserService {
 
   setCurrentPath(thePath: string){
     localStorage.setItem('path', thePath);
-    return console.log("the stored PATH from the service is", localStorage.getItem('path'));
-
+    return ;
   }
 
 
@@ -134,16 +123,13 @@ export class UserService {
     this.router.navigate(['login']);
   }
 
-  //idk if i need
   getUsers(): Observable<any> {
     return this.http.get<any>(`${this.baseApiUrl}/api/user/getAllUsers`);
   }
 
-
   decodedToken(){
     const jwtHelper = new JwtHelperService();
     const token = this.getToken()!;
-    console.log("this is the decoded token",jwtHelper.decodeToken(token));
     return jwtHelper.decodeToken(token);
   }
 
@@ -151,7 +137,6 @@ export class UserService {
     if(this.userPayload){
       return this.userPayload.unique_name;
     }
-    
   }
 
   getRoleFromToken(){

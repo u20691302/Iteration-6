@@ -6,6 +6,7 @@ using SafariSync_API.Models;
 using SafariSync_API.Models.ActivityModel;
 using SafariSync_API.Models.EquipmentModel;
 using SafariSync_API.Models.NotificationModel;
+using SafariSync_API.Models.SkillsModel;
 using SafariSync_API.Models.SupplierModel;
 using SafariSync_API.Repositories.CRUD;
 using SafariSync_API.ViewModels.ActivityViewModel;
@@ -37,8 +38,7 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.Include(e => e.User)
-                                                                                        .Include(e => e.NotificationStatus)
+                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.Include(e => e.NotificationStatus)
                                                                                         .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
                                                                                                                           .ThenInclude(e => e.ScheduledTask)
                                                                                                                           .ToListAsync();
@@ -59,9 +59,8 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationUser.Include(e => e.User)
-                                                                                        .Include(e => e.NotificationStatus)
-                                                                                        .Include(e => e.ScheduledTask).ToListAsync();
+                var scheduledActivity = await safariSyncDBContext.NotificationUser.Include(e => e.NotificationStatus)
+                                                                                  .Include(e => e.ScheduledTask).ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
                 return Ok(scheduledActivity);
@@ -79,11 +78,10 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.Include(e => e.User!)
-                                                                                        .Include(e => e.NotificationStatus)
-                                                                                        .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
-                                                                                                                          .ThenInclude(e => e.ScheduledTask)
-                                                                                                                          .ToListAsync();
+                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.Include(e => e.NotificationStatus)
+                                                                                   .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
+                                                                                                                      .ThenInclude(e => e.ScheduledTask)
+                                                                                                                      .ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
                 return Ok(scheduledActivity);
@@ -99,8 +97,8 @@ namespace SafariSync_API.Controllers.NotificationController
         [Route("AddNotificationSupervisor")]
         public async Task<IActionResult> AddNotificationSupervisor(NotificationSupervisor notificationSupervisor)
         {
-            //try
-            //{
+            try
+            {
                 // Validate the input activity data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -125,13 +123,13 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response
                 return Ok(noticiationSupervisor);
-                //}
-                //        catch (Exception)
-                //        {
-                //            //Handle the exception and return an error response
-                //            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
-                //}
             }
+            catch (Exception)
+            {
+                //Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
+            }
+        }
 
         [HttpPost]
         [Route("AddNotificationUser")]
@@ -209,5 +207,75 @@ namespace SafariSync_API.Controllers.NotificationController
             }
         }
 
+        [HttpDelete]
+        [Route("DeleteSupervisorNotification/{ScheduledActivity_ID}")]
+        public async Task<IActionResult> DeleteSupervisorNotification(int ScheduledActivity_ID)
+        {
+            try
+            {
+                var Notiication = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == ScheduledActivity_ID);
+
+                // If the existing skill is not found, return a NotFound response with an appropriate message
+                if (Notiication == null)
+                    return NotFound("The notifcation does not exist");
+
+                // Delete the skill from the CRUD repository
+                iCRUDRepository.Delete(Notiication);
+
+                // Save changes asynchronously in the context
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(Notiication);
+            }
+            catch (Exception)
+            {
+                // Return a StatusCode 500 response if an exception occurs during the operation
+                return StatusCode(500, "Internal Server Error. Please contact support.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationSupervisor")]
+        public async Task<IActionResult> UpdateNotificationSupervisor(NotificationSupervisor notificationSupervisor)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == notificationSupervisor.ScheduledActivity_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.Date = notificationSupervisor.Date;
+                Notification.User_ID = notificationSupervisor.User_ID;
+                Notification.Notification_Message = notificationSupervisor.Notification_Message;
+                Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
+                Notification.ScheduledActivity_ID = notificationSupervisor.ScheduledActivity_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
     }
 }

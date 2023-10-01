@@ -166,3 +166,20 @@
   .forgot-password:hover {
     color: white; /* Set the color you want when hovering over the link */
   }
+  
+  @media screen and (max-width: 768px) {
+    /* Adjust styles for screens up to 768px wide (typical tablet portrait) */
+    .container {
+        width: 80%; /* Adjust the width for smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Adjust styles for screens up to 480px wide (typical phone portrait) */
+    .container {
+        width: 90%; /* Adjust the width for smaller screens */
+    }
+    .form-control {
+        width: 100%; /* Make form inputs full width on small screens */
+    }
+}

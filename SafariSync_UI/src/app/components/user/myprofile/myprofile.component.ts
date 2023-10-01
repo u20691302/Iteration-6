@@ -72,20 +72,17 @@ export class MyprofileComponent {
     this.userStore.getRoleFromStore().subscribe(val => {
       let roleFromToken = this.userService.getRoleFromToken();
       this.userRole = val || roleFromToken;
-      console.log("the role is", this.userRole);
     });
 
     this.userStore.getUserIdFromStore().subscribe(val => {
       let idFromToken = this.userService.getUserIdFromToken();
       this.userId = val || idFromToken;
-      console.log("the id is", this.userId);
     });
 
     this.userStore.getProfileImageFromStore().subscribe(val => {
       let profileImageFromToken = this.userService.getProfileImageFromToken();
       this.profileImage = val || profileImageFromToken;
       this.profileImage = this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + this.profileImage) as string;
-      console.log("the profile image base 64 is", this.profileImage);
     });
 
     this.userStore.getRatingFromStore().subscribe(val => {
@@ -97,12 +94,10 @@ export class MyprofileComponent {
     
       let emptyStars = this.MAX_STARS - ratingAsInt;
       this.emptyStarsArray = Array(emptyStars).fill(0); // Fill the emptyStarsArray with zeros up to the difference
-      console.log("the rating is", ratingAsInt);
     });
     
     this.route.url.subscribe(urlSegments => {
       this.savedRoute = urlSegments.join('/'); // Convert URL segments to a string
-      console.log("THE ROUTE IS:", this.savedRoute)
       this.userService.setCurrentPath(this.savedRoute);
     });
 
@@ -130,7 +125,6 @@ export class MyprofileComponent {
 
   confirmUpdate() {
     // Call the updatePassword method in the UserService to send data to the database
-    console.log("now we call the api");
     this.userService.updatePassword(this.userId, this.currentPassword, this.newPassword)
       .subscribe(
         response => {

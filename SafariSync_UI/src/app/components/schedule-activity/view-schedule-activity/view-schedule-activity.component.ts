@@ -327,7 +327,6 @@ export class ViewScheduleActivityComponent implements OnInit{
 
     this.route.url.subscribe(urlSegments => {
       this.savedRoute = urlSegments.join('/'); // Convert URL segments to a string
-      console.log("THE ROUTE IS:", this.savedRoute)
       this.userTyService.setCurrentPath(this.savedRoute);
     });
   }
@@ -589,8 +588,31 @@ export class ViewScheduleActivityComponent implements OnInit{
     this.scheduledActivityService.updateScheduledActivity(this.ScheduledActivity).subscribe({
       next: (scheduledActivity: ScheduledActivity) => {
         this.ngOnInit();
+        const username = (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.username) + ' '
+         + (this.users.find(user => user.user_ID === Number(this.selectedSupervisor || 0))?.surname);
+
+        this.notificationSupervisor= {
+          notification_ID: 0,
+          date: new Date(),
+          user_ID: this.selectedSupervisor || 0,
+          notification_Message: 'You, (' + username + ') have been assigned as a supervisor on a scheduled activity.',
+          notificationStatus_ID: 3,
+          scheduledActivity_ID: this.scheduledActivity_ID
+        }
+
+        this.notificationService.UpdateNotificationSupervisor(this.notificationSupervisor).subscribe({
+          next: () => {
+            this.selectedActivity = null;
+            this.selectedSupervisor = null;
+            this.startDateTime = new Date();
+            this.endDateTime = new Date();
+            this.addUpdateScheduledActivityRequest.activity_Location = '';
+          }
+        });
+
         const modalRef = this.modalService.open(success, {
-          size: 'dialog-centered',
+          size: 'xl',
+          centered: true,
           backdrop: 'static'
         });
       },

@@ -33,22 +33,31 @@
           <tr>
             <th>Date</th>
             <th>Message</th>
-            <th></th>
+            <th>Accepted Status</th>
+           
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let notification of notifications">
-            <td>{{ notification.date | date }}</td>
+            <td>{{ notification.date }}</td>
             <td>{{ notification.notification_Message }}</td>
-            <td>
-              <button class="button-but">Accept</button>
-              <button class="button-reject">Reject</button>
+            <td *ngIf="notification.notificationStatus_ID === 3">
+              <div class="button-container">
+                <button class="button-but">Accept</button>
+                <button class="button-reject">Reject</button>
+              </div>
+            </td>
+            <td *ngIf="notification.notificationStatus_ID === 1" style="text-align:center;">
+              <p style="color:green;">Accepted</p>
+            </td>
+            <td *ngIf="notification.notificationStatus_ID === 2" style="text-align:center;">
+              <p style="color:red;">Rejected</p>
             </td>
           </tr>
         </tbody>
         <tbody *ngIf="notifications.length === 0">
           <tr>
-            <td colspan="2">No Recent Updates</td>
+            <td colspan="3">No Recent Updates</td>
           </tr>
         </tbody>
       </table>

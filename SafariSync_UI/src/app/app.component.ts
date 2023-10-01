@@ -27,7 +27,6 @@ export class AppComponent implements OnInit {
     this.userStore.getRoleFromStore().subscribe(val => {
       let roleFromToken = this.userService.getRoleFromToken();
       this.userRole = val || roleFromToken;
-      console.log("the MAIN role is", this.userRole);
     });
 
   }

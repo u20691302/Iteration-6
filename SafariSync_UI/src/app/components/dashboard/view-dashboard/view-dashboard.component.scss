@@ -91,7 +91,7 @@
 
   .button-but {
     padding: 6px 12px;
-    background-color: green;
+    background-color: #001844;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -105,7 +105,7 @@
 
   .button-reject {
     padding: 6px 12px;
-    background-color: red;
+    background-color: #CD1543;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -177,4 +177,45 @@
 .rating-bar {
   height: 20px; /* Customize the height of the rating bars */
   background-color: #CD1543; /* Customize the background color of the bars */
+}
+
+.button-container {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 768px) {
+  /* Adjust styles for screens up to 768px wide (typical tablet portrait) */
+  .container {
+      width: 80%; /* Adjust the width for smaller screens */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Adjust styles for screens up to 480px wide (typical phone portrait) */
+  .container {
+      width: 90%; /* Adjust the width for smaller screens */
+  }
+  .form-control {
+      width: 100%; /* Make form inputs full width on small screens */
+  }
+}
+@media screen and (max-width: 768px) {
+  /* Adjust column layout for small screens */
+  .dashboard {
+    grid-template-columns: 1fr; /* Single column layout for small screens */
+  }
+  
+  /* Adjust heading styles for small screens */
+  .column h5 {
+    font-size: 16px;
+  }
+  
+  /* Adjust other styles for small screens */
+  .section {
+    max-height: none; /* Remove maximum height on small screens */
+    overflow-y: auto; /* Disable vertical scrolling on sections */
+  }
 }

@@ -12,6 +12,8 @@ import { ScheduledActivityService } from 'src/app/services/scheduleActivity/sche
 import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { NotificationService } from 'src/app/services/notification/notification.service';
+import { interval } from 'rxjs';
+
 
 
 @Component({
@@ -53,7 +55,16 @@ export class ViewDashboardComponent implements OnInit {
 
   constructor(private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
 
+  
+
+
   ngOnInit(): void {
+    // interval(5000)
+    //   .subscribe(() => {
+    //     this.ngOnInit();
+    //     console.log(1) 
+    //   });
+
     this.fetchRatingSettings();
     this.GetAllStock();
     this.GetAllUsers();
@@ -74,6 +85,8 @@ export class ViewDashboardComponent implements OnInit {
         this.userID = userid;
     });
 
+    this.notifications = [];
+
     if (this.userRole === "Admin"){
       this.ReadAllNotificationAdmin();
     }
@@ -89,6 +102,7 @@ export class ViewDashboardComponent implements OnInit {
     this.notificationService.getNotificationSupervisor().subscribe({
       next: (notifications) => {
         this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
+        console.log(this.notifications)
       },
       error: (response) => {
         console.log(response);
@@ -167,31 +181,25 @@ export class ViewDashboardComponent implements OnInit {
     this.scheduledActivityService.getAllScheduledActivities("").subscribe({
       next: (scheduledActivities) => {
         this.scheduledActivities = scheduledActivities;
-  
         // Count the number of completed activities
         const completeddActivities = this.scheduledActivities.filter(
           (activity) => activity.activityStatus?.activity_Status === 'Completed'
         );
          this.completedActivities = completeddActivities.length;
-         console.log(`Number of in completed activities: ${this.completedActivities}`);
-
          // Count the number of inprogress activities
         const inprog = this.scheduledActivities.filter(
           (activity) => activity.activityStatus?.activity_Status === 'In Progress'
         );
          this.inProgressActivities = inprog.length;
-        console.log(`Number of in progress activities: ${this.inProgressActivities}`);
-
         // Count the total number of all activities
          this.totalActivities = scheduledActivities.length;
-        console.log(`Number of all activities: ${this.totalActivities}`);
+       
 
         // Count the notstarted activities
         const notstartact = this.scheduledActivities.filter(
           (activity) => activity.activityStatus?.activity_Status === 'Not Started'
         );
          this.pendingScheduling = notstartact.length;
-        console.log(`Number of not started activities: ${this.pendingScheduling}`);
         this.createChart();
       },
       error: (response) => {
@@ -209,11 +217,9 @@ export class ViewDashboardComponent implements OnInit {
           ratingSettings_Upper: this.ratingSettings[0].ratingSettings_Upper,
           ratingSettings_Lower: this.ratingSettings[0].ratingSettings_Lower
         };
-        console.log(this.ratingSettings);
+       
         this.actualUpper = this.updatedRatingSetting.ratingSettings_Upper;
         this.actualLower = this.updatedRatingSetting.ratingSettings_Lower;
-        console.log("the actual upper is", this.actualUpper);
-        console.log("the actual lower is", this.actualLower);
       },
       (error: any) => {
         console.error('Error fetching rating settings:', error);
