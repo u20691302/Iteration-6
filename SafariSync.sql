@@ -240,6 +240,8 @@ CREATE TABLE NotificationUser (
 	Notification_Message VARCHAR(255) NOT NULL,
 	NotificationStatus_ID INT NOT NULL,
 	ScheduledTask_ID INT NOT NULL,
+	ScheduledActivity_ID INT NOT NULL,
+	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
 	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
 	FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
 	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
@@ -252,6 +254,8 @@ CREATE TABLE NotificationAdmin (
 	Contractor_ID INT NOT NULL,
 	Notification_Message VARCHAR(255) NOT NULL,
 	NotificationStatus_ID INT NOT NULL,
+	ScheduledActivity_ID INT NOT NULL,
+	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
 	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
 	FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
 	FOREIGN KEY (Contractor_ID) REFERENCES Contractor (Contractor_ID)

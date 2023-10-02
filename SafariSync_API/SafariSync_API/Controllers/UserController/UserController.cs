@@ -493,8 +493,8 @@ namespace SafariSync_API.Controllers.UserController
         [Route("UpdateUserAsync/{UserID}")]
         public async Task<ActionResult<UserViewModel>> UpdateUserAsync(int UserID, UserViewModel svm)
         {
-            try
-            {
+            //try
+            //{
                 // Retrieve the existing user from the CRUD repository based on the UserID
                 var existingUser = await iCRUDRepository.ReadOneAsync<User>(UserID);
 
@@ -507,10 +507,6 @@ namespace SafariSync_API.Controllers.UserController
 
                 // Retrieve the Ratings by name from the list of Ratingss using LINQ
                 var ratings = existingRatings.FirstOrDefault(st => st.Rating_ID == svm.Rating_ID);
-
-                // If the Ratings is not found, return a BadRequest response with an appropriate message
-                if (ratings == null)
-                    return BadRequest("User type does not exist");
 
                 // Update the properties of the existing user with the values from the UserViewModel
                 existingUser.Username = svm.Username;
@@ -528,15 +524,17 @@ namespace SafariSync_API.Controllers.UserController
                     // Return an Ok response with the updated user
                     return Ok(existingUser);
                 }
-            }
-            catch (Exception)
-            {
-                // Return a StatusCode 500 response if an exception occurs during the operation
-                return StatusCode(500, "Internal Server Error. Please contact support.");
-            }
+
+            return Ok(existingUser);
+            //}
+            //catch (Exception)
+            //{
+            //    // Return a StatusCode 500 response if an exception occurs during the operation
+            //    return StatusCode(500, "Internal Server Error. Please contact support.");
+            //}
 
             // Return a BadRequest response if the request is invalid
-            return BadRequest("Your request is invalid.");
+            //return BadRequest("Your request is invalid.");
         }
 
         [HttpDelete]
