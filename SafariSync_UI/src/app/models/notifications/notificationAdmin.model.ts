@@ -1,15 +1,17 @@
+import { Contractor } from "../contractor/contractor.model";
 import { ScheduledActivity } from "../scheduledActivity/scheduledActivity.model";
+import { ScheduledTask } from "../scheduledActivity/scheduledTask.model";
 import { User } from "../user/user.model";
 import { NotificationStatus } from "./notificationStatus.model";
 
 export interface NotificationAdmin {
     notification_ID: number;
     date: Date;
-    user_ID: number;
     notification_Message: string;
     notificationStatus_ID: number;
-    scheduledActivity_ID: number;
-    scheduledActivity?: ScheduledActivity[];
+    scheduledTask_ID: number;
+    contractor_ID: number;
+    scheduledTask?: ScheduledTask[];
     noticationStatus?: NotificationStatus;
-    user?: User;
+    contractor?: Contractor;
   }

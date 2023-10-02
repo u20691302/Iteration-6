@@ -22,6 +22,8 @@ export class EditdetailsComponent {
   public selectedImageURL: string | ArrayBuffer | null = null;
 
   public newProfileImage: string = "has to work";
+  public newIdImage: string = "has to work";
+
 
   user: User | undefined;
 
@@ -42,6 +44,8 @@ export class EditdetailsComponent {
   public editedEmail: string = "";
   public editedCellphone: string = "";
   photoConfirmationModal: NgbModalRef | undefined;
+  idPhotoConfirmationModal: NgbModalRef | undefined;
+
 
   userSkills: Skills[] = [];
   isSkillListEmpty: boolean = true;
@@ -52,6 +56,8 @@ export class EditdetailsComponent {
   @ViewChild('successModal') successModal: any; // Reference to the success modal
   @ViewChild('photoSuccessModal') photoSuccessModal: any; // Reference to the success modal
   @ViewChild('photoConfirmationModal') photoConfirmationModalTemplate!: TemplateRef<any>;
+  @ViewChild('idPhotoConfirmationModal') idPhotoConfirmationModalTemplate!: TemplateRef<any>;
+
   @ViewChild('fileInput') fileInputRef!: ElementRef;
 
   form: FormGroup; // Add this line
@@ -348,6 +354,118 @@ export class EditdetailsComponent {
     this.fileInputRef.nativeElement.click();
     
   }
+
+
+  ///////////////////////////
+  /////////////////////////
+  ////////////////////////
+  ///////////////////////
+  //id image stuff
+  public selectedIdImageURL: string | ArrayBuffer | null = null;
+
+  public editedIdImage: string = ""; // Initialize the editedIdImage variable
+
+  onIdImageSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const files = fileInput.files;
+
+    if (files && files.length > 0) {
+      const selectedFile = files[0];
+      this.selectedFileName = selectedFile.name;
+      this.showIdImageConfirmationModal(selectedFile);
+    }
+  }
+
+
+  // Method to open the confirmation modal with the selected id image
+  showIdImageConfirmationModal(selectedFile: File) {
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedFile);
+    reader.onload = () => {
+      this.selectedIdImageURL = reader.result as string;
+      // Store the base64 data in the editedIdImage property
+      this.editedIdImage = reader.result?.toString() || "";
+      // Use the template reference for modal content
+      this.idPhotoConfirmationModal = this.modalService.open(this.idPhotoConfirmationModalTemplate, { centered: true });
+    };
+    reader.onerror = () => {
+      this.selectedIdImageURL = null;
+    };
+  }
+
+
+  // Method to confirm the id image update
+  confirmIdImageUpdate() {
+    // Check if editedIdImage is empty or invalid
+    const idImageBase64 = this.editedIdImage ? this.editedIdImage : '';
+    if (!idImageBase64) {
+      console.error("No id image data found.");
+      return;
+    }
+
+    // Create a Blob with the raw binary data from the base64 string
+    const blob = this.dataURItoBlob(idImageBase64);
+
+    // Create FormData and append the Blob with the correct field name "newIdImage"
+    const formData = new FormData();
+    formData.append("newIdPhoto", blob, "idimage.png"); // "newIdImage" is the name expected by the backend
+
+    // Get the user ID
+    const userIdInt = parseInt(this.userId, 10);
+
+    // Send the FormData to update the id image
+    this.userService.updateIdImage(userIdInt, formData).subscribe(
+      response => {
+        // Id image updated successfully, handle the response if needed
+        // Update the jwt token somehow
+        this.userService.storeToken(response.token);
+        let tokePayload = this.userService.decodedToken();
+        this.userStore.setIdImageFromStore(tokePayload.idImage);
+        // You can handle the response as needed, such as updating the UI or displaying a success message.
+        console.log(response);
+        if (this.idPhotoConfirmationModal) {
+          this.idPhotoConfirmationModal.close('Close click');
+          // You can open a success modal here if you want to notify the user of a successful update.
+        }
+      },
+      error => {
+        // Handle the error if the id image update fails
+        console.error(error);
+      }
+    );
+  }
+
+  // Method to handle cancellation of the id image update
+  cancelIdImageUpdate() {
+    if (this.photoConfirmationModal) {
+      this.photoConfirmationModal.dismiss('Close click');
+      this.selectedIdImageURL = null;
+      this.photoConfirmationModal = undefined;
+
+      // Reset the file input to trigger the change event again
+      this.resetFileInput().then(() => {
+        this.openFileExplorer();
+      });
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

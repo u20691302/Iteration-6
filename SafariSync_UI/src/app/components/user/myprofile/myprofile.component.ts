@@ -11,6 +11,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Skills } from 'src/app/models/skills/skills.model';
 import { SkillService } from 'src/app/services/skills/skills.service';
 import { User } from 'src/app/models/user/user.model';
+import { TimerService } from 'src/app/services/user/timer.service';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class MyprofileComponent {
   public fullName: string = "";
   public userRole: string = "";
   public profileImage: string = "";
+  public idImage: string = "";
   public rating: string = "";
   public userId: number = 0;
   public currentPassword: string = "";
@@ -35,12 +37,15 @@ export class MyprofileComponent {
   emptyStarsArray: number[] = [];
   userSkills: Skills[] = [];
 
+  defaultImage = '/assets/default-profile-image.png';
+
   public savedRoute: string = "shap";  // Variable to store the saved route
 
 
   @ViewChild('updatePasswordModal') updatePasswordModal: any; // Reference to the update password modal
   @ViewChild('confirmationModal') confirmationModal: any; // Reference to the confirmation modal
   @ViewChild('successModal') successModal: any; // Reference to the success modal
+  @ViewChild('idImageModal') IdImageModal: any; // Reference to the success modal
   @ViewChild('failedModal') failedModal: any;
 
   // Variables to track the success and failed modals
@@ -51,13 +56,17 @@ export class MyprofileComponent {
   newPassword2Matches: boolean = true; // Fix the property name
 
 
-  constructor(private userService: UserService, private userStore: UserStoreService, private modalService: NgbModal, private sanitizer: DomSanitizer, private skillService: SkillService, private route: ActivatedRoute) {
+  constructor(private userService: UserService, private userStore: UserStoreService, private modalService: NgbModal, private sanitizer: DomSanitizer, private skillService: SkillService, private route: ActivatedRoute, private timerService: TimerService) {
     this.form = new FormGroup({
       CurrentPassword: new FormControl('', [Validators.required, Validators.pattern('^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{5,}$')]),
       NewPassword: new FormControl('', [Validators.required, Validators.pattern('^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{5,}$')]),
       NewPassword2: new FormControl('', [Validators.required, Validators.pattern('^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{5,}$')])
     });
   }
+
+  public isModalOpen: boolean = false;
+
+  
 
   logout() {
     this.userService.logout();
@@ -72,17 +81,27 @@ export class MyprofileComponent {
     this.userStore.getRoleFromStore().subscribe(val => {
       let roleFromToken = this.userService.getRoleFromToken();
       this.userRole = val || roleFromToken;
+      console.log("the role is", this.userRole);
     });
 
     this.userStore.getUserIdFromStore().subscribe(val => {
       let idFromToken = this.userService.getUserIdFromToken();
       this.userId = val || idFromToken;
+      console.log("the id is", this.userId);
     });
 
     this.userStore.getProfileImageFromStore().subscribe(val => {
       let profileImageFromToken = this.userService.getProfileImageFromToken();
       this.profileImage = val || profileImageFromToken;
       this.profileImage = this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + this.profileImage) as string;
+      console.log("the profile image base 64 is", this.profileImage);
+    });
+
+    this.userStore.getIdImageFromStore().subscribe(val => {
+      let idImageFromToken = this.userService.getIdImageFromToken();
+      this.idImage = val || idImageFromToken;
+      this.idImage = this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + this.idImage) as string;
+      console.log("the ID image base 64 is", this.idImage);
     });
 
     this.userStore.getRatingFromStore().subscribe(val => {
@@ -94,14 +113,41 @@ export class MyprofileComponent {
     
       let emptyStars = this.MAX_STARS - ratingAsInt;
       this.emptyStarsArray = Array(emptyStars).fill(0); // Fill the emptyStarsArray with zeros up to the difference
+      console.log("the rating is", ratingAsInt);
     });
     
     this.route.url.subscribe(urlSegments => {
       this.savedRoute = urlSegments.join('/'); // Convert URL segments to a string
+      console.log("THE ROUTE IS:", this.savedRoute)
       this.userService.setCurrentPath(this.savedRoute);
     });
 
 
+  }
+
+  // Example usage in a method
+  updateTimerTimeout(newTimeout: number): void {
+    console.log(newTimeout);
+    this.timerService.updateTimeout(newTimeout).subscribe(
+      (response) => {
+        console.log('Timeout updated successfully', response);
+        // You can handle the response here if needed
+        this.timerService.fetchTimeoutFromBackend();
+        this.userService.handleTimerExpiration(); // Call this method in your component's ngOnInit
+      },
+      (error) => {
+        console.error('Error updating timeout', error);
+        // Handle errors here
+      }
+    );
+  }
+
+  openImageModal() {
+    this.modalService.open(this.IdImageModal, { centered: true });
+  }
+
+  closeImageModal() {
+    this.modalService.dismissAll();
   }
 
   openModal() {
@@ -125,6 +171,7 @@ export class MyprofileComponent {
 
   confirmUpdate() {
     // Call the updatePassword method in the UserService to send data to the database
+    console.log("now we call the api");
     this.userService.updatePassword(this.userId, this.currentPassword, this.newPassword)
       .subscribe(
         response => {
@@ -215,4 +262,7 @@ export class MyprofileComponent {
       eyeIcon.classList.add('fa-eye');
     }
   }
+
+
+
 }

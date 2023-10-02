@@ -20,21 +20,16 @@ export class NotificationService {
   } 
 
   getNotificationAdmin(): Observable<NotificationAdmin[]> {
-    return this.http.get<NotificationAdmin[]>(`${this.baseApiUrl}/api/Notification/ReadUserNotifications`);
+    return this.http.get<NotificationAdmin[]>(`${this.baseApiUrl}/api/Notification/ReadAdminNotifications`);
   } 
 
   getNotificationUser(): Observable<NotificationUser[]> {
-    return this.http.get<NotificationUser[]>(`${this.baseApiUrl}/api/Notification/ReadAdminNotifications`);
+    return this.http.get<NotificationUser[]>(`${this.baseApiUrl}/api/Notification/ReadUserNotifications`);
   } 
 
-  AddNotifcationSupervisor(addNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
-    return this.http.post<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/AddNotificationSupervisor/', addNotificationSupervisorRequest);
-  }
 
-  UpdateNotificationSupervisor(updateNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
-    console.log(updateNotificationSupervisorRequest)
-    return this.http.put<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/UpdateNotificationSupervisor/',updateNotificationSupervisorRequest);
-  }
+
+
 
   AddNotifcationAdmin(addNotificationAdminRequest: NotificationAdmin): Observable<NotificationAdmin> {
     return this.http.post<NotificationAdmin>(this.baseApiUrl + '/api/Notification/AddNotificationAdmin/', addNotificationAdminRequest);
@@ -42,5 +37,42 @@ export class NotificationService {
 
   AddNotifcationUser(addNotificationUserRequest: NotificationUser): Observable<NotificationUser> {
     return this.http.post<NotificationUser>(this.baseApiUrl + '/api/Notification/AddNotificationUser/', addNotificationUserRequest);
+  }
+
+  AddNotifcationSupervisor(addNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
+    return this.http.post<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/AddNotificationSupervisor/', addNotificationSupervisorRequest);
+  }
+
+
+
+
+
+
+  UpdateNotificationSupervisor(updateNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
+    return this.http.put<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/UpdateNotificationSupervisor/',updateNotificationSupervisorRequest);
+  }
+
+  UpdateNotificationAdmin(updateNotificationAdminRequest: NotificationAdmin): Observable<NotificationAdmin> {
+    return this.http.put<NotificationAdmin>(this.baseApiUrl + '/api/Notification/UpdateNotificationAdmin/',updateNotificationAdminRequest);
+  }
+  
+  UpdateNotificationUser(updateNotificationUserRequest: NotificationUser): Observable<NotificationUser> {
+    return this.http.put<NotificationUser>(this.baseApiUrl + '/api/Notification/UpdateNotificationAdmin/',updateNotificationUserRequest);
+  }
+
+
+
+
+
+  UpdateNotificationAdminStatus(updateNotificationAdminRequest: NotificationAdmin): Observable<NotificationAdmin> {
+    return this.http.put<NotificationAdmin>(this.baseApiUrl + '/api/Notification/UpdateNotificationAdminStatus/',updateNotificationAdminRequest);
+  }
+
+  UpdateNotificationSupervisorStatus(updateNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
+    return this.http.put<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/UpdateNotificationSupervisorStatus/',updateNotificationSupervisorRequest);
+  }
+
+  UpdateNotificationUserStatus(updateNotificationUserRequest: NotificationUser): Observable<NotificationUser> {
+    return this.http.put<NotificationUser>(this.baseApiUrl + '/api/Notification/UpdateNotificationUserStatus/',updateNotificationUserRequest);
   }
 }

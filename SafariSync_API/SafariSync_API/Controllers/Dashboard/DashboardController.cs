@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SafariSync_API.Data;
-using SafariSync_API.Models.NotificationModel;
 using SafariSync_API.Models.RatingSettings;
-using SafariSync_API.Models.SkillsModel;
-using SafariSync_API.Models.UserModel;
 using SafariSync_API.Repositories.CRUD;
 using SafariSync_API.ViewModels.RatingSettingsViewModel;
 using SafariSync_API.ViewModels.SkillsViewModel;
@@ -17,11 +13,10 @@ namespace SafariSync_API.Controllers.Dashboard
     [Route("/api/[controller]")]
     public class DashboardController : Controller
     {
-
         // Declaration of a private read-only field of type ICRUDRepository.
         private readonly ICRUDRepository iCRUDRepository;
-        private readonly SafariSyncDBContext safariSyncDBContext;
 
+        private readonly SafariSyncDBContext safariSyncDBContext;
 
         // Constructor for the SkillController class, which takes an argument of type ICRUDRepository.
         public DashboardController(ICRUDRepository crudRepository, SafariSyncDBContext SafariSyncDBContext)
@@ -51,7 +46,7 @@ namespace SafariSync_API.Controllers.Dashboard
                 // Update the skill in the CRUD repository
                 iCRUDRepository.Update(existingRating);
 
-                // Save changes asynchronously in the CRUD repository and check if the operation succeeds 
+                // Save changes asynchronously in the CRUD repository and check if the operation succeeds
                 if (await iCRUDRepository.SaveChangesAsync())
                 {
                     // Return an Ok response with the updated skill
@@ -85,7 +80,6 @@ namespace SafariSync_API.Controllers.Dashboard
                 // Return a StatusCode 500 response if an exception occurs during the operation
                 return StatusCode(500, "Internal Server Error. Please contact support.");
             }
-
         }
     }
 }

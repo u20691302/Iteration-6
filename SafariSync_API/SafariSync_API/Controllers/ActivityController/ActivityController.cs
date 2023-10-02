@@ -132,32 +132,32 @@ namespace SafariSync_API.Controllers.ActivityController
         {
             //try
             //{
-                // Validate the input activity data if necessary
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            // Validate the input activity data if necessary
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                // Fetch the existing activity by ID using SafariSyncDBContext
-                var existingActivity = await safariSyncDBContext.Activity
-                    .Include(e => e.ActivityTask)
-                    .FirstOrDefaultAsync(e => e.Activity_ID == activityViewModel.Activity_ID);
+            // Fetch the existing activity by ID using SafariSyncDBContext
+            var existingActivity = await safariSyncDBContext.Activity
+                .Include(e => e.ActivityTask)
+                .FirstOrDefaultAsync(e => e.Activity_ID == activityViewModel.Activity_ID);
 
-                // If activity with the given ID is not found, return a not found response
-                if (existingActivity == null)
-                {
-                    return NotFound();
-                }
+            // If activity with the given ID is not found, return a not found response
+            if (existingActivity == null)
+            {
+                return NotFound();
+            }
 
-                // Update the Activity entity from the view model
-                existingActivity.Activity_Name = activityViewModel.Activity_Name;
-                existingActivity.Activity_Description = activityViewModel.Activity_Description;
+            // Update the Activity entity from the view model
+            existingActivity.Activity_Name = activityViewModel.Activity_Name;
+            existingActivity.Activity_Description = activityViewModel.Activity_Description;
 
-                // Save changes asynchronously in the CRUD repository
-                await iCRUDRepository.SaveChangesAsync();
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response
-                return Ok(existingActivity);
+            // Return the successful response
+            return Ok(existingActivity);
             //}
             //catch (Exception)
             //{

@@ -170,6 +170,13 @@
     margin-bottom: 10px; /* Optional: Add some space between the image and the other content */
   }
 
+  .id-image {
+    width: 200; /* Adjust the width to your desired size */
+    height: 150px; /* Adjust the height to your desired size */
+    object-fit: cover; /* Ensure the image fits within the circular container */
+    margin-bottom: 10px; /* Optional: Add some space between the image and the other content */
+  }
+
   /* Add custom styles for the toggle password icon */
   .toggle-password {
     position: absolute;
@@ -205,6 +212,8 @@
     margin: 0; /* Remove default margin */
     font-size: 16px; /* Adjust the font size as needed */
   }
+
+  
 
 
  

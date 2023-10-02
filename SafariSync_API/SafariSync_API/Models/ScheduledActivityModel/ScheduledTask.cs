@@ -28,6 +28,7 @@ public class ScheduledTask
 
     [ForeignKey("ScheduledTask_ID")]
     public ICollection<ScheduledTaskUser> ScheduledTaskUser { get; set; } = new List<ScheduledTaskUser>();
+
     [ForeignKey("ScheduledTask_ID")]
     public ICollection<ScheduledTaskContractor> ScheduledTaskContractor { get; set; } = new List<ScheduledTaskContractor>();
 }

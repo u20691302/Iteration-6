@@ -11,7 +11,6 @@ import { ContractorService } from 'src/app/services/contractor/contractor.servic
 import { SkillService } from 'src/app/services/skills/skills.service';
 import { SupplierService } from 'src/app/services/supplier/supplier.service';
 import { User1Service } from 'src/app/services/user/User1.service';
-import { Report } from 'src/app/models/report/report.model';
 
 import { DomSanitizer, SafeResourceUrl, SafeUrl  } from '@angular/platform-browser';
 import jsPDF, * as jspdf from 'jspdf';
@@ -19,7 +18,6 @@ import 'jspdf-autotable';
 import {UserOptions} from "jspdf-autotable"
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { UserService } from 'src/app/services/user/user.service';
-import { ReportsService } from 'src/app/services/reports/reports.service';
 
 interface jsPDFWithPlugin extends jspdf.jsPDF {
   autotable: (options: UserOptions) => jspdf.jsPDF;
@@ -32,7 +30,7 @@ interface jsPDFWithPlugin extends jspdf.jsPDF {
 })
 export class GeneratePersonnelReportComponent implements OnInit {
 
-  constructor(private reportsService: ReportsService,private sanitizer: DomSanitizer,private userService: User1Service, private skillService: SkillService, private modalService: NgbModal, private supplierService: SupplierService, private contractorService: ContractorService, private userStore: UserStoreService, private userTyService: UserService) { }
+  constructor(private sanitizer: DomSanitizer,private userService: User1Service, private skillService: SkillService, private modalService: NgbModal, private supplierService: SupplierService, private contractorService: ContractorService, private userStore: UserStoreService, private userTyService: UserService) { }
 
 
   users: User[] = [];
@@ -59,11 +57,6 @@ export class GeneratePersonnelReportComponent implements OnInit {
 
   generatedPdf: any;
   pdfSrc: SafeResourceUrl = '';
-  retrievedUserID: number = 0;
-
-
-  name: string = '';
-  surname: string = '';
 
   downloadReport: jsPDF = new jsPDF('portrait', 'px', 'a4');
 
@@ -126,13 +119,7 @@ export class GeneratePersonnelReportComponent implements OnInit {
     supplierType_Name: ''
   };
 
-  saveReportRequest: Report = {
-    report_ID: 0,
-    report_Title: '',
-    createdAt: new Date(),
-    user_ID: 0,
-    pdfUrl: ''
-  };
+
 
 
 
@@ -141,22 +128,10 @@ export class GeneratePersonnelReportComponent implements OnInit {
     this.GetAllSuppliers();
     this.GetAllContractors();
     //get the users name
-    this.userStore.getUserIdFromStore().subscribe(val => {
-      let idFromToken = this.userTyService.getUserIdFromToken();
-      this.retrievedUserID = val || idFromToken;
-    });
-
     this.userStore.getFullNameFromStore().subscribe(val => {
       let fullNameFromToken = this.userTyService.getFullNameFromToekn();
-      this.name = val || fullNameFromToken;
+      this.fullName = val || fullNameFromToken;
     });
-
-    this.userStore.getSurnameFromStore().subscribe(val => {
-      let fullNameFromToken = this.userTyService.getSurnameFromToken();
-      this.surname = val || fullNameFromToken;
-    });
-
-    this.fullName = this.name + ' ' + this.surname;
   }
 
   GetAllUsers(): void {
@@ -297,160 +272,55 @@ export class GeneratePersonnelReportComponent implements OnInit {
     }
   
     let startY = 80;
-    addHeader(doc, true);
+  addHeader(doc, true);
 
-    // Generate totals table
-    startY = this.generateTotalsTable(
-      doc,
-      startY,
-      this.calculateTotalQuantityUsers(),
-      this.calculateTotalQuantityExternal()
-    );
+  const combinedData: string[][] = []; // This array will store combined data for all personnel
 
-    startY = this.generateFinalTable(doc, startY, this.calculateTotalQuantityPersonnel());
-  
-    // Generate stock table
-    startY = this.generateUserTable(doc, startY);
-  
-    // Generate equipment table
-    startY = this.generateSupplierTable(doc, startY);
+  // Combine data from users, suppliers, and contractors into a single array
+  this.users.forEach((user) => {
+    combinedData.push([user.username]); // Update data fields here
+  });
 
-    // Generate equipment table
-    startY = this.generateContractorTable(doc, startY);
+  this.suppliers.forEach((supplier) => {
+    combinedData.push([supplier.supplier_Name]); // Update data fields here
+  });
 
+  this.contractors.forEach((contractor) => {
+    combinedData.push([contractor.contractor_Name]); // Update data fields here
+  });
 
-  
-    // Calculate and add the total sum of quantities to the last row of both tables  
-    addFooter(doc);
-  
-    this.generatedPdf = new Blob([doc.output('blob')], { type: 'application/pdf' });
-  
-    const blobUrl = URL.createObjectURL(this.generatedPdf);
-    this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
-  
-    this.downloadReport = doc;
-    this.SaveReport();
-  }
-
-  generateUserTable(doc: any, startY: number) {
-    const tableData = [];
-    const header = ['User ID', 'User Name'];
-  
-    // Push header row
-    tableData.push(header);
-  
-    // Iterate through users and add rows
-    for (const user of this.users) {
-      const userRow = [
-        user.user_ID.toString(),
-        user.username
-      ];
-      tableData.push(userRow);
-    }
-  
-    // Calculate the number of users
-    const totalUsers = this.users.length;
-  
-    // Push the totals row
-    const totalsRow = ['Total Users', `${totalUsers}`];
-    tableData.push(totalsRow);
-  
-    doc.autoTable({
-      head: [header],
-      body: tableData.slice(1),
-      startY: startY,
-      didDrawRow: function (data: any) {
-        if (data.row.index === tableData.length - 1) {
-          data.row.styles.fontStyle = 'bold';
-        }
-      }
-    });
-  
-    // Update startY for the next table
-    return doc.autoTable.previous.finalY + 20;
-  }
-  
-
-generateSupplierTable(doc: any, startY: number) {
-  const tableData = [];
-  const header = ['Supplier ID', 'Supplier Name'];
-
-  // Push header row
-  tableData.push(header);
-
-  // Iterate through suppliers and add rows
-  for (const supplier of this.suppliers) {
-    const supplierRow = [
-      supplier.supplier_ID.toString(),
-      supplier.supplier_Name
-    ];
-    tableData.push(supplierRow);
-  }
-
-  // Calculate the number of suppliers
-  const totalSuppliers = this.suppliers.length;
-
-  // Push the totals row
-  const totalsRow = ['Total Suppliers', ` ${totalSuppliers}`];
-  tableData.push(totalsRow);
-
+  // Generate the table with combined data
   doc.autoTable({
-    head: [header],
-    body: tableData.slice(1),
+    head: [['Name']],
+    body: combinedData,
     startY: startY,
     didDrawRow: function (data: any) {
-      if (data.row.index === tableData.length - 1) {
+      if (data.row.index === combinedData.length - 1) {
         data.row.styles.fontStyle = 'bold';
       }
-    }
+    },
   });
 
-  // Update startY for the next table
-  return doc.autoTable.previous.finalY + 20;
+  // Generate the totals table as before
+  startY = this.generateTotalsTable(doc, startY, this.calculateTotalQuantityUsers(), this.calculateTotalQuantityExternal());
+
+  // Add footer as per your existing code
+  addFooter(doc);
+
+  this.generatedPdf = new Blob([doc.output('blob')], { type: 'application/pdf' });
+
+  const blobUrl = URL.createObjectURL(this.generatedPdf);
+  this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+
+  this.downloadReport = doc;
 }
+  
+  
 
 
-generateContractorTable(doc: any, startY: number) {
-  const tableData = [];
-  const header = ['Contractor ID', 'Contractor Name'];
 
-  // Push header row
-  tableData.push(header);
 
-  // Iterate through contractors and add rows
-  for (const contractor of this.contractors) {
-    const contractorRow = [
-      contractor.contractor_ID.toString(),
-      contractor.contractor_Name
-    ];
-    tableData.push(contractorRow);
-  }
 
-  // Calculate the number of contractors
-  const totalContractors = this.contractors.length;
-
-  // Push the totals row with custom CSS class
-  const totalsRow = ['Total Contractors', ` ${totalContractors}`];
-  tableData.push(totalsRow);
-
-  const boldCellStyle = {
-    fontStyle: 'bold'
-  };
-
-  doc.autoTable({
-    head: [header],
-    body: tableData.slice(1),
-    startY: startY,
-    didDrawCell: function (data: any) {
-      if (data.row.index === tableData.length - 1) {
-        doc.setFontStyle('bold');
-      }
-    }
-  });
-
-  // Update startY for the next table
-  return doc.autoTable.previous.finalY + 20;
-}
 
 
 
@@ -485,35 +355,7 @@ generateTotalsTable(doc: any, startY: number, totalUsers: number, totalExternal:
   return doc.autoTable.previous.finalY + 20;
 }
 
-generateFinalTable(doc: any, startY: number, totalPeeple: number) {
-  const tableData = [];
-  const header = ['Total Personnel'];
 
-  // Push header row
-  tableData.push(header);
-
-  const totalsRow = [
-    totalPeeple.toString(),
-  ];
-  tableData.push(totalsRow);
-
-  const headerStyles = {
-    fillColor: '#FF0000', // RGB color for the header background
-    textColor: 255, // Text color (white)
-    fontStyle: 'bold' // Bold font style for the header
-  };
-
-  doc.autoTable({
-    head: [header],
-    body: tableData.slice(1),
-    startY: startY,
-    theme: 'grid', // Use the 'grid' theme for the table
-    headStyles: headerStyles // Apply the header styles
-  });
-
-  // Update startY for the next content
-  return doc.autoTable.previous.finalY + 20;
-}
 
 
 
@@ -541,35 +383,6 @@ calculateTotalQuantityExternal(): number {
 calculateTotalQuantityPersonnel(): number {
   this.allPersonnel = this.suppliers.length + this.contractors.length + this.users.length;
   return this.allPersonnel;
-}
-
-async SaveReport() {
-  const blobUrl = URL.createObjectURL(this.generatedPdf);
-
-  // Convert the blob URL to base64
-  const pdfBlob = await fetch(blobUrl).then(response => response.blob());
-  const pdfBlobBuffer = await pdfBlob.arrayBuffer();
-  const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
-
-  this.saveReportRequest = {
-    report_ID: 0,
-    report_Title: 'Personnel Report',
-    createdAt: new Date(),
-    user_ID: this.retrievedUserID,
-    pdfUrl: pdfBase64 // Add the serialized PDF data here
-  };
-
-  this.reportsService.SaveReport(this.saveReportRequest)
-    .subscribe(
-      (response) => {
-        console.log('Report saved successfully:', response);
-        // Handle success, you can show a success message or perform other actions
-      },
-      (error) => {
-        console.error('Error saving report:', error);
-        // Handle error, you can show an error message or perform other actions
-      }
-    );
 }
 
 }

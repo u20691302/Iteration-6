@@ -7,27 +7,25 @@ import { StockSupplier } from 'src/app/models/stock/stockSupplier.model';
 import { Observable, tap } from 'rxjs';
 import { Supplier } from 'src/app/models/supplier/supplier.model';
 import { SupplierService } from 'src/app/services/supplier/supplier.service';
+import { ViewChild, ElementRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl, SafeUrl  } from '@angular/platform-browser';
 import jsPDF, * as jspdf from 'jspdf';
 import 'jspdf-autotable';
-
+import {UserOptions} from "jspdf-autotable"
 import { UserService } from 'src/app/services/user/user.service';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { EquipmentService } from 'src/app/services/equipment/equipment.service';
 import { Equipment } from 'src/app/models/equipment/equipment.model';
 import { EquipmentSupplier } from 'src/app/models/equipment/equipmentSupplier.model';
-import { Report } from 'src/app/models/report/report.model';
-import { ReportsService } from 'src/app/services/reports/reports.service';
 
 @Component({
   selector: 'app-generate-inventory-quantities',
   templateUrl: './generate-inventory-quantities.component.html',
   styleUrls: ['./generate-inventory-quantities.component.scss']
 })
-
 export class GenerateInventoryQuantitiesComponent {
 
-  constructor(private reportService: ReportsService,private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
+  constructor(private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
 
   stocks: Stock[] = [];
   stockName = "";
@@ -39,20 +37,20 @@ export class GenerateInventoryQuantitiesComponent {
   searchTerm: string = '';
   isAddMode: boolean = true;
   output: string = '';
-  
+  fullName: string = '';
   totalquan: number = 0;
   totalquan1: number = 0;
   totalquan2: number = 0;
 
-  name: string = '';
-  surname: string = '';
-  fullName: string = '';
-  retrievedUserID: number = 0;
+
+
 
   generatedPdf: any;
   pdfSrc: SafeResourceUrl = '';
 
   downloadReport: jsPDF = new jsPDF('portrait', 'px', 'a4');
+
+
 
   addUpdateStockRequest: Stock = {
     stock_ID: 0,
@@ -114,38 +112,18 @@ export class GenerateInventoryQuantitiesComponent {
     supplier_ID: 0
   };
 
-  saveReportRequest: Report = {
-    report_ID: 0,
-    report_Title: '',
-    createdAt: new Date(),
-    user_ID: 0,
-    pdfUrl: ''
-  };
-
   ngOnInit(): void {
     this.GetAllStock();
     this.GetAllEquipment();
-
-    this.userStore.getUserIdFromStore().subscribe(val => {
-      let idFromToken = this.userService.getUserIdFromToken();
-      this.retrievedUserID = val || idFromToken;
-    });
-
+    //get the users name
     this.userStore.getFullNameFromStore().subscribe(val => {
       let fullNameFromToken = this.userService.getFullNameFromToekn();
-      this.name = val || fullNameFromToken;
+      this.fullName = val || fullNameFromToken;
     });
-
-    this.userStore.getSurnameFromStore().subscribe(val => {
-      let fullNameFromToken = this.userService.getSurnameFromToken();
-      this.surname = val || fullNameFromToken;
-    });
-
-    this.fullName = this.name + ' ' + this.surname;
   }
 
   GetAllStock(): void {
-    this.stockService.getAllStocksReport(this.searchTerm).subscribe({
+    this.stockService.getAllStocks(this.searchTerm).subscribe({
       next: (stock) => {
         this.stocks = stock;
       },
@@ -301,149 +279,60 @@ export class GenerateInventoryQuantitiesComponent {
     }
   
     let startY = 80;
-    addHeader(doc, true);
-  
-    // Generate stock table
-    startY = this.generateStockTable(doc, startY);
-  
-    // Generate equipment table
-    startY = this.generateEquipmentTable(doc, startY);
-  
-    // Calculate and add the total sum of quantities to the last row of both tables
-    const totalQuantityStock = this.equipments.reduce((total, equipment) => total + equipment.equipment_Quantity_On_Hand, 0);
-    const totalQuantityEquipment = this.equipments.reduce((total, equipment) => total + equipment.equipment_Quantity_On_Hand, 0);
-  
-    // Create a summary row and add it to the end of the tables
-    const summaryRow = ['', 'Total', this.totalquan.toString()];
-    doc.autoTable({
-      startY: startY + 10,
-      body: [summaryRow],
-      head: [['', '', 'Total Quantity']],
-      tableWidth: 'wrap',
-      headStyles: { fillColor: '#869EC3' } // Adjust this value as needed
-    });
-  
-    addFooter(doc);
-  
-    this.generatedPdf = new Blob([doc.output('blob')], { type: 'application/pdf' });
-  
-    const blobUrl = URL.createObjectURL(this.generatedPdf);
-    this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
-  
-    this.downloadReport = doc;
-  }
+  addHeader(doc, true);
 
-  generateStockTable(doc: any, startY: number) {
-    const tableData = [];
-    const header = ['Stock ID', 'Stock Name', 'Quantity'];
+  const combinedData = []; // This array will store combined data for equipment and stock
 
-    // Push header row
-    tableData.push(header);
+  // Combine data from stocks into the combinedData array
+  this.stocks.forEach((stock) => {
+    combinedData.push([stock.stock_Name, stock.stock_Quantity_On_Hand.toString(), "Stock"]);
+  });
 
-    // Iterate through equipments and add stock rows
-    for (const stock of this.stocks) {
-      const stockRow = [
-        stock.stock_ID.toString(),
-        stock.stock_Name,
-        stock.stock_Quantity_On_Hand.toString()
-      ];
-      tableData.push(stockRow);
-      this.totalquan1 += stock.stock_Quantity_On_Hand; // Accumulate quantities
-      
-    }
-    this.totalquan = this.totalquan1;
+  // Combine data from equipment into the combinedData array
+  this.equipments.forEach((equipment) => {
+    combinedData.push([equipment.equipment_Name, equipment.equipment_Quantity_On_Hand.toString(), "Equipment"]);
+  });
 
-    // Add total row
-    const totalRow = ['', 'Total', this.totalquan1.toString()];
-    tableData.push(totalRow);
+  // Calculate and add the total sum of quantities for equipment and stock
+  const totalQuantityStock = this.stocks.reduce((total, stock) => total + stock.stock_Quantity_On_Hand, 0);
+  const totalQuantityEquipment = this.equipments.reduce((total, equipment) => total + equipment.equipment_Quantity_On_Hand, 0);
 
-    doc.autoTable({
-      head: [header],
-      body: tableData.slice(1),
-      startY: startY,
-      headStyles: { fillColor: '#869EC3' }
-    });
+  // Add the grand total to the combinedData array
+  combinedData.push(['Grand Total', totalQuantityStock + totalQuantityEquipment, '']);
 
-    // Update startY for the next table
-    return doc.autoTable.previous.finalY + 20;
-  }
+  // Add separate totals for stock and equipment
+  combinedData.push(['Stock Subtotal', totalQuantityStock, '']);
+  combinedData.push(['Equipment Subtotal', totalQuantityEquipment, '']);
 
-  generateEquipmentTable(doc: any, startY: number) {
-    const tableData = [];
-    const header = ['Equipment ID', 'Equipment Name', 'Quantity'];
+  // Generate the table with combined data
+  doc.autoTable({
+    head: [['Name', 'Quantity', 'Type']],
+    body: combinedData,
+    startY: startY,
+  });
 
-    // Push header row
-    tableData.push(header);
+  addFooter(doc);
 
-    // Iterate through equipments and add equipment rows
-    for (const equipment of this.equipments) {
-      const equipmentRow = [
-        equipment.equipment_ID.toString(),
-        equipment.equipment_Name,
-        equipment.equipment_Quantity_On_Hand.toString()
-      ];
-      tableData.push(equipmentRow);
+  this.generatedPdf = new Blob([doc.output('blob')], { type: 'application/pdf' });
 
-      this.totalquan2 += equipment.equipment_Quantity_On_Hand;
-    }
-    this.totalquan += this.totalquan2;
+  const blobUrl = URL.createObjectURL(this.generatedPdf);
+  this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
 
-    // Add total row
-    const totalRow = ['', 'Total', this.totalquan2.toString()];
-    tableData.push(totalRow);
-
-    doc.autoTable({
-      head: [header],
-      body: tableData.slice(1),
-      startY: startY,
-      headStyles: { fillColor: '#869EC3' }
-    });
-
-    // Update startY for the next table
-    return doc.autoTable.previous.finalY + 20;
-  }
+  this.downloadReport = doc;
+}
 
 
 
-  OpenPDFModal(content: any) {
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-  }
+OpenPDFModal(content: any) {
+  const modalRef = this.modalService.open(content, {
+    size: 'dialog-centered',
+    backdrop: 'static'
+  });
+}
 
-  async SaveReport() {
-    const blobUrl = URL.createObjectURL(this.generatedPdf);
-
-    // Convert the blob URL to base64
-    const pdfBlob = await fetch(blobUrl).then(response => response.blob());
-    const pdfBlobBuffer = await pdfBlob.arrayBuffer();
-    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
-
-    this.saveReportRequest = {
-      report_ID: 0,
-      report_Title: 'Inventory Report',
-      createdAt: new Date(),
-      user_ID: this.retrievedUserID,
-      pdfUrl: pdfBase64 // Add the serialized PDF data here
-    };
-
-    this.reportService.SaveReport(this.saveReportRequest)
-      .subscribe(
-        (response) => {
-          console.log('Report saved successfully:', response);
-          // Handle success, you can show a success message or perform other actions
-        },
-        (error) => {
-          console.error('Error saving report:', error);
-          // Handle error, you can show an error message or perform other actions
-        }
-      );
-  }
-
-  downloadPDF() {
-    this.downloadReport.save('Inventory Report' + ' ' + new Date());
-  }
+downloadPDF() {
+  this.downloadReport.save('Equipment Report' + ' ' + new Date());
+}
 
 
 
@@ -527,7 +416,7 @@ equipments: Equipment[] = [];
 
 
   GetAllEquipment(): void {
-    this.equipmentService.getAllEquipmentsReport(this.searchTermEquip).subscribe({
+    this.equipmentService.getAllEquipments(this.searchTermEquip).subscribe({
       next: (equipment) => {
         this.equipments = equipment;
       },
@@ -712,10 +601,14 @@ equipments: Equipment[] = [];
 
   calculateTotalQuantity(items: any[]): number {
     return items.reduce((total, item) => total + item.stock_Quantity_On_Hand, 0);
-  }
+}
 
-  calculateTotalQuantityEquip(items: any[]): number {
-    return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
-  }
+calculateTotalQuantityEquip(items: any[]): number {
+  return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
+}
 
+
+
+
+  
 }

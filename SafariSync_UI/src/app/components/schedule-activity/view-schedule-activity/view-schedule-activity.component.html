@@ -51,7 +51,18 @@
         <td>{{ scheduledActivity.startDate }}</td>
         <td>{{ scheduledActivity.endDate }}</td>
         <td>{{ scheduledActivity.activity_Location }}</td>
-        <td>{{ scheduledActivity.users?.username }} {{ scheduledActivity.users?.surname }}</td>
+        <td>
+          {{ scheduledActivity.users?.username }} {{ scheduledActivity.users?.surname }}
+          <p *ngIf="isScheduledActivityNotified(scheduledActivity.scheduledActivity_ID) === 1" style="color:green;">
+            <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
+          </p>
+          <p *ngIf="isScheduledActivityNotified(scheduledActivity.scheduledActivity_ID) === 2" style="color:red;">
+            <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
+          </p>
+          <p *ngIf="isScheduledActivityNotified(scheduledActivity.scheduledActivity_ID) === 3" style="color:grey;">
+            <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
+          </p>
+        </td>
         <td>{{ scheduledActivity.activityStatus?.activity_Status }}</td>
         <td>
           <div class="button-container">
@@ -171,11 +182,23 @@
         <thead>
           <tr>
             <th><u>Employees</u></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let employee of scheduledTaskUser">
             <td>{{ employee.user?.username }} {{ employee.user?.surname }}</td>
+            <td>
+              <p *ngIf="isScheduledTaskNotified(employee.userId) === 1" style="color:green;">
+                <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
+              </p>
+              <p *ngIf="isScheduledTaskNotified(employee.userId) === 2" style="color:red;">
+                <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
+              </p>
+              <p *ngIf="isScheduledTaskNotified(employee.userId) === 3" style="color:grey;">
+                <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
+              </p>
+            </td>
           </tr>
         </tbody>
         <tbody *ngIf="scheduledTaskUser.length === 0">
@@ -191,11 +214,23 @@
         <thead>
           <tr>
             <th><u>Contractors</u></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let contractor of scheduledTaskContractor">
             <td>{{ contractor.contractor?.contractor_Name }}</td>
+            <td>
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 1" style="color:green;">
+                <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
+              </p>
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 2" style="color:red;">
+                <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
+              </p>
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 3" style="color:grey;">
+                <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
+              </p>
+            </td>
           </tr>
         </tbody>
         <tbody *ngIf="scheduledTaskContractor.length === 0">
@@ -607,7 +642,7 @@
     </div>
     <div class="text-center">
       <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
-      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteTaskActivity(scheduledTask.task.task_ID, TaskConfirmationOfDelete, TaskDeleteError );">Confirm</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); DeleteTaskActivity(scheduledTask.scheduledTask_ID, TaskConfirmationOfDelete, TaskDeleteError );">Confirm</button>
     </div>
   </div>
   <div class="modal-footer"></div>

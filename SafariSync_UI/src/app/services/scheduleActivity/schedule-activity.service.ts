@@ -16,55 +16,102 @@ export class ScheduledActivityService {
   baseApiUrl: string = environment.baseApiUrl
   scheduledtasks: number = 0;
 
+  scheduledTask: ScheduledTask = {
+    scheduledTask_ID: 0,
+    startDate: new Date(),
+    endDate: new Date(),
+    taskStatus_ID: 0,
+    taskStatus: {
+      taskStatus_ID: 0,
+      task_Status: ''
+    },
+    task_ID: 0,
+    task: {
+      task_ID: 0,
+      task_Name: '',
+      task_Description: '',
+      skill_ID: 0,
+      skill: {
+        skill_ID: 0,
+        skill_Name: '',
+        skill_Description: ''
+      }
+    },
+    scheduledTaskUser: [{
+      scheduledTaskUser_ID: 0,
+      userId: 0,
+      scheduledTask_ID: 0,
+      user: {
+        user_ID: 0,
+        username: '',
+        surname: '',
+        email: '',
+        idPassport: '',
+        cellphone: '',
+        role: '',
+        rating_ID: 0,
+        ratings: {
+          rating_ID: 0,
+          rating: 0,
+        },
+      },
+    }],
+    users: [],
+    contractors: []
+  }
+
   constructor(private http: HttpClient) { }
 
   AddScheduledActivity(addScheduledActivityRequest: ScheduledActivity): Observable<ScheduledActivity> {
     return this.http.post<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivity/',addScheduledActivityRequest);
   }
 
-  AddScheduledTask(addScheduledTaskRequest: ScheduledTask, id: number): Observable<any> {
-    return this.http.post<ScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTask/',addScheduledTaskRequest)
-      .pipe(
-        concatMap((scheduledTask: ScheduledTask) => {
-          var scheduledTaskId = Number(scheduledTask.scheduledTask_ID);
-          this.scheduledtasks = scheduledTaskId;
-          const scheduledActivityScheduledTask = {
-            scheduledActivity_ID: id,
-            scheduledTask_ID: scheduledTaskId
-          };
-  
-          return this.http.post<ScheduledActivityScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivityScheduledTask/', scheduledActivityScheduledTask);
-        }),
-        concatMap((scheduledActivityScheduledTask: ScheduledActivityScheduledTask) => {
-          console.log('ScheduledActivityScheduledTask created successfully!');
-          var scheduledTaskId = Number(scheduledActivityScheduledTask.scheduledTask_ID);
-          const userTask = {
-            scheduledTask_ID: scheduledTaskId,
-            users: addScheduledTaskRequest.users
-          };
-  
-          return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskUser/', userTask);
-        }),
-        concatMap(() => {
-          console.log('ScheduledActivityScheduledTask created successfully!');
-          const contractorTask = {
-            scheduledTask_ID: this.scheduledtasks,
-            contractors: addScheduledTaskRequest.contractors
-          };
-        
-          if (contractorTask.contractors && contractorTask.contractors.length > 0) {
-            // Send the request only if the contractors array is not empty
-            return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskContractor/', contractorTask);
-          } else {
-            // Return an observable that immediately completes if the contractors array is empty
-            return of(null);
-          }
-        }),
-        tap(() => {
-          console.log('TaskContractor and TaskUser created successfully!');
-        })
-      );
+  AddScheduledTask(addScheduledTaskRequest: ScheduledTask, id: number): Observable<ScheduledTask> {
+      return this.http.post<ScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTask/', addScheduledTaskRequest)
+          .pipe(
+              concatMap((scheduledTask: ScheduledTask) => {
+                  var scheduledTaskId = Number(scheduledTask.scheduledTask_ID);
+                  this.scheduledTask = scheduledTask;
+                  this.scheduledtasks = scheduledTaskId;
+                  const scheduledActivityScheduledTask = {
+                      scheduledActivity_ID: id,
+                      scheduledTask_ID: scheduledTaskId
+                  };
+
+                  return this.http.post<ScheduledActivityScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivityScheduledTask/', scheduledActivityScheduledTask);
+              }),
+              concatMap((scheduledActivityScheduledTask: ScheduledActivityScheduledTask) => {
+
+                  var scheduledTaskId = Number(scheduledActivityScheduledTask.scheduledTask_ID);
+                  const userTask = {
+                      scheduledTask_ID: scheduledTaskId,
+                      users: addScheduledTaskRequest.users
+                  };
+
+                  return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskUser/', userTask);
+              }),
+              concatMap(() => {
+
+                  const contractorTask = {
+                      scheduledTask_ID: this.scheduledtasks,
+                      contractors: addScheduledTaskRequest.contractors
+                  };
+
+                  if (contractorTask.contractors && contractorTask.contractors.length > 0) {
+                      // Send the request only if the contractors array is not empty
+                      return this.http.post<any>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskContractor/', contractorTask);
+                  } else {
+                      // Return an observable that immediately completes if the contractors array is empty
+                      return of(null);
+                  }
+              }),
+              map(() => {
+                  // Return the created scheduled task
+                  return this.scheduledTask;
+              })
+          );
   }
+
   
   getAllScheduledActivities(term: string): Observable<ScheduledActivity[]> {
     return this.http.get<ScheduledActivity[]>(`${this.baseApiUrl}/api/ScheduledActivity/ReadAllScheduledActivityAsync`).pipe(

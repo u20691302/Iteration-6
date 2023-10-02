@@ -10,6 +10,12 @@
   right: 0; 
 }
 
+.center-column {
+  position:absolute;
+  left: 0;
+  right: 0;
+}
+
 .dashboard {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -18,7 +24,7 @@
   margin: 2vh auto; /* Center the dashboard vertically */
   border: 1px solid lightgray;
   background-color: lightgray;
-
+  align-content: center;
 }
 
 .column {
@@ -29,7 +35,6 @@
   padding: 5px;
   border: 1px solid #ccc;
   height: calc(50vh - 10px); /* Subtract the padding and border to fit */
-  
 }
 
 .section {
@@ -103,6 +108,11 @@
     margin: 0 auto; /* Center buttons horizontally */
   }
 
+  .button-but:hover {
+    box-shadow: 0 0 5px #001844;
+  }
+
+
   .button-reject {
     padding: 6px 12px;
     background-color: #CD1543;
@@ -114,6 +124,120 @@
     margin: 0 auto; /* Center buttons horizontally */
     border-radius:20px;
     width: 75px;
+  }
+
+  .button-reject:hover {
+    box-shadow: 0 0 5px #CD1543;
+  }
+
+  .btn-return {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border: none;
+  }
+  
+  .btn-return:hover {
+    box-shadow: 0 0 5px #CD1543;
+  }
+  
+  .btn-add {
+    background-color: #001844;
+    border-color: #001844;
+    color: white;
+    margin-right: 10px;
+    border-radius: 20px;
+    border: none;
+  }
+  
+  .btn-add:hover {
+    box-shadow: 0 0 5px #001844;
+  }
+  
+  .input-group-text:hover {
+    cursor: pointer;
+  }
+  
+  .text-input{
+    box-shadow: none;
+  }
+
+  .btn-update {
+    background-color: #001844;
+    border-color: #001844;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border:none;
+  }
+  
+  .btn-update:hover {
+    box-shadow: 0 0 5px #001844;
+  }
+
+  .modal-header{
+    background-color: #001844;
+    border: 1px solid #001844;
+    height:70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-title {
+    text-align: center;
+    color: white;
+  }
+  
+  .modal-body {
+    text-align: center;
+    background-color: #869EC3;
+    width: auto;
+  }
+  
+  .modal-body .row {
+    justify-content: center;
+  }
+  
+  .modal-body .col-6 {
+    margin: 0 auto;
+    float: none;
+    width:auto;
+  }
+
+  .btn-form-add{
+    background-color: #001844;
+    border-color: #001844;
+    color: white;
+    margin-right: 10px;
+    border-radius:20px;
+    border:none;
+  }
+  
+  .btn-form-add.disabled {
+    background-color: #001844; 
+    border-color: #001844;
+    box-shadow: none; 
+    opacity: 0.7; 
+    cursor: not-allowed;
+  }
+  
+  .validation-notification{
+    color: #CD1543;
+    font-weight: bold;
+  }
+  
+  .modal-button-container{
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .modal-footer{
+    background-color: #CD1543;
+    border: 1px solid #CD1543;
+    height:50px;
   }
 
 .table.table-hover  {

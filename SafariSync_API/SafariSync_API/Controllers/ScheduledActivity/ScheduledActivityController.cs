@@ -3,12 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SafariSync_API.Data;
 using SafariSync_API.Models;
-using SafariSync_API.Models.ActivityModel;
-using SafariSync_API.Models.EquipmentModel;
-using SafariSync_API.Models.SupplierModel;
 using SafariSync_API.Repositories.CRUD;
-using SafariSync_API.ViewModels.ActivityViewModel;
-using SafariSync_API.ViewModels.EquipmentViewModel;
 using SafariSync_API.ViewModels.ScheduledActivity;
 using SafariSync_API.ViewModels.ScheduledTask;
 
@@ -43,7 +38,6 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                     .Include(es => es.ScheduledActivityScheduledTask!).ThenInclude(es => es.ScheduledTask!).ThenInclude(es => es.TaskStatus!)
                     .Include(es => es.ScheduledActivityScheduledTask!).ThenInclude(es => es.ScheduledTask!).ThenInclude(es => es.Task!).ThenInclude(es => es.Skill)
                     .ToListAsync();
-
 
                 // Return the scheduledActivity data with associated scheduledTasks
                 return Ok(scheduledActivity);
@@ -106,7 +100,6 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching activity data.");
             }
         }
-
 
         [HttpGet]
         [Route("ReadOneScheduledTaskUserAsync/{id}")]
@@ -208,7 +201,7 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 // Validate the input equipment data if necessary
                 if (!ModelState.IsValid)
                 {
-                return BadRequest(ModelState);
+                    return BadRequest(ModelState);
                 }
 
                 // Create the Equipment entity from the view model
@@ -355,14 +348,21 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 {
                     iCRUDRepository.Delete(notificationSupervisor);
                 }
-                
-                var notificationAdmin = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == id);
+
+                var notificationAdmin = await safariSyncDBContext.NotificationAdmin.ToListAsync();
 
                 if (notificationAdmin != null)
                 {
                     iCRUDRepository.Delete(notificationAdmin);
                 }
-                
+
+                var notificationUser = await safariSyncDBContext.NotificationUser.Where(e => e.ScheduledTask_ID == id).ToListAsync();
+
+                if (notificationAdmin != null)
+                {
+                    iCRUDRepository.Delete(notificationAdmin);
+                }
+
                 // Fetch the existing activity by ID using SafariSyncDBContext
                 var existingScheduledActivity = await safariSyncDBContext.ScheduledActivity
                     .Include(e => e.ScheduledActivityScheduledTask)
@@ -453,43 +453,62 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         [Route("DeleteScheduledActivityScheduledTask/{id}")]
         public async Task<IActionResult> DeleteScheduledActivityScheduledTask(int id)
         {
-           
-                // Fetch the existing activity by ID using SafariSyncDBContext
-                var existingScheduledTask = await safariSyncDBContext.ScheduledActivityScheduledTask
-                    .Include(e => e.ScheduledTask!.ScheduledTaskUser)
-                    .Include(e => e.ScheduledTask!.ScheduledTaskContractor)
-                    .FirstOrDefaultAsync(e => e.ScheduledTask_ID == id);
+            // Fetch the existing activity by ID using SafariSyncDBContext
+            var existingScheduledTask = await safariSyncDBContext.ScheduledActivityScheduledTask
+                .Include(e => e.ScheduledTask!.ScheduledTaskUser)
+                .Include(e => e.ScheduledTask!.ScheduledTaskContractor)
+                .FirstOrDefaultAsync(e => e.ScheduledTask_ID == id);
 
-                // If activity with the given ID is not found, return a not found response
-                if (existingScheduledTask == null)
+            var notificationUser = await safariSyncDBContext.NotificationUser.Where(e => e.ScheduledTask_ID == id).ToListAsync();
+
+            if (notificationUser != null)
+            {
+                foreach (var notifications in notificationUser)
                 {
-                    return NotFound();
+                    iCRUDRepository.Delete(notifications);
                 }
+            }
 
-                // Remove the activity from the database using ICRUDRepository
-                iCRUDRepository.Delete(existingScheduledTask);
+            var notificationAdmin = await safariSyncDBContext.NotificationAdmin.Where(e => e.ScheduledTask_ID == id).ToListAsync();
 
-                // Remove the associated activityTask records from the database using ICRUDRepository
-                foreach (var scheduledTaskUser in existingScheduledTask.ScheduledTask!.ScheduledTaskUser.ToList())
+            if (notificationAdmin != null)
+            {
+                foreach (var notifications in notificationAdmin)
                 {
-                    iCRUDRepository.Delete(scheduledTaskUser);
+                    iCRUDRepository.Delete(notifications);
                 }
+            }
 
-                foreach (var scheduledTaskContractor in existingScheduledTask.ScheduledTask!.ScheduledTaskContractor.ToList())
+            // If activity with the given ID is not found, return a not found response
+            if (existingScheduledTask == null)
+            {
+                return NotFound();
+            }
+
+            // Remove the activity from the database using ICRUDRepository
+            iCRUDRepository.Delete(existingScheduledTask);
+
+            // Remove the associated activityTask records from the database using ICRUDRepository
+            foreach (var scheduledTaskUser in existingScheduledTask.ScheduledTask!.ScheduledTaskUser.ToList())
+            {
+                iCRUDRepository.Delete(scheduledTaskUser);
+            }
+
+            foreach (var scheduledTaskContractor in existingScheduledTask.ScheduledTask!.ScheduledTaskContractor.ToList())
+            {
+                iCRUDRepository.Delete(scheduledTaskContractor);
+
+                if (scheduledTaskContractor.Contractor != null)
                 {
-                    iCRUDRepository.Delete(scheduledTaskContractor);
-
-                    if (scheduledTaskContractor.Contractor != null)
-                    {
-                        iCRUDRepository.Delete(scheduledTaskContractor.Contractor);
-                    }
+                    iCRUDRepository.Delete(scheduledTaskContractor.Contractor);
                 }
+            }
 
-                // Save changes asynchronously in the context
-                await safariSyncDBContext.SaveChangesAsync();
+            // Save changes asynchronously in the context
+            await safariSyncDBContext.SaveChangesAsync();
 
-                // Return the successful response
-                return Ok(existingScheduledTask);
+            // Return the successful response
+            return Ok(existingScheduledTask);
         }
 
         [HttpPut]
@@ -533,7 +552,6 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
             }
         }
-
 
         [HttpPut]
         [Route("UpdateScheduledTask")]
@@ -587,8 +605,8 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 // Remove existing EquipmentSupplier records associated with this equipment
                 foreach (var existingUser in existingScheduledTask.ScheduledTaskContractor.ToList())
                 {
-                        existingScheduledTask.ScheduledTaskContractor.Remove(existingUser);
-                }             
+                    existingScheduledTask.ScheduledTaskContractor.Remove(existingUser);
+                }
 
                 List<ScheduledTaskContractor> scheduledTask = new List<ScheduledTaskContractor>();
 
@@ -608,10 +626,8 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 // Save changes asynchronously in the CRUD repository
                 await iCRUDRepository.SaveChangesAsync();
 
-
-
-            // Return the successful response
-            return Ok(existingScheduledTask);
+                // Return the successful response
+                return Ok(existingScheduledTask);
             }
             catch (Exception)
             {

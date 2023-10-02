@@ -50,6 +50,8 @@ import { RatingSettingsComponent } from './components/rating-settings/rating-set
 import { NgChartsModule } from 'ng2-charts'; // Import ng2-charts
 import { ViewPreviousReportsComponent } from './components/reporting/view-previous-reports/view-previous-reports.component';
 import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
+import { AuditActionRecordsComponent } from './components/audit-action-records/audit-action-records.component';
+import { TimeoutSettingsComponent } from './components/timeout-settings/timeout-settings.component';
 
 
 
@@ -98,8 +100,9 @@ const routes: Routes = [
     ViewPreviousReportsComponent,
     GenerateStockReportComponent,
     GenerateDynamicStockReportComponent,
-    GenerateUserReportComponent
-
+    GenerateUserReportComponent,
+    AuditActionRecordsComponent,
+    TimeoutSettingsComponent
   ],
   imports: [
     BrowserModule,

@@ -20,6 +20,9 @@ import { NotificationSupervisor } from 'src/app/models/notifications/notificatio
 import { NotificationAdmin } from 'src/app/models/notifications/notificationAdmin.model';
 import { NotificationUser } from 'src/app/models/notifications/notificationUser.model';
 import { NotificationService } from 'src/app/services/notification/notification.service';
+import { Audit } from 'src/app/models/audit/Audit.model';
+import { AuditService } from 'src/app/services/audit/audit.service';
+import { UserStoreService } from 'src/app/services/user/user-store.service';
 
 @Component({
   selector: 'app-view-schedule-activity',
@@ -29,7 +32,7 @@ import { NotificationService } from 'src/app/services/notification/notification.
 
 export class ViewScheduleActivityComponent implements OnInit{
 
-  constructor(private notificationService: NotificationService, private contractorService: ContractorService, private userService: User1Service, private scheduledActivityService: ScheduledActivityService, private activityService: ActivityService, private modalService: NgbModal, private formBuilder: FormBuilder, private route: ActivatedRoute, private userTyService: UserService) { 
+  constructor(private userStore: UserStoreService, private auditService:AuditService, private notificationService: NotificationService, private contractorService: ContractorService, private userService: User1Service, private scheduledActivityService: ScheduledActivityService, private activityService: ActivityService, private modalService: NgbModal, private formBuilder: FormBuilder, private route: ActivatedRoute, private userTyService: UserService) { 
     this.form = this.formBuilder.group({
       startDateTime: ['', Validators.required],
       endDateTime: ['', Validators.required],
@@ -73,6 +76,9 @@ export class ViewScheduleActivityComponent implements OnInit{
   addUpdateEmployee: User[] = [];
   selectedEmployee: number | null = null;
   isEmployeeListEmpty: boolean = true;
+  
+  notifications: any[] = [];
+  notificationsContractor: any[] = []
 
   contractors: Contractor[] = [];
   addUpdateContractor: Contractor[] = [];
@@ -307,10 +313,10 @@ export class ViewScheduleActivityComponent implements OnInit{
   notificationAdmin: NotificationAdmin = {
     notification_ID: 0,
     date: new Date(),
-    user_ID: 0,
     notification_Message: '',
     notificationStatus_ID: 0,
-    scheduledActivity_ID: 0,
+    scheduledTask_ID: 0,
+    contractor_ID: 0
   };
 
   notificationUser: NotificationUser= {
@@ -322,6 +328,17 @@ export class ViewScheduleActivityComponent implements OnInit{
     scheduledTask_ID: 0,
   };
 
+  Auditstream: Audit = {
+    audit_ID: 0,
+    date: new Date(),
+    message: '',
+    username:'',
+    auditAction_ID:0
+  };
+
+  fullName: string = '';
+  userID: number = 0;
+
   ngOnInit(): void {
     this.GetAllScheduledActivities();
 
@@ -329,12 +346,47 @@ export class ViewScheduleActivityComponent implements OnInit{
       this.savedRoute = urlSegments.join('/'); // Convert URL segments to a string
       this.userTyService.setCurrentPath(this.savedRoute);
     });
+
+    this.userStore.getFullNameFromStore().subscribe(val => {
+      let fullNameFromToken = this.userTyService.getFullNameFromToekn();
+      this.fullName = val || fullNameFromToken;
+    });
+
+    this.userStore.getUserIdFromStore().subscribe(val =>{
+      let userid = this.userTyService.getUserIdFromToken();
+        this.userID = userid;
+    });
+  }
+
+  isScheduledActivityNotified(scheduledActivityId: number): number {
+
+    if (this.notifications.some(notification => notification.scheduledActivity_ID === scheduledActivityId)){
+
+      const notification = this.notifications.find(notification => notification.scheduledActivity_ID === scheduledActivityId);
+
+      if (notification.notificationStatus_ID == 1){
+        return 1;
+      }
+      else if (notification.notificationStatus_ID == 2){
+        return 2;
+      }
+      else if (notification.notificationStatus_ID == 3){
+        return 3;
+      }
+    }
+    return 3;
   }
 
   GetAllScheduledActivities(): void {
     this.scheduledActivityService.getAllScheduledActivities(this.searchTerm).subscribe({
       next: (scheduledActivities) => {
         this.scheduledActivities = scheduledActivities;
+
+        this.notificationService.getNotificationSupervisor().subscribe({
+          next: (notifications) => {
+            this.notifications = notifications;
+          }
+        });
       },
       error: (response) => {
         console.log(response);
@@ -449,8 +501,47 @@ export class ViewScheduleActivityComponent implements OnInit{
       contractors: this.addUpdateContractor
     }
     this.scheduledActivityService.updateScheduledTask(this.scheduledTask).subscribe({
-      next: () => {
+      next: (ScheduledTask: ScheduledTask) => {
         this.GetOneScheduledActivities(this.scheduledActivity_ID)
+
+        if (this.scheduledTask.users) {
+          for (var user of this.scheduledTask.users) {
+            this.notificationUser = {
+              notification_ID: 0,
+              date: new Date(),
+              user_ID: user.user_ID,
+              notification_Message: 'You, ' + user.username +' '+ user.surname +' have been assigned as a farm worker on a scheduled task.',
+              notificationStatus_ID: 3,
+              scheduledTask_ID: ScheduledTask.scheduledTask_ID
+            };
+        
+            this.notificationService.UpdateNotificationUser(this.notificationUser).subscribe({
+              next: () => {
+                
+              }
+            });
+          }
+        }
+
+        if (this.scheduledTask.contractors) {
+          for (var contractors of this.scheduledTask.contractors) {
+            this.notificationAdmin = {
+              notification_ID: 0,
+              date: new Date(),
+              contractor_ID:  contractors.contractor_ID,
+              notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
+              notificationStatus_ID: 3,
+              scheduledTask_ID: ScheduledTask.scheduledTask_ID
+            };
+        
+            this.notificationService.UpdateNotificationAdmin(this.notificationAdmin).subscribe({
+              next: () => {
+                
+              }
+            });
+          }
+        }
+
         const modalRef = this.modalService.open(success, {
           size: 'xl',
           centered: true,
@@ -499,10 +590,35 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
+  isScheduledTaskNotified(scheduledTaskId: number): number {
+
+    if (this.notifications.some(notification => notification.user_ID === scheduledTaskId)){
+
+      const notification = this.notifications.find(notification => notification.user_ID === scheduledTaskId);
+
+      if (notification.notificationStatus_ID == 1){
+        return 1;
+      }
+      else if (notification.notificationStatus_ID == 2){
+        return 2;
+      }
+      else if (notification.notificationStatus_ID == 3){
+        return 3;
+      }
+    }
+    return 3;
+  }
+
   GetOneScheduledTaskUser(id: number): void {
     this.scheduledActivityService.getOneScheduledTaskUser(id).subscribe({
       next: (scheduledTaskUser) => {
         this.scheduledTaskUser = scheduledTaskUser;
+
+        this.notificationService.getNotificationUser().subscribe({
+          next: (notifications) => {
+            this.notifications = notifications;
+          }
+        });
       },
       error: (response) => {
         console.log(response);
@@ -510,10 +626,35 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
+  isScheduledTaskContractorNotified(scheduledTaskId: number): number {
+
+    if (this.notificationsContractor.some(notification => notification.contractor_ID === scheduledTaskId)){
+
+      const notification = this.notificationsContractor.find(notification => notification.contractor_ID === scheduledTaskId);
+
+      if (notification.notificationStatus_ID == 1){
+        return 1;
+      }
+      else if (notification.notificationStatus_ID == 2){
+        return 2;
+      }
+      else if (notification.notificationStatus_ID == 3){
+        return 3;
+      }
+    }
+    return 3;
+  }
+
   GetOneScheduledTaskContractor(id: number): void {
     this.scheduledActivityService.getOneScheduledtaskContractor(id).subscribe({
       next: (scheduledTaskContractor) => {
         this.scheduledTaskContractor = scheduledTaskContractor;
+
+        this.notificationService.getNotificationAdmin().subscribe({
+          next: (notifications) => {
+            this.notificationsContractor = notifications;
+          }
+        });
       },
       error: (response) => {
         console.log(response);
@@ -607,6 +748,19 @@ export class ViewScheduleActivityComponent implements OnInit{
             this.startDateTime = new Date();
             this.endDateTime = new Date();
             this.addUpdateScheduledActivityRequest.activity_Location = '';
+          }
+        });
+
+        this.Auditstream={
+          audit_ID:0,
+          date:new Date(),
+          message:' '+" assigned Employee ID: " + this.selectedSupervisor +" to Scheduled Activity: " + this.scheduledActivity_ID + ' ',
+          username:this.fullName,
+          auditAction_ID:2
+        }
+        this.auditService.AddAudit(this.Auditstream).subscribe({
+          next: () => {
+            
           }
         });
 
@@ -720,13 +874,28 @@ export class ViewScheduleActivityComponent implements OnInit{
 
         this.notificationService.AddNotifcationSupervisor(this.notificationSupervisor).subscribe({
           next: () => {
-            this.selectedActivity = null;
+            
+          }
+        });
+
+        this.Auditstream={
+          audit_ID:0,
+          date:new Date(),
+          message:' '+"assigned " + username+" to Scheduled Activity:" + this.scheduledActivity_ID + ' ',
+          username:this.fullName,
+          auditAction_ID:1
+        }
+        this.auditService.AddAudit(this.Auditstream).subscribe({
+          next: () => {
+            
+          }
+        });
+
+        this.selectedActivity = null;
             this.selectedSupervisor = null;
             this.startDateTime = new Date();
             this.endDateTime = new Date();
             this.addUpdateScheduledActivityRequest.activity_Location = '';
-          }
-        });
 
         const modalRef = this.modalService.open(success, {
           size: 'xl',
@@ -767,9 +936,47 @@ export class ViewScheduleActivityComponent implements OnInit{
     }
 
     this.scheduledActivityService.AddScheduledTask(this.scheduledTask, this.scheduledActivity_ID).subscribe({
-      next: () => {
+      next: (ScheduledTask: ScheduledTask) => {
+        this.scheduledTask_ID = ScheduledTask.scheduledTask_ID;
         this.GetOneScheduledActivities(this.scheduledActivity_ID);
-        // this.loadTask(id);
+
+        if (this.scheduledTask.users) {
+          for (var user of this.scheduledTask.users) {
+            this.notificationUser = {
+              notification_ID: 0,
+              date: new Date(),
+              user_ID: user.user_ID,
+              notification_Message: 'You, ' + user.username +' '+ user.surname +' have been assigned as a farm worker on a scheduled task.',
+              notificationStatus_ID: 3,
+              scheduledTask_ID: ScheduledTask.scheduledTask_ID
+            };
+        
+            this.notificationService.AddNotifcationUser(this.notificationUser).subscribe({
+              next: () => {
+                
+              }
+            });
+          }
+        }
+
+        if (this.scheduledTask.contractors) {
+          for (var contractors of this.scheduledTask.contractors) {
+            this.notificationAdmin = {
+              notification_ID: 0,
+              date: new Date(),
+              contractor_ID: contractors.contractor_ID,
+              notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
+              notificationStatus_ID: 3,
+              scheduledTask_ID: ScheduledTask.scheduledTask_ID
+            };
+        
+            this.notificationService.AddNotifcationAdmin(this.notificationAdmin).subscribe({
+              next: () => {
+                
+              }
+            });
+          }
+        }
         
         const modalRef = this.modalService.open(success, {
           size: 'xl',
@@ -827,7 +1034,6 @@ export class ViewScheduleActivityComponent implements OnInit{
       const employeeToAdd = this.users.find(employee => employee.user_ID === employeeIdToAdd);
       if (employeeToAdd) {
         this.addUpdateEmployee.push(employeeToAdd);
-        console.log(this.addUpdateEmployee);
         this.selectedEmployee = null;
         this.isEmployeeListEmpty = this.addUpdateEmployee.length === 0;
       }
@@ -888,7 +1094,6 @@ export class ViewScheduleActivityComponent implements OnInit{
     }
   }
   
-
   deleteContractorFromArray(contractor: Contractor) {
     const index = this.addUpdateContractor.findIndex(s => s.contractor_ID === contractor.contractor_ID);
     if (index !== -1) {
@@ -982,7 +1187,6 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-
   OpenDeleteModal(content: any, scheduledActivity: ScheduledActivity) {
     const modalRef = this.modalService.open(content, {
       size: 'dialog-centered',
@@ -995,6 +1199,19 @@ export class ViewScheduleActivityComponent implements OnInit{
     this.scheduledActivityService.deleteScheduledActivity(scheduledActivityID).subscribe({
       next: (response) => {
         this.scheduledActivities = this.scheduledActivities.filter(scheduledActivities => scheduledActivities.scheduledActivity_ID !== scheduledActivityID);
+
+        this.Auditstream={
+          audit_ID:0,
+          date:new Date(),
+          message:" deleted Scheduled Activity:" + this.scheduledActivity_ID + ' ',
+          username:this.fullName,
+          auditAction_ID:3
+        }
+        this.auditService.AddAudit(this.Auditstream).subscribe({
+          next: () => {
+            
+          }
+        });
         const modalRef = this.modalService.open(success, {
           size: 'dialog-centered',
           backdrop: 'static'

@@ -3,9 +3,9 @@
   <h3>{{fullName}}'s Dashboard</h3>
 </div>
 
-<div class="dashboard">
+<div class="dashboard" >
   <!-- First Column -->
-  <div class="column" >
+  <div *ngIf="this.userRole == 'Admin';" class="column">
     <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Scheduled Activity Status</h5>
     <!-- Section 1 -->
     <div class="section">
@@ -25,7 +25,7 @@
   </div>
 
   <!-- Middle Column -->
-  <div class="column middle-column">
+  <div class="column middle-column" [ngClass]="{'center-column': userRole !== 'Admin'}" >
     <h4 style="color: #CD1543; font-weight: bold; align-self: center;">Activity Stream</h4>
     <div class="notification-center">
       <table class= "middle-table">
@@ -43,15 +43,15 @@
             <td>{{ notification.notification_Message }}</td>
             <td *ngIf="notification.notificationStatus_ID === 3">
               <div class="button-container">
-                <button class="button-but">Accept</button>
+                <button class="button-but" (click)="openAcceptModal(AcceptConfirmationModal, notification.notification_ID)">Accept</button>
                 <button class="button-reject">Reject</button>
               </div>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 1" style="text-align:center;">
-              <p style="color:green;">Accepted</p>
+              <p style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 2" style="text-align:center;">
-              <p style="color:red;">Rejected</p>
+              <p style="color:red;"><i class="fa fa-times-circle" aria-hidden="true"></i> Rejected</p>
             </td>
           </tr>
         </tbody>
@@ -65,7 +65,7 @@
   </div>
 
   <!-- Third Column -->
-  <div class="column">
+  <div *ngIf="this.userRole == 'Admin';" class="column">
     <!-- Section 4 -->
     <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Stock Items Near Depeletion</h5>
     <div class="section">
@@ -110,3 +110,32 @@
     </div>
   </div> 
 </div>
+
+<!-- Accept Confirmation Modal -->
+<ng-template #AcceptConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Please Confirm</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Please confirm that you are accepting this position.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click');">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); updateNotification(ConfirmationModal)">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Accept Confirmation Modal -->
+<ng-template #ConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Position Accepted!</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click');">Ok</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

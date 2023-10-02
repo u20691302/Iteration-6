@@ -1,18 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SafariSync_API.Data;
-using SafariSync_API.Models;
-using SafariSync_API.Models.ActivityModel;
-using SafariSync_API.Models.EquipmentModel;
 using SafariSync_API.Models.NotificationModel;
-using SafariSync_API.Models.SkillsModel;
-using SafariSync_API.Models.SupplierModel;
 using SafariSync_API.Repositories.CRUD;
-using SafariSync_API.ViewModels.ActivityViewModel;
-using SafariSync_API.ViewModels.EquipmentViewModel;
-using SafariSync_API.ViewModels.ScheduledActivity;
-using SafariSync_API.ViewModels.ScheduledTask;
 
 namespace SafariSync_API.Controllers.NotificationController
 {
@@ -78,9 +68,7 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.Include(e => e.NotificationStatus)
-                                                                                   .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
-                                                                                                                      .ThenInclude(e => e.ScheduledTask)
+                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.Include(e => e.NotificationStatus).Include(e => e.ScheduledTask)
                                                                                                                       .ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
@@ -185,10 +173,10 @@ namespace SafariSync_API.Controllers.NotificationController
                 var newNotificationAdmin = new NotificationAdmin
                 {
                     Date = notificationAdmin.Date,
-                    User_ID = notificationAdmin.User_ID,
                     Notification_Message = notificationAdmin.Notification_Message,
                     NotificationStatus_ID = notificationAdmin.NotificationStatus_ID,
-                    ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID,
+                    ScheduledTask_ID = notificationAdmin.ScheduledTask_ID,
+                    Contractor_ID = notificationAdmin.Contractor_ID,
                 };
 
                 // Add the notification to the database using ICRUDRepository
@@ -274,6 +262,209 @@ namespace SafariSync_API.Controllers.NotificationController
             catch (Exception)
             {
                 // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationAdmin")]
+        public async Task<IActionResult> UpdateNotificationAdmin(NotificationAdmin notificationAdmin)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Contractor_ID == notificationAdmin.Contractor_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.Date = notificationAdmin.Date;
+                Notification.Contractor_ID = notificationAdmin.Contractor_ID;
+                Notification.Notification_Message = notificationAdmin.Notification_Message;
+                Notification.NotificationStatus_ID = notificationAdmin.NotificationStatus_ID;
+                Notification.ScheduledTask_ID = notificationAdmin.ScheduledTask_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationUser")]
+        public async Task<IActionResult> UpdateNotificationUser(NotificationUser notificationUser)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.User_ID == notificationUser.User_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.Date = notificationUser.Date;
+                Notification.User_ID = notificationUser.User_ID;
+                Notification.Notification_Message = notificationUser.Notification_Message;
+                Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
+                Notification.ScheduledTask_ID = notificationUser.ScheduledTask_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationSupervisorStatus")]
+        public async Task<IActionResult> UpdateNotificationSupervisorStatus(NotificationSupervisor notificationSupervisor)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.Notification_ID == notificationSupervisor.Notification_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationUserStatus")]
+        public async Task<IActionResult> UpdateNotificationUserStatus(NotificationUser notificationUser)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.Notification_ID == notificationUser.Notification_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                //Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateNotificationAdminStatus")]
+        public async Task<IActionResult> UpdateNotificationAdminStatus(NotificationAdmin notificationAdmin)
+        {
+            try
+            {
+                // Validate the input data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Notification_ID == notificationAdmin.Notification_ID);
+
+                // Check if the entity exists
+                if (Notification == null)
+                {
+                    return NotFound("Notification not found");
+                }
+
+                // Update the properties of the existing entity with the new values
+                Notification.NotificationStatus_ID = notificationAdmin.NotificationStatus_ID;
+
+                // Update the entity in the database
+                iCRUDRepository.Update(Notification);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response with the updated entity
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                //Handle the exception and return an error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
             }
         }

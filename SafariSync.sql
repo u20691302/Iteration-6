@@ -248,14 +248,36 @@ CREATE TABLE NotificationUser (
 CREATE TABLE NotificationAdmin (
     Notification_ID INT IDENTITY(1,1) PRIMARY KEY,
     Date DATETIME NOT NULL,
-	User_ID INT NOT NULL,
-	ScheduledActivity_ID INT NOT NULL,
+	ScheduledTask_ID INT NOT NULL,
+	Contractor_ID INT NOT NULL,
 	Notification_Message VARCHAR(255) NOT NULL,
 	NotificationStatus_ID INT NOT NULL,
 	FOREIGN KEY (NotificationStatus_ID) REFERENCES NotificationStatus (NotificationStatus_ID),
-	FOREIGN KEY (ScheduledActivity_ID) REFERENCES ScheduledActivity (ScheduledActivity_ID),
-	FOREIGN KEY (User_ID) REFERENCES [User] (User_ID)
+	FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
+	FOREIGN KEY (Contractor_ID) REFERENCES Contractor (Contractor_ID)
 );
+
+CREATE TABLE AuditAction (
+    AuditAction_ID INT IDENTITY(1,1) PRIMARY KEY,
+    AuditAction_Name NVARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Audit (
+    Audit_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Date DATETIME  NOT NULL,
+    Message TEXT NOT NULL,
+    Username TEXT NOT NULL,
+    AuditAction_ID INT NOT NULL,
+    FOREIGN KEY (AuditAction_ID) REFERENCES AuditAction (AuditAction_ID)
+);
+
+CREATE TABLE Timer (
+    Timer_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Timer_Time INT
+);
+
+INSERT INTO Timer (Timer_Time)
+VALUES (30);
 
 INSERT INTO SupplierType (SupplierType_Name)
 VALUES 
@@ -541,6 +563,10 @@ VALUES
     ('Rejected'),
     ('Pending');
 
-INSERT INTO RatingSettings ( RatingSettings_Upper, RatingSettings_Lower) VALUES
+INSERT INTO RatingSettings (RatingSettings_Upper, RatingSettings_Lower) VALUES
     (2.5, 4);
 
+INSERT INTO AuditAction (AuditAction_Name) VALUES
+    ('Add'),
+    ('Update'),
+    ('Delete');

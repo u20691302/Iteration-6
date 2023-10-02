@@ -33,6 +33,8 @@ import { RatingSettingsComponent } from './components/rating-settings/rating-set
 import { RegisterGuard } from './components/user/guards/register.guard';
 import { RegisterFarmworkerComponent } from './components/user/register-farmworker/register-farmworker.component';
 import { RegisterSupervisorComponent } from './components/user/register-supervisor/register-supervisor.component';
+import { AuditActionRecordsComponent } from './components/audit-action-records/audit-action-records.component';
+import { TimeoutSettingsComponent } from './components/timeout-settings/timeout-settings.component';
 
 
 const routes: Routes = [
@@ -160,6 +162,14 @@ const routes: Routes = [
     path:'ratingSettings',
     component: RatingSettingsComponent, canActivate: [AuthGuard, RoleGuard]
   },
+  {
+    path:'audit',
+    component: AuditActionRecordsComponent, canActivate: [AuthGuard, RoleGuard]
+  },
+  {
+    path:'timeout-settings',
+    component: TimeoutSettingsComponent
+  }
 ];
 
 @NgModule({

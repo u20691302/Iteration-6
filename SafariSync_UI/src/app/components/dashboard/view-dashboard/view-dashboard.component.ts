@@ -13,6 +13,10 @@ import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledAct
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { NotificationService } from 'src/app/services/notification/notification.service';
 import { interval } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NotificationSupervisor } from 'src/app/models/notifications/notificationSupervisor.model';
+import { NotificationAdmin } from 'src/app/models/notifications/notificationAdmin.model';
+import { NotificationUser } from 'src/app/models/notifications/notificationUser.model';
 
 
 
@@ -34,6 +38,8 @@ export class ViewDashboardComponent implements OnInit {
   completedActivities:number = 0;
   notifications: any[] = [];
 
+  notificationID: number = 0;
+
   scheduledActivities: ScheduledActivity [] = [];
 
   stocks: Stock[] = [];
@@ -53,10 +59,34 @@ export class ViewDashboardComponent implements OnInit {
   userRole: string = "";
   userID: number = 0;
 
-  constructor(private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
+  notificationSupervisor: NotificationSupervisor = {
+    notification_ID: 0,
+    date: new Date(),
+    user_ID: 0,
+    notification_Message: '',
+    notificationStatus_ID: 0,
+    scheduledActivity_ID: 0,
+  };
 
-  
+  notificationAdmin: NotificationAdmin = {
+    notification_ID: 0,
+    date: new Date(),
+    notification_Message: '',
+    notificationStatus_ID: 0,
+    scheduledTask_ID: 0,
+    contractor_ID: 0
+  };
 
+  notificationUser: NotificationUser = {
+    notification_ID: 0,
+    date: new Date(),
+    user_ID: 0,
+    notification_Message: '',
+    notificationStatus_ID: 0,
+    scheduledTask_ID: 0,
+  };
+
+  constructor(private modalService: NgbModal, private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     // interval(5000)
@@ -102,7 +132,6 @@ export class ViewDashboardComponent implements OnInit {
     this.notificationService.getNotificationSupervisor().subscribe({
       next: (notifications) => {
         this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
-        console.log(this.notifications)
       },
       error: (response) => {
         console.log(response);
@@ -124,7 +153,7 @@ export class ViewDashboardComponent implements OnInit {
   ReadAllNotificationAdmin(): void {
     this.notificationService.getNotificationAdmin().subscribe({
       next: (notifications) => {
-        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
+        this.notifications = notifications;
       },
       error: (response) => {
         console.log(response);
@@ -200,7 +229,10 @@ export class ViewDashboardComponent implements OnInit {
           (activity) => activity.activityStatus?.activity_Status === 'Not Started'
         );
          this.pendingScheduling = notstartact.length;
-        this.createChart();
+
+         if(this.userRole=='Admin'){
+          this.createChart();
+         }
       },
       error: (response) => {
         console.log(response);
@@ -263,5 +295,85 @@ export class ViewDashboardComponent implements OnInit {
         console.log(response);
       }
     });
+  }
+
+  openAcceptModal(content: any, id: number){
+    this.notificationID=id;
+    const modalRef = this.modalService.open(content, {
+      size: 's',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  updateNotification(content: any){
+    this.notificationSupervisor= {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      user_ID: 0,
+      notification_Message:'',
+      notificationStatus_ID: 1,
+      scheduledActivity_ID: 0
+    }
+
+    this.notificationAdmin = {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      notification_Message: '',
+      notificationStatus_ID: 1,
+      scheduledTask_ID: 0,
+      contractor_ID: 0
+    };
+  
+    this.notificationUser = {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      user_ID: 0,
+      notification_Message: '',
+      notificationStatus_ID: 1,
+      scheduledTask_ID: 0,
+    };
+
+    this.userStore.getRoleFromStore().subscribe(val =>{
+      let userRole = this.userTyService.getRoleFromToken();
+        this.userRole = userRole;
+    });
+
+    if (this.userRole === "Admin"){
+      this.notificationService.UpdateNotificationAdminStatus(this.notificationAdmin).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
+    else if (this.userRole === "Supervisor"){
+      this.notificationService.UpdateNotificationSupervisorStatus(this.notificationSupervisor).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
+    else if (this.userRole === "Farm Worker"){
+      this.notificationService.UpdateNotificationUserStatus(this.notificationUser).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
   }
 }

@@ -9,6 +9,11 @@
   <input id="fileInput" type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>
   <button class="edit-buttons" (click)="fileInput.click()">Update Profile Photo</button>
 
+  <!-- Update ID Image Button -->
+  <input id="idFileInput" type="file" (change)="onIdImageSelected($event)" accept="image/*" style="display: none" #idFileInput>
+  <button class="edit-buttons" (click)="idFileInput.click()">Update ID Image</button>
+  
+
   <h6><b>Name:</b> {{ fullName }}</h6>
   <h6><b>Surname:</b> {{ surname }}</h6>
   <h6><b>ID/Passport Number:</b> {{ idPassport }}</h6>
@@ -214,5 +219,25 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn-form-ok" (click)="modal.dismiss('Close click')">Ok</button>
+  </div>
+</ng-template>
+
+
+
+<!-- ID Image Confirmation Modal -->
+<ng-template #idPhotoConfirmationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">ID Image Confirmation</h5>
+    <button type="button" class="btn-close" (click)="cancelIdImageUpdate()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <h6><b>Selected ID Image:</b></h6>
+    <!-- Display the selected id image here with the 'image-container' class -->
+    <img [src]="selectedIdImageURL" alt="Selected ID Image" class="image-container">
+    <p><b>Do you want to update your ID image with this image?</b></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn-modal-return" (click)="cancelIdImageUpdate()">No</button>
+    <button type="button" class="btn-form-add" (click)="confirmIdImageUpdate()">Yes</button>
   </div>
 </ng-template>

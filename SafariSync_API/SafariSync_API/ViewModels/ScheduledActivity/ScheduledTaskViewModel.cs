@@ -7,6 +7,7 @@ namespace SafariSync_API.ViewModels.ScheduledTask
     public class ScheduledTaskViewModel
     {
         public int ScheduledTask_ID { get; set; }
+
         [Required]
         public DateTime StartDate { get; set; }
 

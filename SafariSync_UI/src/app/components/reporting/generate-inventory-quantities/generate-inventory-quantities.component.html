@@ -1,42 +1,34 @@
 <div class="top-panel">
-    <h3>Generate Inventory Quantity Report</h3>
+    <h3>Generate Inventory Quantities Report</h3>
 </div>
 
 <!-- Toolbar -->
-<!-- <div class="container toolbar">
+<div class="container toolbar">
   <div class="row align-items-center">
     <div class="col d-flex justify-content-start">
       <button type="button" class="btn btn-return" routerLink="/reporting">
         <i class="fa-solid fa-arrow-left"></i> Return
       </button>
     </div>
-  </div>
-</div> -->
-
-<!-- Toolbar -->
-<div class="container toolbar">
-  <div class="row align-items-center">
-    
-    <div class="col-md-6 d-flex justify-content-start">
+    <div class="col-md-4 d-flex justify-content-end">
       <div class="input-group custom-search-bar">
         <input type="text" class="text-input input form-control flex-fill" placeholder="Search Stocks..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
         <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
           <i class="fa-solid fa-times"></i>
         </span>
         <span class="input-group-text" *ngIf="!searchTerm">
-          <i class="fa-solid fa-filter"></i>
+          <i class="fa-solid fa-magnifying-glass"></i>
         </span>
       </div>
     </div>
-    
-    <div class="col-md-6 d-flex justify-content-end">
+    <div class="col-md-4 d-flex justify-content-end">
       <div class="input-group custom-search-bar">
         <input type="text" class="text-input input form-control flex-fill" placeholder="Search Equipment..." name="searchStringEquip" autocomplete="off" [(ngModel)]="searchTermEquip" (ngModelChange)="OnSearchEquip()">
         <span class="input-group-text" *ngIf="searchTermEquip" (click)="ClearSearchTermEquip()">
           <i class="fa-solid fa-times"></i>
         </span>
         <span class="input-group-text" *ngIf="!searchTermEquip">
-          <i class="fa-solid fa-filter"></i>
+          <i class="fa-solid fa-magnifying-glass"></i>
         </span>
       </div>
     </div>
@@ -44,96 +36,92 @@
 </div>
 
 <div class="tables-container">
-    <div class="table-container">
-      <table class="table table-hover">
-          <thead>
-              <tr>
+  <!-- Stock Table and Search -->
+<div class="table-container">
+    <table class="table table-hover">
+        <thead>
+            <tr>
                 <th><u>Stock Name</u></th>
-                <th><u>Equipment Description</u></th>
                 <th><u>Quantity on Hand</u></th>
-              </tr>
-          </thead>
-          <tbody *ngFor="let stock of stocks">
-              <tr>
-                  <td>{{ stock.stock_Name }}</td>
-                  <td>{{ stock.stock_Description }}</td>
-                  <td>{{ stock.stock_Quantity_On_Hand }}</td>
-              </tr>
-          </tbody>
-          <tfoot style="position:sticky; bottom:0%">
-              <tr>
+            </tr>
+        </thead>
+        <tbody *ngFor="let stock of stocks">
+            <tr>
+                <td>{{ stock.stock_Name }}</td>
+                <td>{{ stock.stock_Quantity_On_Hand }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
                 <td><strong>Total Quantity:</strong></td>
-                  <td><strong></strong></td>
-                  <td><strong>{{ calculateTotalQuantity(stocks) }}</strong></td>
-              </tr>
-          </tfoot>
-          <tbody *ngIf="stocks.length === 0">
-              <tr>
-                  <td colspan="3">No Stock Listings</td>
-              </tr>
-          </tbody>
-      </table>
-    </div>
+                <td><strong>{{ calculateTotalQuantity(stocks) }}</strong></td>
+            </tr>
+        </tfoot>
+        <tbody *ngIf="stocks.length === 0">
+            <tr>
+                <td colspan="2">No Stock Listings</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-    <div class="table-container">
-      <table class="table table-hover">
-          <thead>
-              <tr>
-                  <th><u>Equipment Name</u></th>
-                  <th><u>Equipment Description</u></th>
-                  <th><u>Quantity on Hand</u></th>
-              </tr>
-          </thead>
-          <tbody *ngFor="let equipment of equipments">
-              <tr>
+<!-- Equipment Table and Search -->
+<div class="table-container">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th><u>Equipment Name</u></th>
+                <th><u>Quantity on Hand</u></th>
+            </tr>
+        </thead>
+        <tbody *ngFor="let equipment of equipments">
+            <tr>
                 <td>{{ equipment.equipment_Name }}</td>
-                <td>{{ equipment.equipment_Description }}</td>
                 <td>{{ equipment.equipment_Quantity_On_Hand }}</td>
-              </tr>
-          </tbody>
-          <tfoot style="position:sticky; bottom:0%">
-              <tr >
-                  <td><strong>Total Quantity:</strong></td>
-                  <td><strong></strong></td>
-                  <td><strong>{{ calculateTotalQuantityEquip(equipments) }}</strong></td>
-              </tr>
-          </tfoot>
-          <tbody *ngIf="equipments.length === 0">
-              <tr>
-                  <td colspan="3">No Equipment Listings</td>
-              </tr>
-          </tbody>
-      </table>
-    </div>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td><strong>Total Quantity:</strong></td>
+                <td><strong>{{ calculateTotalQuantityEquip(equipments) }}</strong></td>
+            </tr>
+        </tfoot>
+        <tbody *ngIf="equipments.length === 0">
+            <tr>
+                <td colspan="2">No Equipment Listings</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</div>
+
+
+
+<div class="button-container">
+  <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)" >Generate PDF</button> 
+</div>
+
+<div class="button-container">
+    <h3>Total Inventory Quantity is: {{ calculateTotalQuantityEquip(equipments) + calculateTotalQuantity(stocks) }}</h3>
   </div>
 
-  <div class="button-container" style="margin-top: 15px;">
-    <h4>Total Inventory Quantity: {{ calculateTotalQuantityEquip(equipments) + calculateTotalQuantity(stocks) }}</h4>
+<!-- PDF modal template -->
+<ng-template #PDFModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Generated Stock Report</h5>
   </div>
-
-  <div class="button-container">
-    <button type="button" class="btn btn-return" routerLink="/reporting">
-      <i class="fa-solid fa-arrow-left"></i> Return
-    </button>
-    <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)" >Generate PDF</button>
+  <div class="modal-body">
+    <!-- Embed the PDF using an iframe -->
+    <iframe [src]="pdfSrc" width="100%" height="500px"></iframe>
+    <div class="modal-button-container">
+      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+      <!-- Add a download button if needed -->
+      <button class="btn-add" (click)="downloadPDF()">Download PDF</button>
+    </div>
   </div>
-
-  <!-- PDF modal template -->
-  <ng-template #PDFModal let-modal class="modal fade">
-    <div class="modal-header">
-      <h5 class="modal-title">Generated Inventory Report</h5>
-    </div>
-    <div class="modal-body">
-      <!-- Embed the PDF using an iframe -->
-      <iframe [src]="pdfSrc" width="100%" height="500px"></iframe>
-      <div class="modal-button-container">
-        <button class="btn-return" (click)="modal.close('Close click')">Return</button>
-        <!-- Add a download button if needed -->
-        <button class="btn-add" (click)="downloadPDF()">Download PDF</button>
-      </div>
-    </div>
-    <div class="modal-footer"></div>
-  </ng-template>
+  <div class="modal-footer"></div>
+</ng-template>
 
 
 

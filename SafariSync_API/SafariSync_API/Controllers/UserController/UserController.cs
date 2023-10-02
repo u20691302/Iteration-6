@@ -1,22 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SafariSync_API.Data;
 using SafariSync_API.Models.UserModel;
+using SafariSync_API.Repositories.CRUD;
 using SafariSync_API.Repositories.UserRepository;
 using SafariSync_API.ViewModels.UserViewModel;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using SafariSync_API.Repositories.CRUD;
-using MimeKit;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
-using System;
-using SafariSync_API.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
 
 namespace SafariSync_API.Controllers.UserController
 {
@@ -135,7 +131,8 @@ namespace SafariSync_API.Controllers.UserController
                     new Claim("cellphone", user.Cellphone),
                     new Claim("userid", user.User_ID.ToString()),
                     new Claim("profileImage", user.ProfileImage),
-                    new Claim("rating", Convert.ToString(user.Ratings?.Rating ?? 0m)) // Convert decimal to string
+                    new Claim("rating", Convert.ToString(user.Ratings?.Rating ?? 0m)), // Convert decimal to string
+                    new Claim("idImage", user.IDImage),
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -164,7 +161,6 @@ namespace SafariSync_API.Controllers.UserController
             user.IdPassport = userDto.IdPassport;
             user.Surname = userDto.Surname;
             user.Cellphone = userDto.Cellphone;
-         
 
             // Remove existing user skills
             await _userRepository.RemoveUserSkills(user.User_ID);
@@ -191,7 +187,6 @@ namespace SafariSync_API.Controllers.UserController
 
             return Ok(new { message = "User updated successfully", Token = token });
         }
-
 
         [HttpPut("updatepassword/{id}")]
         public async Task<IActionResult> UpdatePassword(int id, string currentPassword, string newPassword)
@@ -222,7 +217,6 @@ namespace SafariSync_API.Controllers.UserController
         }
 
         [HttpPut("updateprofileimage/{id}")]
-        //[HttpPost("updateprofileimage/{id}")]
         public async Task<IActionResult> UpdateProfileImage(int id, IFormFile newProfilePhoto)
         {
             // Retrieve the user from the database based on the provided id
@@ -251,14 +245,14 @@ namespace SafariSync_API.Controllers.UserController
         ///////////////////////////////////
         //////////////////////////////////
         ///////////////////////////////
-        string accountSid = "ACcaa3fc10e2076ea95e51736c6a201c8b";
-        string authToken = "b63c5e7df0403044f422cd39119f7f50";
+        private string accountSid = "ACcaa3fc10e2076ea95e51736c6a201c8b";
+
+        private string authToken = "b63c5e7df0403044f422cd39119f7f50";
 
         [HttpPost]
         [Route("SendSMS")]
         public async Task<IActionResult> SendSMS(string idpass)
         {
-
             var user = await _userRepository.GetUserByIdPassport(idpass);
 
             if (user == null)
@@ -280,7 +274,7 @@ namespace SafariSync_API.Controllers.UserController
                     from: new Twilio.Types.PhoneNumber("+14786067955"),  // Replace with your Twilio phone number
 
                     to: new Twilio.Types.PhoneNumber(convertedCellNum)
-                    
+
                 );
 
                 // SMS sent successfully
@@ -296,6 +290,7 @@ namespace SafariSync_API.Controllers.UserController
 
         private static readonly Random random = new Random();
         private static readonly string symbols = "!@#$%^&*";
+
         private static string GenerateRandomPassword()
         {
             const string capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -375,15 +370,17 @@ namespace SafariSync_API.Controllers.UserController
             {
                 case "User":
                     return $"Hello, you are registered as a user. Your registration link is: http://localhost:4200/register-user?token={token}";
+
                 case "Admin":
                     return $"Hello, you are registered as an admin. Your registration link is: http://localhost:4200/register-admin?token={token}";
+
                 case "Farm Worker":
                     return $"Hello, you are registered as a worker. Your registration link is: http://localhost:4200/register-farmworker?token={token}";
+
                 default:
                     return "Hello, you are registered. Your registration link is: www.hello.com";
             }
         }
-
 
         /////////////////////////////////
 
@@ -406,7 +403,6 @@ namespace SafariSync_API.Controllers.UserController
 
             return Ok(userSkills);
         }
-
 
         [HttpGet]
         [Route("ReadAllUsersAsync")]
@@ -604,6 +600,64 @@ namespace SafariSync_API.Controllers.UserController
                 // Handle the exception and return an error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the user.");
             }
+        }
+
+        [HttpGet("timeout")]
+        public async Task<IActionResult> GetTimeout()
+        {
+            var timer = await safariSyncDBContext.Timer.FindAsync(1);
+
+            if (timer == null)
+            {
+                return NotFound();
+            }
+
+
+            return Ok(new { timeout = timer });
+        }
+
+        [HttpPut("updateTimeout")]
+        public async Task<IActionResult> UpdateTimeout(int newTimeout)
+        {
+            var timer = await safariSyncDBContext.Timer.FindAsync(1);
+
+            if (timer == null)
+            {
+                return NotFound();
+            }
+
+            timer.Timer_Time = newTimeout;
+            safariSyncDBContext.Timer.Update(timer);
+            await safariSyncDBContext.SaveChangesAsync();
+
+            return Ok(new { timeout = timer });
+        }
+
+        [HttpPut("updateidimage/{id}")]
+        //[HttpPost("updateprofileimage/{id}")]
+        public async Task<IActionResult> UpdateIdImage(int id, IFormFile newIdPhoto)
+        {
+            // Retrieve the user from the database based on the provided id
+            var user = await _userRepository.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Read the image data from the IFormFile
+            using (var stream = new MemoryStream())
+            {
+                await newIdPhoto.CopyToAsync(stream);
+                user.IDImage = Convert.ToBase64String(stream.ToArray());
+            }
+
+            // Save the updated user to the database
+            await _userRepository.UpdateUser(user);
+
+            var token = GenerateJwtToken(user);
+
+            return Ok(new { message = "ID image updated successfully", Token = token });
         }
     }
 }

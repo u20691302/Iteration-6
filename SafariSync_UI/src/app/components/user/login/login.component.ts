@@ -6,6 +6,7 @@ import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { User } from 'src/app/models/user/user.model';
+import { TimerService } from 'src/app/services/user/timer.service';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +31,7 @@ export class LoginComponent {
 
   form: FormGroup; // Add this line
 
-  constructor(private userService: UserService, private router: Router, private toast: NgToastService, private userStore: UserStoreService) {
+  constructor(private timerService: TimerService,private userService: UserService, private router: Router, private toast: NgToastService, private userStore: UserStoreService) {
     this.form = new FormGroup({
       IdPassport: new FormControl('', [Validators.required, Validators.pattern(/(([0-9]{2})(0|1)([0-9])([0-3])([0-9]))([ ]?)(([0-9]{4})([ ]?)([0-1][8]([ ]?)[0-9]))/)]),
       Password: new FormControl('', [Validators.required, Validators.pattern('^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{5,}$')])
@@ -58,6 +59,9 @@ export class LoginComponent {
           this.userStore.setProfileImageFromStore(tokePayload.profileImage);
           this.userStore.setRatingFromStore(tokePayload.rating);
           
+          this.userStore.setIdImageFromStore(tokePayload.idImage);
+          this.timerService.startTimer();
+
           this.toast.success({detail: "SUCCESS", summary: "Logged in Successfully", duration: 5000})
           this.router.navigate(['/dashboard']);
         },

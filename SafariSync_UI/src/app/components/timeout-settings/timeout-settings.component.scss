@@ -1,0 +1,83 @@
+.mid-panel {
+    background-color: #869EC3;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    left: 0;
+    right: 0; 
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 160px;
+  }
+
+  .btn-return {
+    background-color: #CD1543;
+    border-color: #CD1543;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    margin-top: 20px;
+  }
+  
+  .mb-3 {
+    position: relative;
+    width: 100%;
+  }
+  
+  
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  
+  /* Additional styles to make the eye icon more visible on hover */
+  .toggle-password:hover {
+    color: #007bff;
+  }
+
+  .submit-button {
+    background-color: #001844; 
+    border-color: #001844;
+    color: white;
+    border-radius: 20px;
+    border: none;
+  }
+
+  .submit-button:hover {
+    box-shadow: 0 0 5px #001844;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  
+  .validation-notification{
+    color: #CD1543;
+    font-weight: bold;
+  }
+
+  .submit-button:disabled {
+    background-color: #001844; 
+    border-color: #001844;
+    box-shadow: none; 
+    opacity: 0.7; 
+    cursor: not-allowed;
+    
+  }
+
+
+ 

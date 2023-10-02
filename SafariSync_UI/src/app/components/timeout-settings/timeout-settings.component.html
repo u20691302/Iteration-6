@@ -1,0 +1,29 @@
+<div class="mid-panel">
+    <h3>Update Timeout Time</h3>
+</div>
+  
+<div class="container">
+    <form #form="ngForm" (ngSubmit)="updateTimerTimeout(timeoutnum)"> 
+
+        <div class="mb-3">
+            <label for="timeoutnum">Timeout (in seconds):</label>
+            <input type="number" class="text-input form-control" id="timeoutnum" name="timeoutnum"  required min="10" max="500000000" [(ngModel)]="timeoutnum">
+            <div *ngIf="form.controls['timeoutnum']?.invalid && (form.controls['timeoutnum']?.dirty || form.controls['timeoutnum']?.touched)">
+                <div *ngIf="form.controls['timeoutnum']?.errors?.['required']">
+                    <p class="validation-notification">Time out setting is required.</p>
+                </div>
+                <div *ngIf="form.controls['timeoutnum']?.errors?.['min']">
+                    <p class="validation-notification">Time out setting cannot be negative.</p>
+                </div>
+                <div *ngIf="form.controls['timeoutnum']?.errors?.['max']">
+                    <p class="validation-notification">Time out setting cannot be more than 500 000 000.</p>
+                </div>
+            </div>
+        </div>
+        
+
+        <button type="submit" class="submit-button" [disabled]="!form.valid">Update Timeout Settings</button>
+    </form>
+    <button class="btn-return" routerLink="/dashboard">Return</button>
+</div>
+

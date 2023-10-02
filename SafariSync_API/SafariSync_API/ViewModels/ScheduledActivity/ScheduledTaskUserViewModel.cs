@@ -1,5 +1,4 @@
-﻿using SafariSync_API.Models.SupplierModel;
-using SafariSync_API.Models.UserModel;
+﻿using SafariSync_API.Models.UserModel;
 using System.ComponentModel.DataAnnotations;
 
 public class ScheduledTaskUserViewModel

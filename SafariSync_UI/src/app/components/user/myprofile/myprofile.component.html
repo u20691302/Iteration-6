@@ -5,7 +5,7 @@
 <div class="container">
   
   <div class="icon-container">
-    <img [src]="profileImage" alt="Profile Image" class="profile-image">
+    <img [src]="profileImage ? profileImage : defaultImage" alt="Profile Image" class="profile-image">
   </div>
 
   <h5>{{ fullName }}</h5>
@@ -19,13 +19,33 @@
   <div class="rating-container">
     <p>({{rating}})</p>
   </div>
-  
+
+  <!--ID Image modal-->
+  <button class="edit-buttons" (click)="openImageModal()">View ID Image</button>
+
+  <ng-template #idImageModal let-modal>
+      <div class="modal-header">
+        <h5 class="modal-title">My ID</h5>
+        <button type="button" class="btn-close" (click)="closeImageModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <img [src]="idImage" alt="ID Image" class="id-image">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-form-ok" (click)="closeImageModal()">Ok</button>
+      </div>
+</ng-template>
+
+
+
+
   
   
 <!--*ngIf="userRole !== 'User'"-->
   <button class="edit-buttons"  routerLink="/editdetails">Edit Personal Information</button>
   <button  class="edit-buttons" (click)="openModal()">Change Password</button>
   <button class="btn-return" routerLink="/dashboard">Return</button>
+
   
   <button class="btn-logout" (click)="logout()">Logout</button>
 </div>

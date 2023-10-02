@@ -6,6 +6,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/app/environments/environment';
 import { User } from 'src/app/models/user/user.model';
 import { RatingSettings } from 'src/app/models/user/ratingsettings.model';
+import { NgToastService } from 'ng-angular-popup';
+import { TimerService } from './timer.service';
+
 
 @Injectable()
 export class UserService {
@@ -16,8 +19,26 @@ export class UserService {
 
   baseApiUrl: string = environment.baseApiUrl;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private timerService: TimerService, private toast: NgToastService) {
     this.userPayload = this.decodedToken();
+    this.timerService.startTimer(); 
+  }
+
+  // Handle timer expiration and logout
+  handleTimerExpiration(): void {
+    this.timerService.timerExpired$.subscribe(() => {
+      this.toast.error({detail: "ERROR", summary: "Logged out due to inactivity", duration: 5000})
+      this.logout(); // Call the logout method when the timer expires
+    });
+  }
+
+  updateIdImage(userId: number, newIdPhoto: FormData): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/api/user/updateidimage/${userId}`, newIdPhoto)
+      .pipe(
+        tap(response => {
+          this.token = response.Token; // Save the token if needed
+        })
+      );
   }
 
   registerUser(user: User): Observable<any> {
@@ -121,6 +142,7 @@ export class UserService {
   logout(){
     localStorage.clear();
     this.router.navigate(['login']);
+    this.timerService.stopTimer();
   }
 
   getUsers(): Observable<any> {
@@ -177,6 +199,11 @@ export class UserService {
   getRatingFromToken(){
     if(this.userPayload)
     return this.userPayload.rating;
+  }
+
+  getIdImageFromToken(){
+    if(this.userPayload)
+    return this.userPayload.idImage;
   }
 
   //getProfile(): Observable<User> {

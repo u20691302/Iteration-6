@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SafariSync_API.Models;
 using SafariSync_API.Models.ActivityModel;
+using SafariSync_API.Models.AuditActionModel;
+using SafariSync_API.Models.AuditModel;
 using SafariSync_API.Models.ContractorModel;
 using SafariSync_API.Models.EquipmentModel;
 using SafariSync_API.Models.NotificationModel;
@@ -51,5 +53,8 @@ namespace SafariSync_API.Data
         public DbSet<NotificationSupervisor> NotificationSupervisor { get; set; }
         public DbSet<NotificationUser> NotificationUser { get; set; }
         public DbSet<NotificationAdmin> NotificationAdmin { get; set; }
+        public DbSet<Audit> Audit { get; set; }
+        public DbSet<AuditAction> AuditAction { get; set; }
+        public DbSet<Models.UserModel.Timer> Timer { get; set; }
     }
 }

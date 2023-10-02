@@ -14,6 +14,7 @@ export class UserStoreService {
   private userid$ = new BehaviorSubject<string>("");
   private profileimage$ = new BehaviorSubject<string>("");
   private rating$ = new BehaviorSubject<string>("");
+  private idimage$ = new BehaviorSubject<string>("");
 
   constructor() { }
 
@@ -87,6 +88,14 @@ export class UserStoreService {
 
   public setRatingFromStore(ratingg:string){
     this.rating$.next(ratingg);
+  }
+
+  public getIdImageFromStore(){
+    return this.idimage$.asObservable();
+  }
+
+  public setIdImageFromStore(idImagee:string){
+    this.idimage$.next(idImagee);
   }
 }
 

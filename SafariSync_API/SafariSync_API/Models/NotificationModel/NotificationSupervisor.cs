@@ -1,6 +1,6 @@
 ﻿using SafariSync_API.Models.UserModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SafariSync_API.Models.NotificationModel
 {
@@ -9,20 +9,15 @@ namespace SafariSync_API.Models.NotificationModel
         [Key]
         public int Notification_ID { get; set; }
 
-        [Required]
         public DateTime Date { get; set; }
 
-        [Required]
         public int User_ID { get; set; }
 
-        [Required]
         [MaxLength(255)]
         public string Notification_Message { get; set; } = string.Empty;
 
-        [Required]
         public int NotificationStatus_ID { get; set; }
 
-        [Required]
         public int ScheduledActivity_ID { get; set; }
 
         [ForeignKey("NotificationStatus_ID")]
@@ -33,6 +28,5 @@ namespace SafariSync_API.Models.NotificationModel
 
         [ForeignKey("User_ID")]
         public User? User { get; set; }
-
     }
 }
