@@ -189,13 +189,13 @@
           <tr *ngFor="let employee of scheduledTaskUser">
             <td>{{ employee.user?.username }} {{ employee.user?.surname }}</td>
             <td>
-              <p *ngIf="isScheduledTaskNotified(employee.userId) === 1" style="color:green;">
+              <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 1" style="color:green;">
                 <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
               </p>
-              <p *ngIf="isScheduledTaskNotified(employee.userId) === 2" style="color:red;">
+              <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 2" style="color:red;">
                 <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
               </p>
-              <p *ngIf="isScheduledTaskNotified(employee.userId) === 3" style="color:grey;">
+              <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 3" style="color:grey;">
                 <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
               </p>
             </td>
@@ -221,13 +221,13 @@
           <tr *ngFor="let contractor of scheduledTaskContractor">
             <td>{{ contractor.contractor?.contractor_Name }}</td>
             <td>
-              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 1" style="color:green;">
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 1" style="color:green;">
                 <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
               </p>
-              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 2" style="color:red;">
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 2" style="color:red;">
                 <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
               </p>
-              <p *ngIf="isScheduledTaskContractorNotified(contractor.Contractor_ID) === 3" style="color:grey;">
+              <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 3" style="color:grey;">
                 <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
               </p>
             </td>

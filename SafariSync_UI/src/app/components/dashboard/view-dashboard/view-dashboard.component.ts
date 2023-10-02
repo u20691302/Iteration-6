@@ -74,6 +74,7 @@ export class ViewDashboardComponent implements OnInit {
     notification_Message: '',
     notificationStatus_ID: 0,
     scheduledTask_ID: 0,
+    scheduledActivity_ID: 0,
     contractor_ID: 0
   };
 
@@ -83,6 +84,7 @@ export class ViewDashboardComponent implements OnInit {
     user_ID: 0,
     notification_Message: '',
     notificationStatus_ID: 0,
+    scheduledActivity_ID: 0,
     scheduledTask_ID: 0,
   };
 
@@ -161,6 +163,12 @@ export class ViewDashboardComponent implements OnInit {
     });
   }
   
+  ngOnDestroy() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  }
+
   createChart() {
     this.chart = new Chart('MyChart', {
       type: 'pie', // This denotes the type of chart
@@ -322,6 +330,7 @@ export class ViewDashboardComponent implements OnInit {
       notification_Message: '',
       notificationStatus_ID: 1,
       scheduledTask_ID: 0,
+      scheduledActivity_ID: 0,
       contractor_ID: 0
     };
   
@@ -330,6 +339,7 @@ export class ViewDashboardComponent implements OnInit {
       date: new Date(),
       user_ID: 0,
       notification_Message: '',
+      scheduledActivity_ID: 0,
       notificationStatus_ID: 1,
       scheduledTask_ID: 0,
     };

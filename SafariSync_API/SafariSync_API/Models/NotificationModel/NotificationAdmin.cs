@@ -19,6 +19,7 @@ namespace SafariSync_API.Models.NotificationModel
         public int NotificationStatus_ID { get; set; }
 
         public int Contractor_ID { get; set; }
+        public int ScheduledActivity_ID { get; set; }
 
         [ForeignKey("NotificationStatus_ID")]
         public NotificationStatus? NotificationStatus { get; set; }

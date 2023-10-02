@@ -349,18 +349,24 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                     iCRUDRepository.Delete(notificationSupervisor);
                 }
 
-                var notificationAdmin = await safariSyncDBContext.NotificationAdmin.ToListAsync();
+                var notificationAdmin = await safariSyncDBContext.NotificationAdmin.Where(e => e.ScheduledActivity_ID == id).ToListAsync();
 
                 if (notificationAdmin != null)
                 {
-                    iCRUDRepository.Delete(notificationAdmin);
+                    foreach (var notifications in notificationAdmin)
+                    {
+                        iCRUDRepository.Delete(notifications);
+                    }
                 }
 
-                var notificationUser = await safariSyncDBContext.NotificationUser.Where(e => e.ScheduledTask_ID == id).ToListAsync();
+                var notificationUser = await safariSyncDBContext.NotificationUser.Where(e => e.ScheduledActivity_ID == id).ToListAsync();
 
-                if (notificationAdmin != null)
+                if (notificationUser != null)
                 {
-                    iCRUDRepository.Delete(notificationAdmin);
+                    foreach (var notifications in notificationUser)
+                    {
+                        iCRUDRepository.Delete(notifications);
+                    }
                 }
 
                 // Fetch the existing activity by ID using SafariSyncDBContext

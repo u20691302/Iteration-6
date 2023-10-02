@@ -85,6 +85,9 @@ export class ViewScheduleActivityComponent implements OnInit{
   selectedContractor: number | null = null;
   isContractorListEmpty: boolean = true;
 
+  farmworkers: ScheduledTaskUser[] = [];
+  Contractors: ScheduledTaskContractor[] = [];
+
   ActivityID: number = 0;
 
   addUpdateScheduledActivityRequest: ScheduledActivity = {
@@ -314,6 +317,7 @@ export class ViewScheduleActivityComponent implements OnInit{
     notification_ID: 0,
     date: new Date(),
     notification_Message: '',
+    scheduledActivity_ID: 0,
     notificationStatus_ID: 0,
     scheduledTask_ID: 0,
     contractor_ID: 0
@@ -324,6 +328,7 @@ export class ViewScheduleActivityComponent implements OnInit{
     date: new Date(),
     user_ID: 0,
     notification_Message: '',
+    scheduledActivity_ID: 0,
     notificationStatus_ID: 0,
     scheduledTask_ID: 0,
   };
@@ -504,43 +509,45 @@ export class ViewScheduleActivityComponent implements OnInit{
       next: (ScheduledTask: ScheduledTask) => {
         this.GetOneScheduledActivities(this.scheduledActivity_ID)
 
-        if (this.scheduledTask.users) {
-          for (var user of this.scheduledTask.users) {
-            this.notificationUser = {
-              notification_ID: 0,
-              date: new Date(),
-              user_ID: user.user_ID,
-              notification_Message: 'You, ' + user.username +' '+ user.surname +' have been assigned as a farm worker on a scheduled task.',
-              notificationStatus_ID: 3,
-              scheduledTask_ID: ScheduledTask.scheduledTask_ID
-            };
+        // if (this.scheduledTask.users) {
+        //   for (var user of this.scheduledTask.users) {
+        //     this.notificationUser = {
+        //       notification_ID: 0,
+        //       date: new Date(),
+        //       user_ID: user.user_ID,
+        //       scheduledActivity_ID: this.scheduledActivity_ID,
+        //       notification_Message: 'You, ' + user.username +' '+ user.surname +' have been assigned as a farm worker on a scheduled task.',
+        //       notificationStatus_ID: 3,
+        //       scheduledTask_ID: ScheduledTask.scheduledTask_ID
+        //     };
         
-            this.notificationService.UpdateNotificationUser(this.notificationUser).subscribe({
-              next: () => {
+        //     this.notificationService.AddNotifcationUser(this.notificationUser).subscribe({
+        //       next: () => {
                 
-              }
-            });
-          }
-        }
+        //       }
+        //     });
+        //   }
+        // }
 
-        if (this.scheduledTask.contractors) {
-          for (var contractors of this.scheduledTask.contractors) {
-            this.notificationAdmin = {
-              notification_ID: 0,
-              date: new Date(),
-              contractor_ID:  contractors.contractor_ID,
-              notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
-              notificationStatus_ID: 3,
-              scheduledTask_ID: ScheduledTask.scheduledTask_ID
-            };
+        // if (this.scheduledTask.contractors) {
+        //   for (var contractors of this.scheduledTask.contractors) {
+        //     this.notificationAdmin = {
+        //       notification_ID: 0,
+        //       date: new Date(),
+        //       contractor_ID:  contractors.contractor_ID,
+        //       scheduledActivity_ID: this.scheduledActivity_ID,
+        //       notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
+        //       notificationStatus_ID: 3,
+        //       scheduledTask_ID: ScheduledTask.scheduledTask_ID
+        //     };
         
-            this.notificationService.UpdateNotificationAdmin(this.notificationAdmin).subscribe({
-              next: () => {
+        //     this.notificationService.AddNotifcationAdmin(this.notificationAdmin).subscribe({
+        //       next: () => {
                 
-              }
-            });
-          }
-        }
+        //       }
+        //     });
+        //   }
+        // }
 
         const modalRef = this.modalService.open(success, {
           size: 'xl',
@@ -590,11 +597,11 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  isScheduledTaskNotified(scheduledTaskId: number): number {
+  isScheduledTaskNotified(scheduledTaskId: number, userId: number): number {
 
-    if (this.notifications.some(notification => notification.user_ID === scheduledTaskId)){
+    if (this.notifications.some(notification => notification.scheduledTask_ID == scheduledTaskId)){
 
-      const notification = this.notifications.find(notification => notification.user_ID === scheduledTaskId);
+      const notification = this.notifications.find(notification => notification.user_ID == userId && notification.scheduledTask_ID == scheduledTaskId);
 
       if (notification.notificationStatus_ID == 1){
         return 1;
@@ -610,15 +617,15 @@ export class ViewScheduleActivityComponent implements OnInit{
   }
 
   GetOneScheduledTaskUser(id: number): void {
+    this.notificationService.getNotificationUser().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications;
+      }
+    });
     this.scheduledActivityService.getOneScheduledTaskUser(id).subscribe({
       next: (scheduledTaskUser) => {
-        this.scheduledTaskUser = scheduledTaskUser;
 
-        this.notificationService.getNotificationUser().subscribe({
-          next: (notifications) => {
-            this.notifications = notifications;
-          }
-        });
+        this.scheduledTaskUser = scheduledTaskUser;
       },
       error: (response) => {
         console.log(response);
@@ -626,11 +633,11 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  isScheduledTaskContractorNotified(scheduledTaskId: number): number {
+  isScheduledTaskContractorNotified(scheduledTaskId: number,  contractor_ID: number): number {
 
-    if (this.notificationsContractor.some(notification => notification.contractor_ID === scheduledTaskId)){
+    if (this.notificationsContractor.some(notification => notification.scheduledTask_ID == scheduledTaskId)){
 
-      const notification = this.notificationsContractor.find(notification => notification.contractor_ID === scheduledTaskId);
+      const notification = this.notificationsContractor.find(notification => notification.contractor_ID == contractor_ID && notification.scheduledTask_ID == scheduledTaskId);
 
       if (notification.notificationStatus_ID == 1){
         return 1;
@@ -646,15 +653,15 @@ export class ViewScheduleActivityComponent implements OnInit{
   }
 
   GetOneScheduledTaskContractor(id: number): void {
+    this.notificationService.getNotificationAdmin().subscribe({
+      next: (notifications) => {
+        this.notificationsContractor = notifications;
+      }
+    }); 
     this.scheduledActivityService.getOneScheduledtaskContractor(id).subscribe({
       next: (scheduledTaskContractor) => {
-        this.scheduledTaskContractor = scheduledTaskContractor;
 
-        this.notificationService.getNotificationAdmin().subscribe({
-          next: (notifications) => {
-            this.notificationsContractor = notifications;
-          }
-        });
+        this.scheduledTaskContractor = scheduledTaskContractor;
       },
       error: (response) => {
         console.log(response);
@@ -945,6 +952,7 @@ export class ViewScheduleActivityComponent implements OnInit{
             this.notificationUser = {
               notification_ID: 0,
               date: new Date(),
+              scheduledActivity_ID: this.scheduledActivity_ID,
               user_ID: user.user_ID,
               notification_Message: 'You, ' + user.username +' '+ user.surname +' have been assigned as a farm worker on a scheduled task.',
               notificationStatus_ID: 3,
@@ -964,6 +972,7 @@ export class ViewScheduleActivityComponent implements OnInit{
             this.notificationAdmin = {
               notification_ID: 0,
               date: new Date(),
+              scheduledActivity_ID: this.scheduledActivity_ID,
               contractor_ID: contractors.contractor_ID,
               notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
               notificationStatus_ID: 3,

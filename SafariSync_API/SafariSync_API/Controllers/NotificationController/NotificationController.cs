@@ -138,7 +138,8 @@ namespace SafariSync_API.Controllers.NotificationController
                     User_ID = notificationUser.User_ID,
                     Notification_Message = notificationUser.Notification_Message,
                     NotificationStatus_ID = notificationUser.NotificationStatus_ID,
-                    ScheduledTask_ID = notificationUser.ScheduledTask_ID // Assuming ScheduledTask_ID maps to ScheduledActivity_ID in your model
+                    ScheduledTask_ID = notificationUser.ScheduledTask_ID,
+                    ScheduledActivity_ID = notificationUser.ScheduledActivity_ID,
                 };
 
                 // Add the activity to the database using ICRUDRepository
@@ -161,8 +162,8 @@ namespace SafariSync_API.Controllers.NotificationController
         [Route("AddNotificationAdmin")]
         public async Task<IActionResult> AddNotificationAdmin(NotificationAdmin notificationAdmin)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -177,6 +178,7 @@ namespace SafariSync_API.Controllers.NotificationController
                     NotificationStatus_ID = notificationAdmin.NotificationStatus_ID,
                     ScheduledTask_ID = notificationAdmin.ScheduledTask_ID,
                     Contractor_ID = notificationAdmin.Contractor_ID,
+                    ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID
                 };
 
                 // Add the notification to the database using ICRUDRepository
@@ -187,12 +189,12 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response
                 return Ok(newNotificationAdmin);
-            }
-            catch (Exception)
-            {
-                // Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the notification.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    // Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the notification.");
+            //}
         }
 
         [HttpDelete]
@@ -250,6 +252,8 @@ namespace SafariSync_API.Controllers.NotificationController
                 Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
                 Notification.ScheduledActivity_ID = notificationSupervisor.ScheduledActivity_ID;
 
+
+
                 // Update the entity in the database
                 iCRUDRepository.Update(Notification);
 
@@ -278,7 +282,7 @@ namespace SafariSync_API.Controllers.NotificationController
                     return BadRequest(ModelState);
                 }
 
-                var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Contractor_ID == notificationAdmin.Contractor_ID);
+                var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Contractor_ID == notificationAdmin.Contractor_ID && e.ScheduledTask_ID == notificationAdmin.ScheduledTask_ID);
 
                 // Check if the entity exists
                 if (Notification == null)
@@ -321,7 +325,7 @@ namespace SafariSync_API.Controllers.NotificationController
                     return BadRequest(ModelState);
                 }
 
-                var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.User_ID == notificationUser.User_ID);
+                var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.User_ID == notificationUser.User_ID && e.ScheduledTask_ID == notificationUser.ScheduledTask_ID);
 
                 // Check if the entity exists
                 if (Notification == null)
@@ -336,6 +340,7 @@ namespace SafariSync_API.Controllers.NotificationController
                 Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
                 Notification.ScheduledTask_ID = notificationUser.ScheduledTask_ID;
 
+     
                 // Update the entity in the database
                 iCRUDRepository.Update(Notification);
 
@@ -356,8 +361,8 @@ namespace SafariSync_API.Controllers.NotificationController
         [Route("UpdateNotificationSupervisorStatus")]
         public async Task<IActionResult> UpdateNotificationSupervisorStatus(NotificationSupervisor notificationSupervisor)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -383,20 +388,20 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response with the updated entity
                 return Ok(Notification);
-            }
-            catch (Exception)
-            {
-                // Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    // Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            //}
         }
 
         [HttpPut]
         [Route("UpdateNotificationUserStatus")]
         public async Task<IActionResult> UpdateNotificationUserStatus(NotificationUser notificationUser)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -422,20 +427,20 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response with the updated entity
                 return Ok(Notification);
-            }
-            catch (Exception)
-            {
-                //Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    //Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            //}
         }
 
         [HttpPut]
         [Route("UpdateNotificationAdminStatus")]
         public async Task<IActionResult> UpdateNotificationAdminStatus(NotificationAdmin notificationAdmin)
         {
-            try
-            {
+            //try
+            //{
                 // Validate the input data if necessary
                 if (!ModelState.IsValid)
                 {
@@ -461,12 +466,12 @@ namespace SafariSync_API.Controllers.NotificationController
 
                 // Return the successful response with the updated entity
                 return Ok(Notification);
-            }
-            catch (Exception)
-            {
-                //Handle the exception and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    //Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the notification.");
+            //}
         }
     }
 }

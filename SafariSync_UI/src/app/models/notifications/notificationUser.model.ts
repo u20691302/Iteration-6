@@ -9,6 +9,7 @@ export interface NotificationUser {
     notification_Message: string;
     notificationStatus_ID: number;
     scheduledTask_ID: number;
+    scheduledActivity_ID: number;
     scheduledActivity?: ScheduledTask[];
     noticationStatus?: NotificationStatus;
     user?: User;
