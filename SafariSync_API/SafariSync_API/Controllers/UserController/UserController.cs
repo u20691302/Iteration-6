@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -490,51 +491,43 @@ namespace SafariSync_API.Controllers.UserController
         }
 
         [HttpPut]
-        [Route("UpdateUserAsync/{UserID}")]
-        public async Task<ActionResult<UserViewModel>> UpdateUserAsync(int UserID, UserViewModel svm)
+        [Route("UpdateUserAsync")]
+        public async Task<IActionResult> UpdateUserAsync(int id, UserViewModel userDto)
         {
-            //try
-            //{
-                // Retrieve the existing user from the CRUD repository based on the UserID
-                var existingUser = await iCRUDRepository.ReadOneAsync<User>(UserID);
+            // Retrieve the user from the database based on the provided id
+            var user = await safariSyncDBContext.User.FirstOrDefaultAsync(e => e.User_ID == id);
 
-                // If the existing user is not found, return a NotFound response with an appropriate message
-                if (existingUser == null)
-                    return NotFound("The user does not exist");
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
 
-                // Retrieve all Ratingss from the CRUD repository
-                var existingRatings = await iCRUDRepository.ReadAllAsync<Ratings>();
+            // Update the user properties with the values from the userDto object
+            user.Username = userDto.Username;
+            user.Email = userDto.Email;
+            user.IdPassport = userDto.IdPassport;
+            user.Surname = userDto.Surname;
+            user.Cellphone = userDto.Cellphone;
 
-                // Retrieve the Ratings by name from the list of Ratingss using LINQ
-                var ratings = existingRatings.FirstOrDefault(st => st.Rating_ID == svm.Rating_ID);
+            // Remove existing user skills
+            await _userRepository.RemoveUserSkills(user.User_ID);
 
-                // Update the properties of the existing user with the values from the UserViewModel
-                existingUser.Username = svm.Username;
-                existingUser.Email = svm.Email;
-                existingUser.IdPassport = svm.IdPassport;
-                existingUser.Surname = svm.Surname;
-                existingUser.Cellphone = svm.Cellphone;
-
-                // Update the user in the CRUD repository
-                iCRUDRepository.Update(existingUser);
-
-                // Save changes asynchronously in the CRUD repository and check if the operation succeeds
-                if (await iCRUDRepository.SaveChangesAsync())
+            // Create associated UserSkill records for new skills
+            foreach (var skill in userDto.Skills)
+            {
+                var userSkill = new UserSkill
                 {
-                    // Return an Ok response with the updated user
-                    return Ok(existingUser);
-                }
+                    User_ID = user.User_ID,
+                    Skill_ID = skill.Skill_ID
+                };
+                // Add the userSkill to the database using ICRUDRepository
+                iCRUDRepository.Add(userSkill);
+            }
 
-            return Ok(existingUser);
-            //}
-            //catch (Exception)
-            //{
-            //    // Return a StatusCode 500 response if an exception occurs during the operation
-            //    return StatusCode(500, "Internal Server Error. Please contact support.");
-            //}
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-            // Return a BadRequest response if the request is invalid
-            //return BadRequest("Your request is invalid.");
+            return Ok();
         }
 
         [HttpDelete]

@@ -15,6 +15,8 @@ export class PageComponent implements OnInit {
   showPdfViewer: boolean = false;
   modalRef: NgbModalRef | null = null;
 
+  searchTerm: string = '';
+
   
 
   constructor(
@@ -46,9 +48,8 @@ export class PageComponent implements OnInit {
 
   filteredEntries: string[] = [];
 
-  searchEntries(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    const query = inputElement.value.trim();
+  searchEntries(searchTerm: string): void {
+    const query = searchTerm.trim();
     if (query === '') {
       this.filteredEntries = this.entries.filter(entry => entry !== 'Entry 14');
     } else {
@@ -56,6 +57,11 @@ export class PageComponent implements OnInit {
         entry.toLowerCase().includes(query.toLowerCase()) && entry !== 'Entry 14'
       );
     }
+  }
+
+  ClearSearchTerm(): void {
+    this.searchTerm = '';
+    this.searchEntries('');
   }
 
   showPdf(entry: string): void {

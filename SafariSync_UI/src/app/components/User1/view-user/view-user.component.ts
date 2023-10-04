@@ -36,6 +36,9 @@ export class ViewUserComponent implements OnInit {
     cellphone: '',
     role: '',
     rating_ID: 0,
+    password: '', 
+    profileImage: '', 
+    idImage: '',
     regDate: new Date(),
     userSkill: [
       {
@@ -49,9 +52,35 @@ export class ViewUserComponent implements OnInit {
         }
       }
     ],
-    password: '', // Add the password property
-    profileImage: '', // Add the profileImage property
-    idImage: '' // Add the idImage property
+    skills: []
+  };
+
+  addUpdateRequest: User = {
+    user_ID: 0,
+    username: '',
+    surname: '',
+    email: '',
+    idPassport: '',
+    cellphone: '',
+    role: '',
+    rating_ID: 0,
+    password: '', 
+    profileImage: '', 
+    idImage: '',
+    regDate: new Date(),
+    userSkill: [
+      {
+        userSkill_ID: 0,
+        user_ID: 0,
+        skill_ID: 0,
+        skills: {
+          skill_ID: 0, 
+          skill_Name: '',
+          skill_Description: ''
+        }
+      }
+    ],
+    skills: []
   };
   
   user: User = {
@@ -150,7 +179,7 @@ export class ViewUserComponent implements OnInit {
   openUpdateUserModal(id:number, content: any){
     this.LoadUser(id);
     this.GetAllSkills();
-    this.loadSkillsIntoArray();
+    
     const modalRef = this.modalService.open(content, {
       size: 'dialog-centered',
       backdrop: 'static'
@@ -163,21 +192,22 @@ export class ViewUserComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.addUpdateUserRequest = response;
+          console.log( this.addUpdateUserRequest)
+          this.loadSkillsIntoArray();
         }
       })
     }
   }
 
   loadSkillsIntoArray() {
+    
     const filteredSkills = this.addUpdateUserRequest.userSkill
       ?.map(skillItem => skillItem.skills)
       .filter(skills => skills !== undefined) as Skills[];
-    
+
     this.userSkills = filteredSkills;
-    console.log(this.userSkill)
     this.isSkillListEmpty = this.userSkills.length === 0;
   }
-  
   
   deleteSkillFromArray(skill: Skills) {
     const index = this.userSkills.findIndex(s => s.skill_ID === skill.skill_ID);
@@ -187,15 +217,26 @@ export class ViewUserComponent implements OnInit {
     this.isSkillListEmpty = this.userSkills.length === 0;
   }
 
-  addSkillToArray() {
-    if (this.selectedSkill) {
-      const skillToAdd = this.skills.find(supplier => supplier.skill_ID === Number(this.selectedSkill));
-      if (skillToAdd) {
-        this.userSkills.push(skillToAdd);
-        this.selectedSkill = null;
-        this.isSkillListEmpty = this.userSkills.length === 0;
+  addSkillToArray(content: any) {
+
+    const skillIdToAdd = Number(this.selectedSkill);
+      const isUserAlreadyAdded = this.userSkills.some(skill => skill.skill_ID === skillIdToAdd);
+
+      if (!isUserAlreadyAdded) {
+          const skillToAdd = this.skills.find(skill => skill.skill_ID === Number(this.selectedSkill));
+        if (skillToAdd) {
+          this.userSkills.push(skillToAdd);
+          this.selectedSkill = null;
+          this.isSkillListEmpty = this.userSkills.length === 0;
+        }
       }
-    }
+      else {
+        this.selectedSkill = null;
+        const modalRef = this.modalService.open(content, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+      }
   }
 
   OpenSkillsModal(id: any, content:any, name: string, surname: string){
@@ -227,30 +268,66 @@ export class ViewUserComponent implements OnInit {
   }
 
   UpdateUser(success: any, failed: any) {
-    this.userService.updateUser(this.addUpdateUserRequest.user_ID, this.addUpdateUserRequest).subscribe({
-      next: (response) => {
-        this. GetAllUsers();
-        const modalRef = this.modalService.open(success, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      },
-      error: (response) => {
-        console.log(response);
-        const modalRef = this.modalService.open(failed, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
+      this.addUpdateRequest = {
+        user_ID:this.addUpdateUserRequest.user_ID,
+        username: this.addUpdateUserRequest.username,
+        surname: this.addUpdateUserRequest.surname,
+        email: this.addUpdateUserRequest.email,
+        idPassport: this.addUpdateUserRequest.idPassport,
+        cellphone: this.addUpdateUserRequest.cellphone,
+        role: '',
+        rating_ID: 0,
+        password: '', 
+        profileImage: '', 
+        idImage: '',
+        regDate: new Date(),
+        userSkill: [
+          {
+            userSkill_ID: 0,
+            user_ID: 0,
+            skill_ID: 0,
+            skills: {
+              skill_ID: 0, 
+              skill_Name: '',
+              skill_Description: ''
+            }
+          }
+        ],
+        skills: this.userSkills
       }
-    });
+      
+      this.userService.updateUser(this.addUpdateUserRequest.user_ID, this.addUpdateRequest).subscribe({
+        next: (response) => {
+          this. GetAllUsers();
+          const modalRef = this.modalService.open(success, {
+            size: 'dialog-centered',
+            backdrop: 'static'
+          });
+        },
+        error: (response) => {
+          console.log(response);
+          const modalRef = this.modalService.open(failed, {
+            size: 'dialog-centered',
+            backdrop: 'static'
+          });
+        }
+      });
   }
 
-  OpenUpdateConfirmDetailsModal(content: any) {
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-    this.user = this.addUpdateUserRequest;
+  OpenUpdateConfirmDetailsModal(content: any, error: any) {
+    if (this.userSkills.length == 0){
+      const modalRef = this.modalService.open(error, {
+        size: 'dialog-centered',
+        backdrop: 'static'
+      });
+      
+    }else {
+      const modalRef = this.modalService.open(content, {
+        size: 'dialog-centered',
+        backdrop: 'static'
+      });
+      this.user = this.addUpdateUserRequest;
+    } 
   }
 
   OpenConfirmationModal(content: any, form: NgForm) {

@@ -64,6 +64,7 @@
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
+          <p *ngIf="user.role == 'Admin'">Admin Privileges</p>
         </td>
       </tr>
     </tbody>
@@ -160,7 +161,7 @@
           
           <div class="mb-3">
             <label for="Email" class="form-label">Email</label>
-            <input type="Email" class="form-control" id="Email" name="Email" [(ngModel)]="addUpdateUserRequest.email" required pattern="^[a-zA-Z0-9._%+\-\~]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">
+            <input type="Email" class="form-control" id="Email" name="Email" [(ngModel)]="addUpdateUserRequest.email" pattern="^[a-zA-Z0-9._%+\-\~]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">
             <div *ngIf="form.controls['Email']?.invalid && (form.controls['Email']?.dirty || form.controls['Email']?.touched)">
               <div *ngIf="form.controls['Email']?.errors?.['required']">
                 <p class="validation-notification">Email Address is required.</p>
@@ -191,7 +192,7 @@
                 <option *ngFor="let skill of skills" [value]="skill.skill_ID">{{ skill.skill_Name }}</option>
               </select>
           
-              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSkillToArray()" [disabled]="!selectedSkill" >
+              <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addSkillToArray(alreadyExistsSkill)" [disabled]="!selectedSkill" >
                 <i class="fa-solid fa-plus"></i>
               </button>
             </div>
@@ -228,7 +229,7 @@
           </div>
           
           <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset()">Cancel</button>
-          <button type="button" class="btn-form-add" (click)="OpenUpdateConfirmDetailsModal(OpenUpdateModalConfirmation); modal.close('Close click')" [disabled]="!form.valid || skills.length === 0 && !form.dirty || skills.length === 0" [ngClass]="{'disabled': !form.valid || skills.length === 0 && !form.dirty || skills.length === 0}">
+          <button type="button" class="btn-form-add" (click)="OpenUpdateConfirmDetailsModal(OpenUpdateModalConfirmation, LastSkillError); modal.close('Close click')" [disabled]="!form.valid || skills.length === 0 && !form.dirty || skills.length === 0" [ngClass]="{'disabled': !form.valid || skills.length === 0 && !form.dirty || skills.length === 0}">
             Update User
           </button>
         </div>
@@ -390,3 +391,30 @@
   <div class="modal-footer"></div>
 </ng-template>
 
+<!-- Skill Exists Error Modal -->
+<ng-template #alreadyExistsSkill let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This skill has already been added to this user.</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Last Skill Delete Error -->
+<ng-template #LastSkillError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There must be atleast one skill associated with a user.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); OpenUpdateModal(UpdateUserModal)">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

@@ -1,13 +1,16 @@
-
   <div class="mid-panel">
     <h3>Help Page</h3>
   </div>
-  
-  
 
   <div class="container">
-    <div class="search-bar text-center">
-      <input type="text" class="form-control" placeholder="Search" (input)="searchEntries($event)">
+    <div class="search-bar text-center input-group">
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="searchEntries(searchTerm)">
+      <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+        <i class="fa-solid fa-times"></i>
+      </span>
+      <span class="input-group-text" *ngIf="!searchTerm">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
     </div>
     <div class="row">
       <div class="col">

@@ -26,8 +26,8 @@ export class User1Service {
         const filteredUsers = users.filter((user: User) =>
           user.username.toLowerCase().includes(term.toLowerCase()) ||
           user.surname.toLowerCase().includes(term.toLowerCase()) ||
-          user.email.toLowerCase().includes(term.toLowerCase()) ||
-          user.idPassport.toLowerCase().includes(term.toLowerCase()) || 
+          user.email?.toLowerCase().includes(term.toLowerCase()) ||
+          user.idPassport?.toLowerCase().includes(term.toLowerCase()) || 
           user.cellphone.toLowerCase().includes(term.toLowerCase()) ||
           user.role.toLowerCase().includes(term.toLowerCase()) ||
           user.ratings?.rating.toString().toLowerCase().includes(term.toLowerCase())
@@ -79,8 +79,8 @@ export class User1Service {
     return this.http.get<UserSkill[]>(this.baseApiUrl + '/api/User/ReadOneUserSkillAsync/' + userID)
   }
 
-  updateUser(userID: number, updateUserRequest: User): Observable<User> {
-    return this.http.put<User>(this.baseApiUrl + '/api/User/UpdateUserAsync/' + userID, updateUserRequest);
+  updateUser(userId:number, updateUserRequest: User): Observable<User> {
+    return this.http.put<any>(`${this.baseApiUrl}/api/user/${userId}`, updateUserRequest);
   }
 
   deleteUser(userID: number): Observable<User> {
