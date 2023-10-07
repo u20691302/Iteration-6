@@ -8,6 +8,8 @@ import { UserSkill } from 'src/app/models/user/userSkill.model';
 import { SkillService } from 'src/app/services/skills/skills.service';
 import { Skills } from 'src/app/models/skills/skills.model';
 import { User1Service } from 'src/app/services/user/User1.service';
+import { RatingSettings } from 'src/app/models/user/ratingsettings.model';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-view-user',
@@ -16,7 +18,7 @@ import { User1Service } from 'src/app/services/user/User1.service';
 })
 export class ViewUserComponent implements OnInit {
 
-  constructor(private userService: User1Service, private skillService: SkillService, private modalService: NgbModal) { }
+  constructor(private userTyService: UserService, private userService: User1Service, private skillService: SkillService, private modalService: NgbModal) { }
 
   users: User[] = [];
   ratings: Ratings[] = [];
@@ -26,6 +28,10 @@ export class ViewUserComponent implements OnInit {
   userSkills: Skills[] = [];
   isSkillListEmpty: boolean = true;
   selectedSkill: number | null = null;
+
+  ratingSettings: RatingSettings[] = [];
+  actualUpper: number = 0;
+  actualLower: number = 0;
   
   addUpdateUserRequest: User = {
     user_ID: 0,
@@ -128,9 +134,36 @@ export class ViewUserComponent implements OnInit {
     }
   ];
 
+  updatedRatingSetting: RatingSettings = {
+    ratingSettings_ID: 1,
+    ratingSettings_Upper: 4,
+    ratingSettings_Lower: 2
+  };
+
+
   ngOnInit(): void {
     this.GetAllUsers();
     this.GetAllRatings();
+    this.fetchRatingSettings();
+  }
+
+  fetchRatingSettings(): void {
+    this.userTyService.readAllRatingSettings().subscribe(
+      (data: RatingSettings[]) => {
+        this.ratingSettings = data;
+        this.updatedRatingSetting = {
+          ratingSettings_ID: this.ratingSettings[0].ratingSettings_ID,
+          ratingSettings_Upper: this.ratingSettings[0].ratingSettings_Upper,
+          ratingSettings_Lower: this.ratingSettings[0].ratingSettings_Lower
+        };
+       
+        this.actualUpper = this.updatedRatingSetting.ratingSettings_Upper;
+        this.actualLower = this.updatedRatingSetting.ratingSettings_Lower;
+      },
+      (error: any) => {
+        console.error('Error fetching rating settings:', error);
+      }
+    );
   }
 
   GetAllUsers(): void {

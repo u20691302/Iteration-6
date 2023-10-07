@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MOwkJuYiVkU8jUQyxjWwhBdozsph9NWrJJd8lqO0cr963VRkVKonJBR84iedzFRWC06xxRg8wI6jZ3nLwclrhQ==",
+  "dgSpecHash": "sUknZrsVrkABuXnHkQrKJ5kWIsxE4Y5ZP0j47s7ElAh3EZEkh9rFHQQN5XRPTcVTbm/gBaSjICq1jygeHyP3xA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
+  "projectFilePath": "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\camer\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\camer\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

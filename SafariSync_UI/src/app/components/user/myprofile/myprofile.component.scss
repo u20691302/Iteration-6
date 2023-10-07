@@ -166,9 +166,10 @@
     width: 100px; /* Adjust the width to your desired size */
     height: 100px; /* Adjust the height to your desired size */
     border-radius: 50%; /* Make the image circular */
-    object-fit: cover; /* Ensure the image fits within the circular container */
+    object-fit: cover; /* Ensure the image fits within the circular container without stretching */
     margin-bottom: 10px; /* Optional: Add some space between the image and the other content */
-  }
+}
+
 
   .id-image {
     width: 200; /* Adjust the width to your desired size */

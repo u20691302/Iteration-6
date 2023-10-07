@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj": {}
+    "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj": {
+    "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
+        "projectUniqueName": "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
         "projectName": "SafariSync_API",
-        "projectPath": "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
+        "projectPath": "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\SafariSync_API.csproj",
         "packagesPath": "C:\\Users\\camer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\camer\\Documents\\INF370\\TyCamMerged 19 Aug\\Iteration-6\\SafariSync_API\\SafariSync_API\\obj\\",
+        "outputPath": "C:\\Users\\camer\\Documents\\INF370\\SafariSync 04-10-2023\\Iteration-6\\SafariSync_API\\SafariSync_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

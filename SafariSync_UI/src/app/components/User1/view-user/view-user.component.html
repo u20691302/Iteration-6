@@ -49,7 +49,12 @@
         <td>{{ user.idPassport }}</td>
         <td>{{ user.cellphone }}</td>
         <td>{{ user.role }}</td>
-        <td>{{ user.ratings?.rating }}</td>
+        <td>
+          {{ user.ratings?.rating }}
+          <p *ngIf="(user.ratings?.rating || 0) >= actualUpper">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+          </p>
+        </td>        
         <td>
           <button class="btn-update" (click)="OpenSkillsModal(user.user_ID, SkillsModal, user.username, user.surname)"> 
             View Skills
