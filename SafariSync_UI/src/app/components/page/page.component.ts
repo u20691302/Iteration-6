@@ -68,45 +68,45 @@ export class PageComponent implements OnInit {
     let pdfName: string;
 
     switch (entry) {
-      // case 'Dashboard':
-      //   pdfName = '1PDF1.pdf';
-      //   break;
-      // case 'My Profile':
-      //   pdfName = '1PDF2.pdf';
-      //   break;
-      // case 'Scheduled Activities':
-      //   pdfName = '1Bootcamp day 2 memo.pdf';
-      //   break;
-      // case 'Activities':
-      //   pdfName = '1Technical requirements.pdf';
-      //   break;
-      //   case 'Skills':
-      //   pdfName = '1Technical ERD 2022(2).pdf';
-      //   break;
-      //   case 'Employees':
-      //   pdfName = '1PDF1.pdf';
-      //   break;
-      // case 'Toolboxes':
-      //   pdfName = '1Tuesday Memo.pdf';
-      //   break;
-      // case 'Equipment':
-      //   pdfName = '1Bootcamp day 2 memo.pdf';
-      //   break;
-      // case 'Stock':
-      //   pdfName = '1Technical requirements.pdf';
-      //   break;
-      //   case 'Suppliers':
-      //   pdfName = '1Technical ERD 2022(2).pdf';
-      //   break;
-      //   case 'Contractors':
-      //   pdfName = '1Tuesday Memo.pdf';
-      //   break;
-      // case 'Reports':
-      //   pdfName = '1Bootcamp day 2 memo.pdf';
-      //   break;
-      // case 'Settings':
-      //   pdfName = '1Technical requirements.pdf';
-      //   break;     
+      case 'Dashboard':
+        pdfName = 'Dashboard.pdf';
+        break;
+      case 'My Profile':
+        pdfName = 'Profile.pdf';
+        break;
+      case 'Scheduled Activities':
+        pdfName = 'Scheduling.pdf';
+        break;
+      case 'Activities':
+        pdfName = 'Activity.pdf';
+        break;
+        case 'Skills':
+        pdfName = 'Skill.pdf';
+        break;
+        case 'Employees':
+        pdfName = 'User.pdf';
+        break;
+      case 'Toolboxes':
+        pdfName = 'Toolbox.pdf';
+        break;
+      case 'Equipment':
+        pdfName = 'Equipment.pdf';
+        break;
+      case 'Stock':
+        pdfName = 'Stock.pdf';
+        break;
+        case 'Suppliers':
+        pdfName = 'Supplier.pdf';
+        break;
+        case 'Contractors':
+        pdfName = 'Contractor.pdf';
+        break;
+      case 'Reports':
+        pdfName = 'Report.pdf';
+        break;
+      case 'Settings':
+        pdfName = 'Settings.pdf';
+        break;     
         case 'Entry 14':
         pdfName = 'Complete.pdf';
         break;

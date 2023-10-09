@@ -24,7 +24,6 @@ export class TimerService {
       const response = await this.http.get<any>(`${this.baseApiUrl}/api/user/timeout`).pipe(take(1)).toPromise();
       const timeout = response.timeout.timer_Time as number; // Cast the response to the number type
       this.activityTimeout = timeout * 1000; // Convert seconds to milliseconds
-      console.log("THE TIMER EKSE IS", this.activityTimeout);
       localStorage.setItem('timeout', timeout.toString());
 
       //console.log("Response from the backend:", response);

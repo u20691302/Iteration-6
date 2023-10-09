@@ -6,6 +6,7 @@ import { ScheduledTaskContractor } from 'src/app/models/scheduledActivity/schedu
 import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
 import { ScheduledActivityScheduledTask } from 'src/app/models/scheduledActivity/scheduledActivityScheduledTask';
 import { ScheduledTask } from 'src/app/models/scheduledActivity/scheduledTask.model';
+import { ScheduledTaskToolbox } from 'src/app/models/scheduledActivity/scheduledTaskToolbox.model';
 import { ScheduledTaskUser } from 'src/app/models/scheduledActivity/scheduledTaskUser.model';
 
 @Injectable({
@@ -168,63 +169,14 @@ export class ScheduledActivityService {
   }
 
   updateScheduledTask(updateScheduledActivityRequest: ScheduledTask): Observable<ScheduledTask> {
-    console.log(updateScheduledActivityRequest)
     return this.http.put<ScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/UpdateScheduledTask/', updateScheduledActivityRequest);
   }
-   
-  // loadScheduledActivity(scheduledActivityID: number): Observable<ScheduledActivity> {
-  //   return this.http.get<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/ReadOneScheduledActivityAsync/' + scheduledActivityID)
-  // }
 
-  // updateScheduledActivity(updateScheduledActivityRequest: ScheduledActivity): Observable<ScheduledActivity> {
-  //   return this.http.put<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/UpdateScheduledActivityAsync/', updateScheduledActivityRequest);
-  // }
+  getOneScheduledTaskToolbox(id: number): Observable<ScheduledTaskToolbox[]> {
+    return this.http.get<ScheduledTaskToolbox[]>(`${this.baseApiUrl}/api/ScheduledActivity/ReadOneScheduledTaskToolboxAsync/${id}`);
+  } 
 
-  // deleteScheduledActivity(scheduledActivityID: number): Observable<ScheduledActivity> {
-  //   return this.http.delete<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/DeleteScheduledActivity/' + scheduledActivityID);
-  // }
-
-  // AddScheduledActivityTask(addScheduledActivityTaskRequest: ScheduledActivityTask): Observable<ScheduledActivityTask> {
-  //   return this.http.post<ScheduledActivityTask>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivity/', addScheduledActivityTaskRequest);
-  // }
-
-  // LoadScheduledActivityTask(scheduledActivityTaskId: number): Observable<ScheduledActivityTask> {
-  //   return this.http.get<ScheduledActivityTask>(this.baseApiUrl + '/api/ScheduledActivity/ReadOneScheduledActivityTaskAsync/' + scheduledActivityTaskId)
-  // }
-
-  // deleteScheduledActivityTask(scheduledActivityTaskID: number): Observable<ScheduledActivityTask> {
-  //   return this.http.delete<ScheduledActivityTask>(this.baseApiUrl + '/api/ScheduledActivity/DeleteScheduledActivityTask/' + scheduledActivityTaskID);
-  // }
-
-  // AddTask(addTaskRequest: TaskS, id: number): Observable<TaskS> {
-  //   return this.http.post<TaskS>(this.baseApiUrl + '/api/ScheduledActivity/AddTask/', addTaskRequest)
-  //     .pipe(
-  //       mergeMap((createdTask: TaskS) => {
-  //         // Extract the ID from the createdTask object
-  //         var taskId = Number(createdTask.task_ID);
-  //         const scheduledActivityTask = {
-  //           scheduledActivity_ID: id,
-  //           task_ID: taskId
-  //         };
-  
-  //         // Make a separate request to create the scheduledActivity task and return the result as an Observable
-  //         return this.http.post<TaskS>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledActivityTask/', scheduledActivityTask)
-  //           .pipe(
-  //             mergeMap(() => {
-  //               console.log('ScheduledActivity Task created successfully!');
-  //               // Return the createdTask as the final result of the observable chain
-  //               return of(createdTask);
-  //             }),
-  //           );
-  //       })
-  //     );
-  // }
-  
-  // loadTask(taskID: number): Observable<TaskS> {
-  //   return this.http.get<TaskS>(this.baseApiUrl + '/api/ScheduledActivity/ReadOneTaskAsync/' + taskID)
-  // }
-
-  // updateTask(updateTaskRequest: TaskS): Observable<TaskS> {
-  //   return this.http.put<TaskS>(this.baseApiUrl + '/api/ScheduledActivity/UpdateTaskAsync/', updateTaskRequest);
-  // }
+  AddScheduledTaskToolbox(addScheduledTaskToolboxRequest: ScheduledTaskToolbox): Observable<ScheduledTaskToolbox> {
+    return this.http.post<ScheduledTaskToolbox>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskToolbox/',addScheduledTaskToolboxRequest);
+  }
 }

@@ -641,5 +641,64 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
             }
         }
+
+        [HttpGet]
+        [Route("ReadOneScheduledTaskToolboxAsync/{id}")]
+        public async Task<IActionResult> ReadOneScheduledTaskToolboxAsync(int id)
+        {
+            //try
+            //{
+                var scheduledTaskToolbox = await safariSyncDBContext.ScheduledTaskToolbox.Where(es => es.ScheduledTask_ID == id)
+                    .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxEquipment).ThenInclude(es => es.Equipment)
+                    .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxStock).ThenInclude(es => es.Stock).ToListAsync();
+
+                // If activity with the given ID is not found, return a not found response
+                if (scheduledTaskToolbox == null)
+                    return NotFound();
+
+                // Return the activity data with associated tasks
+                return Ok(scheduledTaskToolbox);
+            //}
+            //catch (Exception)
+            //{
+            //    // Handle the exception and return an error response
+            //    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching activity data.");
+            //}
+        }
+
+        [HttpPost]
+        [Route("AddScheduledTaskToolbox")]
+        public async Task<IActionResult> AddScheduledTaskToolbox(ScheduledTaskToolboxViewModel scheduledTaskToolboxViewModel)
+        {
+            try
+            {
+                // Validate the input activity data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Create the Activity entity from the view model
+                var scheduledTaskToolbox = new ScheduledTaskToolbox
+                {
+                    Toolbox_ID = scheduledTaskToolboxViewModel.Toolbox_ID,
+                    ScheduledTask_ID = scheduledTaskToolboxViewModel.ScheduledTask_ID
+                };
+
+                // Add the activity to the database using ICRUDRepository
+                iCRUDRepository.Add(scheduledTaskToolbox);
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(scheduledTaskToolbox);
+            }
+            catch (Exception)
+            {
+                //Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
+            }
+        }
     }
 }

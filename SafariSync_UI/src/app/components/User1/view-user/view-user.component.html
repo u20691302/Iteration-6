@@ -45,7 +45,8 @@
       <tr>
         <td>{{ user.username }}</td>
         <td>{{ user.surname }}</td>
-        <td>{{ user.email }}</td>
+        <td *ngIf="user.email !==''">{{ user.email }}</td>
+        <td *ngIf="user.email ===''">No Email Address</td>
         <td>{{ user.idPassport }}</td>
         <td>{{ user.cellphone }}</td>
         <td>{{ user.role }}</td>

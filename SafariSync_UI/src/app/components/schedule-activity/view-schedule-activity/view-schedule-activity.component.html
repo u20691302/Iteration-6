@@ -138,6 +138,11 @@
               <td>{{ task.scheduledTask.taskStatus?.task_Status }}</td>
               <td>
                 <div class="button-container">
+                  <button  class="btn-form-add" (click)="openAddToolboxModal(addUpdateScheduledTaskToolboxModal, task.scheduledTask.scheduledTask_ID )">View Toolboxes</button>
+                </div>
+              </td>
+              <td>
+                <div class="button-container">
                   <button  class="btn-form-add" (click)="openEmployeeModal(ViewEmployees, task.scheduledTask.scheduledTask_ID, task.scheduledTask.task.task_Name )">View Employees/Contractors</button>
                 </div>
               </td>
@@ -669,6 +674,145 @@
   </div>
   <div class="modal-body">
     <p><b>There was an error deleting this scheduled task.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- View Schedule Task Toolboxes Modal -->  
+<ng-template #addUpdateScheduledTaskToolboxModal let-modal class="modal fade" >
+  <div class="modal-header">
+    <h5 class="modal-title">Assigned Toolboxes</h5>
+  </div>
+  
+  <div class="modal-body">
+
+    <!-- Toolbar -->
+    <div class="task container toolbar">
+      <div class="row align-items-center">
+        <div class="col d-flex justify-content-start">
+          <button type="button" class="btn btn-add" (click)="ScheduleTaskToolboxModal(SelectToolbox)">
+            <i class="fa-solid fa-plus"></i>  Schedule a Toolbox
+          </button>
+        </div>
+      </div>  
+    </div>
+
+    <div class="task-table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th><u>Toolbox Name</u></th>
+            <th><u>Task Description</u></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let toolbox of this.scheduledTaskToolboxes">
+            <td>{{ toolbox.toolbox?.toolbox_Name }}</td>
+            <td>{{ toolbox.toolbox?.toolbox_Description }}</td>
+            <td>{{ toolbox.toolbox?.toolbox_Name }}</td>
+            <td><div class="button-container">
+              <button  class="btn-form-add">View Toolbox Items</button>
+            </div></td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="this.addUpdateScheduledTaskToolboxes.length === 0">
+          <tr>
+            <td colspan="4">No Toolbox Listings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Return</button>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Select Toolbox -->
+<ng-template #SelectToolbox let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Add Toolbox to </h5>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-6">
+        <div class="mb-3">
+          <label for="toolbox" class="form-label">Select a Toolbox</label>
+          <div class="d-flex align-items-center">
+            <select class="form-select" id="toolbox" name="toolbox" [(ngModel)]="selectedToolbox">
+              <option value="null" selected disabled>Select a Toolbox</option>
+              <option *ngFor="let toolbox of toolboxes" [value]="toolbox.toolbox_ID">{{ toolbox.toolbox_Name }}</option>
+            </select>
+        
+            <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addToolboxToArray(alreadyExistsToolbox)" [disabled]="!selectedToolbox">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>    
+        
+        <div class="task-table-container">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th><u>Toolbox Name</u></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody *ngIf="this.addUpdateScheduledTaskToolboxes.length > 0">
+              <tr *ngFor="let toolbox of this.addUpdateScheduledTaskToolboxes">
+                <td>{{ toolbox.toolbox_Name }}</td>
+                <td>
+                  <div class="button-container">
+                    <button class="btn-delete" title="Delete" (click)="deleteToolboxFromArray(toolbox)">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="addUpdateScheduledTaskToolboxes.length === 0">
+              <tr>
+                <td colspan="2">No Toolbox Listings</td>
+              </tr>
+            </tbody>
+          </table>
+        </div> 
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); AddScheduledTaskToolbox(TaskToolboxConfirmation)">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Toolbox Exists Error Modal -->
+<ng-template #alreadyExistsToolbox let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title" id="ConfirmationModal">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This toolbox is already scheduled to this task.</b></p>
+    <div class="text-center">
+      <button class="btn-add" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #TaskToolboxConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Toolbox/s have been successfully scheduled.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
     </div>

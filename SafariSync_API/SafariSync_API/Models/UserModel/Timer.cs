@@ -6,6 +6,7 @@ namespace SafariSync_API.Models.UserModel
     {
         [Key]
         public int Timer_ID { get; set; }
+
         public int Timer_Time { get; set; }
     }
 }

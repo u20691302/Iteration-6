@@ -164,31 +164,31 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             //try
             //{
-                // Validate the input data if necessary
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            // Validate the input data if necessary
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                // Create the NotificationAdmin entity from the view model
-                var newNotificationAdmin = new NotificationAdmin
-                {
-                    Date = notificationAdmin.Date,
-                    Notification_Message = notificationAdmin.Notification_Message,
-                    NotificationStatus_ID = notificationAdmin.NotificationStatus_ID,
-                    ScheduledTask_ID = notificationAdmin.ScheduledTask_ID,
-                    Contractor_ID = notificationAdmin.Contractor_ID,
-                    ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID
-                };
+            // Create the NotificationAdmin entity from the view model
+            var newNotificationAdmin = new NotificationAdmin
+            {
+                Date = notificationAdmin.Date,
+                Notification_Message = notificationAdmin.Notification_Message,
+                NotificationStatus_ID = notificationAdmin.NotificationStatus_ID,
+                ScheduledTask_ID = notificationAdmin.ScheduledTask_ID,
+                Contractor_ID = notificationAdmin.Contractor_ID,
+                ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID
+            };
 
-                // Add the notification to the database using ICRUDRepository
-                iCRUDRepository.Add(newNotificationAdmin);
+            // Add the notification to the database using ICRUDRepository
+            iCRUDRepository.Add(newNotificationAdmin);
 
-                // Save changes asynchronously in the CRUD repository
-                await iCRUDRepository.SaveChangesAsync();
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response
-                return Ok(newNotificationAdmin);
+            // Return the successful response
+            return Ok(newNotificationAdmin);
             //}
             //catch (Exception)
             //{
@@ -198,25 +198,55 @@ namespace SafariSync_API.Controllers.NotificationController
         }
 
         [HttpDelete]
-        [Route("DeleteSupervisorNotification/{ScheduledActivity_ID}")]
-        public async Task<IActionResult> DeleteSupervisorNotification(int ScheduledActivity_ID)
+        [Route("DeleteUserNotification/{user_ID}/{scheduledTask_ID}")]
+        public async Task<IActionResult> DeleteUserNotification(int user_ID, int scheduledTask_ID)
         {
             try
             {
-                var Notiication = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.ScheduledActivity_ID == ScheduledActivity_ID);
+                var Notification = await safariSyncDBContext.NotificationUser
+                    .FirstOrDefaultAsync(e => e.User_ID == user_ID && e.ScheduledTask_ID == scheduledTask_ID);
 
-                // If the existing skill is not found, return a NotFound response with an appropriate message
-                if (Notiication == null)
-                    return NotFound("The notifcation does not exist");
+                // If the existing notification is not found, return a NotFound response with an appropriate message
+                if (Notification == null)
+                    return NotFound("The notification does not exist");
 
-                // Delete the skill from the CRUD repository
-                iCRUDRepository.Delete(Notiication);
+                // Delete the notification from the CRUD repository
+                iCRUDRepository.Delete(Notification);
 
                 // Save changes asynchronously in the context
                 await iCRUDRepository.SaveChangesAsync();
 
                 // Return the successful response
-                return Ok(Notiication);
+                return Ok(Notification);
+            }
+            catch (Exception)
+            {
+                // Return a StatusCode 500 response if an exception occurs during the operation
+                return StatusCode(500, "Internal Server Error. Please contact support.");
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteAdminNotification/{contractor_ID}/{scheduledTask_ID}")]
+        public async Task<IActionResult> DeleteAdminNotification(int contractor_ID, int scheduledTask_ID)
+        {
+            try
+            {
+                var Notification = await safariSyncDBContext.NotificationAdmin
+                    .FirstOrDefaultAsync(e => e.Contractor_ID == contractor_ID && e.ScheduledTask_ID == scheduledTask_ID);
+
+                // If the existing notification is not found, return a NotFound response with an appropriate message
+                if (Notification == null)
+                    return NotFound("The notification does not exist");
+
+                // Delete the notification from the CRUD repository
+                iCRUDRepository.Delete(Notification);
+
+                // Save changes asynchronously in the context
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(Notification);
             }
             catch (Exception)
             {
@@ -251,8 +281,6 @@ namespace SafariSync_API.Controllers.NotificationController
                 Notification.Notification_Message = notificationSupervisor.Notification_Message;
                 Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
                 Notification.ScheduledActivity_ID = notificationSupervisor.ScheduledActivity_ID;
-
-
 
                 // Update the entity in the database
                 iCRUDRepository.Update(Notification);
@@ -340,7 +368,6 @@ namespace SafariSync_API.Controllers.NotificationController
                 Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
                 Notification.ScheduledTask_ID = notificationUser.ScheduledTask_ID;
 
-     
                 // Update the entity in the database
                 iCRUDRepository.Update(Notification);
 
@@ -363,31 +390,31 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             //try
             //{
-                // Validate the input data if necessary
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            // Validate the input data if necessary
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                var Notification = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.Notification_ID == notificationSupervisor.Notification_ID);
+            var Notification = await safariSyncDBContext.NotificationSupervisor.FirstOrDefaultAsync(e => e.Notification_ID == notificationSupervisor.Notification_ID);
 
-                // Check if the entity exists
-                if (Notification == null)
-                {
-                    return NotFound("Notification not found");
-                }
+            // Check if the entity exists
+            if (Notification == null)
+            {
+                return NotFound("Notification not found");
+            }
 
-                // Update the properties of the existing entity with the new values
-                Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
+            // Update the properties of the existing entity with the new values
+            Notification.NotificationStatus_ID = notificationSupervisor.NotificationStatus_ID;
 
-                // Update the entity in the database
-                iCRUDRepository.Update(Notification);
+            // Update the entity in the database
+            iCRUDRepository.Update(Notification);
 
-                // Save changes asynchronously in the CRUD repository
-                await iCRUDRepository.SaveChangesAsync();
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response with the updated entity
-                return Ok(Notification);
+            // Return the successful response with the updated entity
+            return Ok(Notification);
             //}
             //catch (Exception)
             //{
@@ -402,31 +429,31 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             //try
             //{
-                // Validate the input data if necessary
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            // Validate the input data if necessary
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.Notification_ID == notificationUser.Notification_ID);
+            var Notification = await safariSyncDBContext.NotificationUser.FirstOrDefaultAsync(e => e.Notification_ID == notificationUser.Notification_ID);
 
-                // Check if the entity exists
-                if (Notification == null)
-                {
-                    return NotFound("Notification not found");
-                }
+            // Check if the entity exists
+            if (Notification == null)
+            {
+                return NotFound("Notification not found");
+            }
 
-                // Update the properties of the existing entity with the new values
-                Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
+            // Update the properties of the existing entity with the new values
+            Notification.NotificationStatus_ID = notificationUser.NotificationStatus_ID;
 
-                // Update the entity in the database
-                iCRUDRepository.Update(Notification);
+            // Update the entity in the database
+            iCRUDRepository.Update(Notification);
 
-                // Save changes asynchronously in the CRUD repository
-                await iCRUDRepository.SaveChangesAsync();
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response with the updated entity
-                return Ok(Notification);
+            // Return the successful response with the updated entity
+            return Ok(Notification);
             //}
             //catch (Exception)
             //{
@@ -441,31 +468,31 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             //try
             //{
-                // Validate the input data if necessary
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            // Validate the input data if necessary
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Notification_ID == notificationAdmin.Notification_ID);
+            var Notification = await safariSyncDBContext.NotificationAdmin.FirstOrDefaultAsync(e => e.Notification_ID == notificationAdmin.Notification_ID);
 
-                // Check if the entity exists
-                if (Notification == null)
-                {
-                    return NotFound("Notification not found");
-                }
+            // Check if the entity exists
+            if (Notification == null)
+            {
+                return NotFound("Notification not found");
+            }
 
-                // Update the properties of the existing entity with the new values
-                Notification.NotificationStatus_ID = notificationAdmin.NotificationStatus_ID;
+            // Update the properties of the existing entity with the new values
+            Notification.NotificationStatus_ID = notificationAdmin.NotificationStatus_ID;
 
-                // Update the entity in the database
-                iCRUDRepository.Update(Notification);
+            // Update the entity in the database
+            iCRUDRepository.Update(Notification);
 
-                // Save changes asynchronously in the CRUD repository
-                await iCRUDRepository.SaveChangesAsync();
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
 
-                // Return the successful response with the updated entity
-                return Ok(Notification);
+            // Return the successful response with the updated entity
+            return Ok(Notification);
             //}
             //catch (Exception)
             //{

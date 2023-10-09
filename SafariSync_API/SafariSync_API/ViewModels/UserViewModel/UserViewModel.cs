@@ -1,5 +1,4 @@
 ﻿using SafariSync_API.Models.SkillsModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace SafariSync_API.ViewModels.UserViewModel
 {

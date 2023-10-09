@@ -56,5 +56,6 @@ namespace SafariSync_API.Data
         public DbSet<Audit> Audit { get; set; }
         public DbSet<AuditAction> AuditAction { get; set; }
         public DbSet<Models.UserModel.Timer> Timer { get; set; }
+        public DbSet<ScheduledTaskToolbox> ScheduledTaskToolbox { get; set; }
     }
 }

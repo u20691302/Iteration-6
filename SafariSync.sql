@@ -201,6 +201,14 @@ CREATE TABLE ScheduledTaskContractor (
     FOREIGN KEY (Contractor_ID) REFERENCES Contractor (Contractor_ID)
 );
 
+CREATE TABLE ScheduledTaskToolbox (
+    ScheduledTaskToolbox_ID INT IDENTITY(1,1) PRIMARY KEY,
+    ScheduledTask_ID INT NOT NULL,
+    Toolbox_ID INT NOT NULL,
+    FOREIGN KEY (ScheduledTask_ID) REFERENCES ScheduledTask (ScheduledTask_ID),
+    FOREIGN KEY (Toolbox_ID) REFERENCES Toolbox (Toolbox_ID)
+);
+
 CREATE TABLE Report (
   Report_ID INT PRIMARY KEY IDENTITY,
   Report_Title VARCHAR(255) NOT NULL,

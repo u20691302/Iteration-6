@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -603,7 +602,6 @@ namespace SafariSync_API.Controllers.UserController
                 return NotFound();
             }
 
-
             return Ok(new { timeout = timer });
         }
 
@@ -625,7 +623,6 @@ namespace SafariSync_API.Controllers.UserController
         }
 
         [HttpPut("updateidimage/{id}")]
-        //[HttpPost("updateprofileimage/{id}")]
         public async Task<IActionResult> UpdateIdImage(int id, IFormFile newIdPhoto)
         {
             // Retrieve the user from the database based on the provided id

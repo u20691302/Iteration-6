@@ -75,4 +75,16 @@ export class NotificationService {
   UpdateNotificationUserStatus(updateNotificationUserRequest: NotificationUser): Observable<NotificationUser> {
     return this.http.put<NotificationUser>(this.baseApiUrl + '/api/Notification/UpdateNotificationUserStatus/',updateNotificationUserRequest);
   }
+
+
+
+  deleteNotificationUser(notificationUser: NotificationUser): Observable<any> {
+    const url = `${this.baseApiUrl}/api/Notification/DeleteUserNotification/${notificationUser.user_ID}/${notificationUser.scheduledTask_ID}`;
+    return this.http.delete<any>(url);
+  }
+
+  deleteNotificationAdmin(notificationAdmin: NotificationAdmin): Observable<any> {
+    const url = `${this.baseApiUrl}/api/Notification/DeleteAdminNotification/${notificationAdmin.contractor_ID}/${notificationAdmin.scheduledTask_ID}`;
+    return this.http.delete<any>(url);
+  }
 }
