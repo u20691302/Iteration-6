@@ -28,10 +28,13 @@ export class ViewUserComponent implements OnInit {
   userSkills: Skills[] = [];
   isSkillListEmpty: boolean = true;
   selectedSkill: number | null = null;
+  selectedRole: string = '';
 
   ratingSettings: RatingSettings[] = [];
   actualUpper: number = 0;
   actualLower: number = 0;
+
+  userID: number =0;
   
   addUpdateUserRequest: User = {
     user_ID: 0,
@@ -400,5 +403,54 @@ export class ViewUserComponent implements OnInit {
       }
     });
   }
+
+  OpenUpdateRoleModal(content:any, id: number){
+    this.userID =  id;
+    console.log(this.userID)
+    const modalRef = this.modalService.open(content, {
+      size: 'dialog-centered',
+      backdrop: 'static'
+    });
+  }
+
+  updateUserRole(success: any){
+    this.addUpdateRequest = {
+      user_ID:this.userID,
+      username: '',
+      surname: '',
+      email: '',
+      idPassport: '',
+      cellphone: '',
+      role: this.selectedRole,
+      rating_ID: 0,
+      password: '', 
+      profileImage: '', 
+      idImage: '',
+      regDate: new Date(),
+      userSkill: [
+        {
+          userSkill_ID: 0,
+          user_ID: 0,
+          skill_ID: 0,
+          skills: {
+            skill_ID: 0, 
+            skill_Name: '',
+            skill_Description: ''
+          }
+        }
+      ],
+      skills: []
+    }
+
+    this.userService.updateUserRole(this.addUpdateUserRequest).subscribe({
+      next: (response) => {
+        this. GetAllUsers();
+        const modalRef = this.modalService.open(success, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+      }
+    });
+  }      
 }
 

@@ -8,7 +8,7 @@
         public int NotificationStatus_ID { get; set; }
         public int ScheduledTask_ID { get; set; }
         public int Contractor_ID { get; set; }
-
+        public int ScheduledTaskToolbox_ID { get; set; }
         public int ScheduledActivity_ID { get; set; }
     }
 }

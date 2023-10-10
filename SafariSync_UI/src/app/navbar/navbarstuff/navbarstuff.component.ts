@@ -36,11 +36,11 @@ export class NavbarstuffComponent implements OnInit {
     if (this.currentPage === 'page') {
       return '/assets/Videos/Page.mkv';
     } else if (this.currentPage === 'dashboard') {
-      return '/assets/Videos/Test4.mp4';
+      return '/assets/Videos/Dashboard.mp4';
     }else if (this.currentPage === 'myprofile') {
       return '/assets/Videos/Profile.mkv';
-    }else if (this.currentPage === 'schedueleActivity') {
-      return '/assets/Videos/Test4.mp4';
+    }else if (this.currentPage === 'scheduleActivity') {
+      return '/assets/Videos/Scheduling.mp4';
     }else if (this.currentPage === 'activity') {
       return '/assets/Videos/Activity.mkv';
     }else if (this.currentPage === 'skills') {
@@ -75,8 +75,13 @@ export class NavbarstuffComponent implements OnInit {
       return '/assets/Videos/GenerateReport.mkv';
     }else if (this.currentPage === 'previousReport') {
       return '/assets/Videos/PreviousReport.mkv';
-    }else if (this.currentPage === 'rating-settings') {
-      return '/assets/Videos/Test4.mp4';
+    }else if (this.currentPage === 'ratingSettings') {
+      return '/assets/Videos/Rating.mp4';
+    }else if (this.currentPage === 'timeout-settings') {
+      return '/assets/Videos/Timeout.mp4';
+    }else if (this.currentPage === 'audit') {
+      return '/assets/Videos/Audit.mp4';
+    
     
     }else {
       return '/assets/Videos/DefaultVideo.mp4';

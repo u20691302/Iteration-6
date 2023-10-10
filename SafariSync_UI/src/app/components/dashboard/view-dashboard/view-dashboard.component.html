@@ -33,22 +33,23 @@
           <tr>
             <th>Date</th>
             <th>Message</th>
-            <th>Accepted Status</th>
+            <th>Status</th>
            
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let notification of notifications">
-            <td>{{ notification.date }}</td>
+            <td>{{ notification.date | date:'short'}}</td>
             <td>{{ notification.notification_Message }}</td>
             <td *ngIf="notification.notificationStatus_ID === 3">
               <div class="button-container">
                 <button class="button-but" (click)="openAcceptModal(AcceptConfirmationModal, notification.notification_ID)">Accept</button>
-                <button class="button-reject">Reject</button>
+                <button class="button-reject" (click)="openRejectModal(RejectConfirmationModal, notification.notification_ID)">Reject</button>
               </div>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 1" style="text-align:center;">
-              <p style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
+              <p *ngIf="notification.scheduledTaskToolbox_ID == 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
+              <p *ngIf="notification.scheduledTaskToolbox_ID > 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Approved</p>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 2" style="text-align:center;">
               <p style="color:red;"><i class="fa fa-times-circle" aria-hidden="true"></i> Rejected</p>
@@ -117,10 +118,25 @@
     <h5 class="modal-title">Please Confirm</h5>
   </div>
   <div class="modal-body">
-    <p><b>Please confirm that you are accepting this position.</b></p>
+    <p><b>Please confirm that you are accepting this position/request.</b></p>
     <div class="text-center">
       <button type="button" class="btn-return" (click)="modal.close('Close click');">Cancel</button>
       <button type="button" class="btn-update" (click)="modal.close('Close click'); updateNotification(ConfirmationModal)">Confirm</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Accept Confirmation Modal -->
+<ng-template #RejectConfirmationModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Please Confirm</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Please confirm that you are rejecting this position/request.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click');">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); updateNotificationReject(ConfirmationRejectModal)">Confirm</button>
     </div>
   </div>
   <div class="modal-footer"></div>
@@ -133,6 +149,20 @@
   </div>
   <div class="modal-body">
     <p><b>Position Accepted!</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click');">Ok</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Accept Confirmation Modal -->
+<ng-template #ConfirmationRejectModal let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>Position Rejected!</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click');">Ok</button>
     </div>

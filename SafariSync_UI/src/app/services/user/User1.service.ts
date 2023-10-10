@@ -110,4 +110,8 @@ export class User1Service {
       })
     );
   }
+
+  updateUserRole(updateScheduledActivityRequest: User): Observable<User> {
+    return this.http.put<User>(this.baseApiUrl + '/api/User/UpdateUserRoleAsync/', updateScheduledActivityRequest);
+  }
 }

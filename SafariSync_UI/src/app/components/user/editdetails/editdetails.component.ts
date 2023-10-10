@@ -73,6 +73,15 @@ export class EditdetailsComponent {
     });
   }
 
+  isValidBase64(str:string) {
+    try {
+        atob(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+  }
+
   //method to get all user info from token
   getAllUserInfo(){
     //get name
@@ -118,9 +127,14 @@ export class EditdetailsComponent {
 
     this.userStore.getProfileImageFromStore().subscribe(val => {
       let profileImageFromToken = this.userService.getProfileImageFromToken();
-      this.profileImage = val || profileImageFromToken;
-      this.profileImage = this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + this.profileImage) as string;
-      console.log("the profile image base 64 is", this.profileImage);
+
+      let pi = val || profileImageFromToken;
+
+      if (this.isValidBase64(pi)) {
+          this.profileImage = this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + pi) as string;
+      } else {
+          this.profileImage = 'assets/default-profile-image.png';
+      }
     });
 
     const userIdInt = parseInt(this.userId, 10);

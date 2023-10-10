@@ -11,6 +11,7 @@ export interface NotificationAdmin {
     notificationStatus_ID: number;
     scheduledTask_ID: number;
     contractor_ID: number;
+    scheduledTaskToolbox_ID: number;
     scheduledActivity_ID: number;
     scheduledTask?: ScheduledTask[];
     noticationStatus?: NotificationStatus;

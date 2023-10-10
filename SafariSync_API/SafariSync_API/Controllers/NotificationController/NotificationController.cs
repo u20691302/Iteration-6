@@ -28,7 +28,7 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.Include(e => e.NotificationStatus)
+                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.OrderBy(e => e.Date).Include(e => e.NotificationStatus)
                                                                                         .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
                                                                                                                           .ThenInclude(e => e.ScheduledTask)
                                                                                                                           .ToListAsync();
@@ -49,7 +49,7 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationUser.Include(e => e.NotificationStatus)
+                var scheduledActivity = await safariSyncDBContext.NotificationUser.OrderBy(e => e.Date).Include(e => e.NotificationStatus)
                                                                                   .Include(e => e.ScheduledTask).ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
@@ -68,7 +68,7 @@ namespace SafariSync_API.Controllers.NotificationController
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.Include(e => e.NotificationStatus).Include(e => e.ScheduledTask)
+                var scheduledActivity = await safariSyncDBContext.NotificationAdmin.OrderBy(e => e.Date).Include(e => e.NotificationStatus).Include(e => e.ScheduledTask)
                                                                                                                       .ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
@@ -178,7 +178,8 @@ namespace SafariSync_API.Controllers.NotificationController
                 NotificationStatus_ID = notificationAdmin.NotificationStatus_ID,
                 ScheduledTask_ID = notificationAdmin.ScheduledTask_ID,
                 Contractor_ID = notificationAdmin.Contractor_ID,
-                ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID
+                ScheduledActivity_ID = notificationAdmin.ScheduledActivity_ID,
+                ScheduledTaskToolbox_ID = notificationAdmin.ScheduledTaskToolbox_ID,
             };
 
             // Add the notification to the database using ICRUDRepository

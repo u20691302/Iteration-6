@@ -39,6 +39,7 @@
         <th><u>Rating</u></th>
         <th></th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody *ngFor="let user of users">
@@ -55,7 +56,10 @@
           <p *ngIf="(user.ratings?.rating || 0) >= actualUpper">
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
           </p>
-        </td>        
+        </td>
+          <div class="button-container">
+            <button  class="btn-form-add" (click)="OpenUpdateRoleModal(UpdateTaskStatus, user.user_ID )">Update Role</button>
+          </div>        
         <td>
           <button class="btn-update" (click)="OpenSkillsModal(user.user_ID, SkillsModal, user.username, user.surname)"> 
             View Skills
@@ -420,6 +424,42 @@
     <p><b>There must be atleast one skill associated with a user.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click'); OpenUpdateModal(UpdateUserModal)">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #UpdateTaskStatus let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Please select a role</h5>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <select class="form-select" [(ngModel)]="selectedRole" name="selectedRole">
+        <option value="" selected disabled>Select a role</option>
+        <option value="Admin">Admin</option>
+        <option value="Supervisor">Supervisor</option>
+        <option value="Farm Worker">Farm Worker</option>
+      </select>      
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click');">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); updateUserRole(statusUpdateConfirmation)">Update</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #statusUpdateConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This employee's role has been successfully updated.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>

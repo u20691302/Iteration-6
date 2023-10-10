@@ -647,5 +647,29 @@ namespace SafariSync_API.Controllers.UserController
 
             return Ok(new { message = "ID image updated successfully", Token = token });
         }
+
+        [HttpPut]
+        [Route("UpdateUserRoleAsync")]
+        public async Task<IActionResult> UpdateUserRoleAsync(UserViewModel userDto)
+        {
+            // Retrieve the user from the database based on the provided id
+            var user = await safariSyncDBContext.User.FirstOrDefaultAsync(e => e.User_ID == userDto.User_ID);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Update the user properties with the values from the userDto object
+           
+            user.Role = userDto.Role;
+
+            iCRUDRepository.Update(user);
+
+            // Save changes asynchronously in the CRUD repository
+            await iCRUDRepository.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

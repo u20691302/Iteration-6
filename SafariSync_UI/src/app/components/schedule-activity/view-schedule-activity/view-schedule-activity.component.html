@@ -48,8 +48,8 @@
       <tr>
         <td>{{ scheduledActivity.activity.activity_Name }}</td>
         <td>{{ scheduledActivity.activity.activity_Description }}</td>
-        <td>{{ scheduledActivity.startDate }}</td>
-        <td>{{ scheduledActivity.endDate }}</td>
+        <td>{{ scheduledActivity.startDate | date:'short'}}</td>
+        <td>{{ scheduledActivity.endDate | date:'short'}}</td>
         <td>{{ scheduledActivity.activity_Location }}</td>
         <td>
           {{ scheduledActivity.users?.username }} {{ scheduledActivity.users?.surname }}
@@ -127,15 +127,21 @@
               <th><u>Task Status</u></th>
               <th></th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let task of filteredTasks">
               <td>{{ task.scheduledTask.task.task_Name }}</td>
               <td>{{ task.scheduledTask.task.task_Description }}</td>
-              <td>{{ task.scheduledTask.startDate }}</td>
-              <td>{{ task.scheduledTask.endDate }}</td>
+              <td>{{ task.scheduledTask.startDate | date:'short'}}</td>
+              <td>{{ task.scheduledTask.endDate | date:'short'}}</td>
               <td>{{ task.scheduledTask.taskStatus?.task_Status }}</td>
+              <td>
+                <div class="button-container">
+                  <button  class="btn-form-add" (click)="openUpdateTaskStatus(UpdateTaskStatus, task.scheduledTask.scheduledTask_ID )">Update Status</button>
+                </div>
+              </td>
               <td>
                 <div class="button-container">
                   <button  class="btn-form-add" (click)="openAddToolboxModal(addUpdateScheduledTaskToolboxModal, task.scheduledTask.scheduledTask_ID )">View Toolboxes</button>
@@ -166,7 +172,7 @@
         </table>
       </div>
       <div class="modal-button-container">
-        <button class="btn-return" (click)="modal.close('Close click')">Return</button>
+        <button class="btn-return" (click)="modal.close('Close click');">Return</button>
       </div>
     </div>
     <div class="modal-footer"></div>
@@ -195,13 +201,13 @@
             <td>{{ employee.user?.username }} {{ employee.user?.surname }}</td>
             <td>
               <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 1" style="color:green;">
-                <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
+                <i class="fa fa-check-circle" aria-hidden="true"></i>Position Accepted 
               </p>
               <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 2" style="color:red;">
-                <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
+                <i class="fa fa-times-circle" aria-hidden="true"></i>Position Rejected 
               </p>
               <p *ngIf="isScheduledTaskNotified(employee.scheduledTask_ID, employee.user?.user_ID||0) === 3" style="color:grey;">
-                <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
+                <i class="fa fa-spinner" aria-hidden="true"></i>Position Pending 
               </p>
             </td>
           </tr>
@@ -227,13 +233,13 @@
             <td>{{ contractor.contractor?.contractor_Name }}</td>
             <td>
               <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 1" style="color:green;">
-                <i class="fa fa-check-circle" aria-hidden="true"></i> Accepted 
+                <i class="fa fa-check-circle" aria-hidden="true"></i>Position Accepted 
               </p>
               <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 2" style="color:red;">
-                <i class="fa fa-times-circle" aria-hidden="true"></i> Rejected 
+                <i class="fa fa-times-circle" aria-hidden="true"></i>Position Rejected 
               </p>
               <p *ngIf="isScheduledTaskContractorNotified(contractor.scheduledTask_ID, contractor.contractor?.contractor_ID||0) === 3" style="color:grey;">
-                <i class="fa fa-spinner" aria-hidden="true"></i> Pending 
+                <i class="fa fa-spinner" aria-hidden="true"></i>Position Pending 
               </p>
             </td>
           </tr>
@@ -693,10 +699,17 @@
     <div class="task container toolbar">
       <div class="row align-items-center">
         <div class="col d-flex justify-content-start">
-          <button type="button" class="btn btn-add" (click)="ScheduleTaskToolboxModal(SelectToolbox)">
-            <i class="fa-solid fa-plus"></i>  Schedule a Toolbox
-          </button>
-        </div>
+          <div class="d-flex align-items-center">
+            <select class="form-select" id="toolbox" name="toolbox" [(ngModel)]="selectedToolbox">
+              <option value="null" selected disabled>Select a Toolbox</option>
+              <option *ngFor="let toolbox of toolboxes" [value]="toolbox.toolbox_ID">{{ toolbox.toolbox_Name }}</option>
+            </select>
+        
+            <button class="btn-update" style="margin-left:10px;" title="Add" [disabled]="!selectedToolbox" (click)="AddScheduledTaskToolbox(TaskToolboxConfirmation, alreadyExistsToolbox)">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>   
       </div>  
     </div>
 
@@ -706,6 +719,7 @@
           <tr>
             <th><u>Toolbox Name</u></th>
             <th><u>Task Description</u></th>
+            <th><u>Checkout Status</u></th>
             <th></th>
           </tr>
         </thead>
@@ -713,13 +727,31 @@
           <tr *ngFor="let toolbox of this.scheduledTaskToolboxes">
             <td>{{ toolbox.toolbox?.toolbox_Name }}</td>
             <td>{{ toolbox.toolbox?.toolbox_Description }}</td>
-            <td>{{ toolbox.toolbox?.toolbox_Name }}</td>
+            <td>
+              <p *ngIf="isScheduledTaskToolboxNotified(toolbox.scheduledTask_ID, toolbox.scheduledTaskToolbox_ID) === 1" style="color:green;">
+                <i class="fa fa-check-circle" aria-hidden="true"></i> Checkout Approved 
+              </p>
+              <p *ngIf="isScheduledTaskToolboxNotified(toolbox.scheduledTask_ID, toolbox.scheduledTaskToolbox_ID) === 2" style="color:red;">
+                <i class="fa fa-times-circle" aria-hidden="true"></i>Checkout Rejected 
+              </p>
+              <p *ngIf="isScheduledTaskToolboxNotified(toolbox.scheduledTask_ID, toolbox.scheduledTaskToolbox_ID) === 3" style="color:grey;">
+                <i class="fa fa-spinner" aria-hidden="true"></i>Checkout Pending 
+              </p>
+            </td>
             <td><div class="button-container">
               <button  class="btn-form-add">View Toolbox Items</button>
-            </div></td>
+            </div>
+          </td>
+          <td>
+            <div class="button-container">
+              <button class="btn-delete"  title="Delete" (click)="DeleteScheduledTaskToolbox(toolbox.scheduledTaskToolbox_ID, TaskToolboxConfirmationOfDelete, TaskToolboxDeleteError)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
           </tr>
         </tbody>
-        <tbody *ngIf="this.addUpdateScheduledTaskToolboxes.length === 0">
+        <tbody *ngIf="this.scheduledTaskToolboxes.length === 0">
           <tr>
             <td colspan="4">No Toolbox Listings</td>
           </tr>
@@ -728,66 +760,6 @@
     </div>
 
     <button type="button" class="btn-return" (click)="modal.close('Close click'); form.reset();">Return</button>
-  </div>
-  <div class="modal-footer"></div>
-</ng-template>
-
-<!-- Select Toolbox -->
-<ng-template #SelectToolbox let-modal class="modal fade">
-  <div class="modal-header">
-    <h5 class="modal-title">Add Toolbox to </h5>
-  </div>
-  <div class="modal-body">
-    <div class="row">
-      <div class="col-6">
-        <div class="mb-3">
-          <label for="toolbox" class="form-label">Select a Toolbox</label>
-          <div class="d-flex align-items-center">
-            <select class="form-select" id="toolbox" name="toolbox" [(ngModel)]="selectedToolbox">
-              <option value="null" selected disabled>Select a Toolbox</option>
-              <option *ngFor="let toolbox of toolboxes" [value]="toolbox.toolbox_ID">{{ toolbox.toolbox_Name }}</option>
-            </select>
-        
-            <button class="btn-update" style="margin-left:10px;" title="Add" (click)="addToolboxToArray(alreadyExistsToolbox)" [disabled]="!selectedToolbox">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-        </div>    
-        
-        <div class="task-table-container">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th><u>Toolbox Name</u></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody *ngIf="this.addUpdateScheduledTaskToolboxes.length > 0">
-              <tr *ngFor="let toolbox of this.addUpdateScheduledTaskToolboxes">
-                <td>{{ toolbox.toolbox_Name }}</td>
-                <td>
-                  <div class="button-container">
-                    <button class="btn-delete" title="Delete" (click)="deleteToolboxFromArray(toolbox)">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-            <tbody *ngIf="addUpdateScheduledTaskToolboxes.length === 0">
-              <tr>
-                <td colspan="2">No Toolbox Listings</td>
-              </tr>
-            </tbody>
-          </table>
-        </div> 
-      </div>
-    </div>
-
-    <div class="text-center">
-      <button type="button" class="btn-return" (click)="modal.close('Close click')">Cancel</button>
-      <button type="button" class="btn-update" (click)="modal.close('Close click'); AddScheduledTaskToolbox(TaskToolboxConfirmation)">Confirm</button>
-    </div>
   </div>
   <div class="modal-footer"></div>
 </ng-template>
@@ -813,6 +785,70 @@
   </div>
   <div class="modal-body">
     <p><b>Toolbox/s have been successfully scheduled.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #TaskToolboxConfirmationOfDelete let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This toolbox that was scheduled to this scheduled task has been deleted.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #TaskToolboxDeleteError let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Error</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>There was an error deleting this toolbox that is scheduled to this scheduled task.</b></p>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Activity Delete Error -->
+<ng-template #UpdateTaskStatus let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Please select a status</h5>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <select class="form-select" [(ngModel)]="selectedStatus" name="selectedStatus">
+        <option value="null" selected disabled>Select a Status</option>
+        <option value="1">Not Started</option>
+        <option value="2">In Progress</option>
+        <option value="3">Completed</option>
+      </select>      
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-return" (click)="modal.close('Close click');">Cancel</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); updateScheduledTaskStatus(statusUpdateConfirmation)">Update</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Confirmation of delete -->
+<ng-template #statusUpdateConfirmation let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Success</h5>
+  </div>
+  <div class="modal-body">
+    <p><b>This scheduled task's status has been successfully updated.</b></p>
     <div class="text-center">
       <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
     </div>

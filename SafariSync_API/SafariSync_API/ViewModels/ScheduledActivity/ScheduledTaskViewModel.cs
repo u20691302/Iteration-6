@@ -8,16 +8,16 @@ namespace SafariSync_API.ViewModels.ScheduledTask
     {
         public int ScheduledTask_ID { get; set; }
 
-        [Required]
+        
         public DateTime StartDate { get; set; }
 
-        [Required]
+        
         public DateTime EndDate { get; set; }
 
-        [Required]
+        
         public int TaskStatus_ID { get; set; }
 
-        [Required]
+      
         public int Task_ID { get; set; }
 
         public User[] Users { get; set; } = Array.Empty<User>();

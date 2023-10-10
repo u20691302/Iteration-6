@@ -75,7 +75,8 @@ export class ViewDashboardComponent implements OnInit {
     notificationStatus_ID: 0,
     scheduledTask_ID: 0,
     scheduledActivity_ID: 0,
-    contractor_ID: 0
+    contractor_ID: 0,
+    scheduledTaskToolbox_ID: 0
   };
 
   notificationUser: NotificationUser = {
@@ -331,7 +332,8 @@ export class ViewDashboardComponent implements OnInit {
       notificationStatus_ID: 1,
       scheduledTask_ID: 0,
       scheduledActivity_ID: 0,
-      contractor_ID: 0
+      contractor_ID: 0,
+      scheduledTaskToolbox_ID: 0
     };
   
     this.notificationUser = {
@@ -341,6 +343,89 @@ export class ViewDashboardComponent implements OnInit {
       notification_Message: '',
       scheduledActivity_ID: 0,
       notificationStatus_ID: 1,
+      scheduledTask_ID: 0,
+    };
+
+    this.userStore.getRoleFromStore().subscribe(val =>{
+      let userRole = this.userTyService.getRoleFromToken();
+        this.userRole = userRole;
+    });
+
+    if (this.userRole === "Admin"){
+      this.notificationService.UpdateNotificationAdminStatus(this.notificationAdmin).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
+    else if (this.userRole === "Supervisor"){
+      this.notificationService.UpdateNotificationSupervisorStatus(this.notificationSupervisor).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
+    else if (this.userRole === "Farm Worker"){
+      this.notificationService.UpdateNotificationUserStatus(this.notificationUser).subscribe({
+        next: () => {
+          this.ngOnInit();
+          const modalRef = this.modalService.open(content, {
+            size: 's',
+            centered: true,
+            backdrop: 'static'
+          });
+        }
+      });
+    }
+  }
+
+  openRejectModal(content: any, id: number){
+    this.notificationID=id;
+    const modalRef = this.modalService.open(content, {
+      size: 's',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  updateNotificationReject(content: any){
+    this.notificationSupervisor= {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      user_ID: 0,
+      notification_Message:'',
+      notificationStatus_ID: 2,
+      scheduledActivity_ID: 0
+    }
+
+    this.notificationAdmin = {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      notification_Message: '',
+      notificationStatus_ID: 2,
+      scheduledTask_ID: 0,
+      scheduledActivity_ID: 0,
+      contractor_ID: 0,
+      scheduledTaskToolbox_ID: 0
+    };
+  
+    this.notificationUser = {
+      notification_ID: this.notificationID,
+      date: new Date(),
+      user_ID: 0,
+      notification_Message: '',
+      scheduledActivity_ID: 0,
+      notificationStatus_ID: 2,
       scheduledTask_ID: 0,
     };
 

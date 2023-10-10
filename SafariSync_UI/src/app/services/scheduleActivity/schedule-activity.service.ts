@@ -179,4 +179,16 @@ export class ScheduledActivityService {
   AddScheduledTaskToolbox(addScheduledTaskToolboxRequest: ScheduledTaskToolbox): Observable<ScheduledTaskToolbox> {
     return this.http.post<ScheduledTaskToolbox>(this.baseApiUrl + '/api/ScheduledActivity/AddScheduledTaskToolbox/',addScheduledTaskToolboxRequest);
   }
+
+  deleteScheduledTaskToolbox(scheduledTaskToolbox_ID: number): Observable<ScheduledTaskToolbox> {
+    return this.http.delete<ScheduledTaskToolbox>(this.baseApiUrl + '/api/ScheduledActivity/DeleteScheduledTaskToolbox/' + scheduledTaskToolbox_ID);
+  }
+
+  updateScheduledTaskStatus(updateScheduledActivityRequest: ScheduledTask): Observable<ScheduledTask> {
+    return this.http.put<ScheduledTask>(this.baseApiUrl + '/api/ScheduledActivity/UpdateScheduledTaskStatus/', updateScheduledActivityRequest);
+  }
+
+  updateScheduledActivityStatus(updateScheduledActivityRequest: ScheduledActivity): Observable<ScheduledActivity> {
+    return this.http.put<ScheduledActivity>(this.baseApiUrl + '/api/ScheduledActivity/UpdateScheduledActivityStatus/', updateScheduledActivityRequest);
+  }
 }

@@ -379,6 +379,19 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
                         .ThenInclude(e => e.ScheduledTaskContractor)
                         .FirstOrDefaultAsync(e => e.ScheduledActivity_ID == id);
 
+                foreach (var scheduledTask in existingScheduledActivity!.ScheduledActivityScheduledTask)
+                {
+                    if (notificationUser != null)
+                    {
+                        // Filter the existingScheduledTaskToolbox to get the records with the same scheduledTaskID
+                        var recordsToDelete = await safariSyncDBContext.ScheduledTaskToolbox
+                        .Where(e => e.ScheduledTask_ID == scheduledTask.ScheduledTask_ID).ToListAsync();
+
+                        // Delete the records
+                        safariSyncDBContext.ScheduledTaskToolbox.RemoveRange(recordsToDelete);
+                    }
+                }
+
                 // If activity with the given ID is not found, return a not found response
                 if (existingScheduledActivity == null)
                 {
@@ -492,6 +505,8 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
             }
 
             // Remove the activity from the database using ICRUDRepository
+            iCRUDRepository.Delete(existingScheduledTask.ScheduledTask!);
+
             iCRUDRepository.Delete(existingScheduledTask);
 
             // Remove the associated activityTask records from the database using ICRUDRepository
@@ -648,16 +663,16 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         {
             //try
             //{
-                var scheduledTaskToolbox = await safariSyncDBContext.ScheduledTaskToolbox.Where(es => es.ScheduledTask_ID == id)
-                    .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxEquipment).ThenInclude(es => es.Equipment)
-                    .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxStock).ThenInclude(es => es.Stock).ToListAsync();
+            var scheduledTaskToolbox = await safariSyncDBContext.ScheduledTaskToolbox.Where(es => es.ScheduledTask_ID == id)
+                .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxEquipment).ThenInclude(es => es.Equipment)
+                .Include(es => es.Toolbox!).ThenInclude(es => es.ToolboxStock).ThenInclude(es => es.Stock).ToListAsync();
 
-                // If activity with the given ID is not found, return a not found response
-                if (scheduledTaskToolbox == null)
-                    return NotFound();
+            // If activity with the given ID is not found, return a not found response
+            if (scheduledTaskToolbox == null)
+                return NotFound();
 
-                // Return the activity data with associated tasks
-                return Ok(scheduledTaskToolbox);
+            // Return the activity data with associated tasks
+            return Ok(scheduledTaskToolbox);
             //}
             //catch (Exception)
             //{
@@ -698,6 +713,126 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
             {
                 //Handle the exception and return an error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while adding the activity.");
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteScheduledTaskToolbox/{scheduledTaskToolbox_ID}")]
+        public async Task<IActionResult> DeleteScheduledTaskToolbox(int scheduledTaskToolbox_ID)
+        {
+            try
+            {
+                // Fetch the existing stock by ID using SafariSyncDBContext
+                var scheduledTaskToolbox = await safariSyncDBContext.ScheduledTaskToolbox.FirstOrDefaultAsync(e => e.ScheduledTaskToolbox_ID == scheduledTaskToolbox_ID);
+
+                // If stock with the given ID is not found, return a not found response
+                if (scheduledTaskToolbox == null)
+                {
+                    return NotFound();
+                }
+
+                // Remove the stock from the database using ICRUDRepository
+                iCRUDRepository.Delete(scheduledTaskToolbox);
+
+                var Notification = await safariSyncDBContext.NotificationAdmin
+                  .FirstOrDefaultAsync(e => e.ScheduledTaskToolbox_ID == scheduledTaskToolbox_ID);
+
+                // If the existing notification is not found, return a NotFound response with an appropriate message
+                if (Notification == null)
+                    return NotFound("The notification does not exist");
+
+                // Delete the notification from the CRUD repository
+                iCRUDRepository.Delete(Notification);
+
+                // Save changes asynchronously in the context
+                await safariSyncDBContext.SaveChangesAsync();
+
+                return Ok(scheduledTaskToolbox);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the stock.");
+            }
+        }
+
+
+        [HttpPut]
+        [Route("UpdateScheduledTaskStatus")]
+        public async Task<IActionResult> UpdateScheduledTaskStatus(ScheduledTaskViewModel scheduledTaskViewModel)
+        {
+            try
+            {
+                // Validate the input activity data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Fetch the existing activity by ID using SafariSyncDBContext
+                var existingScheduledTask = await safariSyncDBContext.ScheduledTask
+                    .FirstOrDefaultAsync(e => e.ScheduledTask_ID == scheduledTaskViewModel.ScheduledTask_ID);
+
+                // If activity with the given ID is not found, return a not found response
+                if (existingScheduledTask == null)
+                {
+                    return NotFound();
+                }
+
+                // Update the Activity entity from the view model
+
+                existingScheduledTask.TaskStatus_ID = scheduledTaskViewModel.TaskStatus_ID;
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(existingScheduledTask);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
+            }
+        }
+
+
+        [HttpPut]
+        [Route("UpdateScheduledActivityStatus")]
+        public async Task<IActionResult> UpdateScheduledActivityStatus(ScheduledActivityViewModel scheduledActivityViewModel)
+        {
+            try
+            {
+                // Validate the input activity data if necessary
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Fetch the existing activity by ID using SafariSyncDBContext
+                var existingScheduledActivity = await safariSyncDBContext.ScheduledActivity
+                    .FirstOrDefaultAsync(e => e.ScheduledActivity_ID == scheduledActivityViewModel.ScheduledActivity_ID);
+
+                // If activity with the given ID is not found, return a not found response
+                if (existingScheduledActivity == null)
+                {
+                    return NotFound();
+                }
+
+                // Update the Activity entity from the view model
+
+                existingScheduledActivity.ActivityStatus_ID = scheduledActivityViewModel.ActivityStatus_ID;
+
+                // Save changes asynchronously in the CRUD repository
+                await iCRUDRepository.SaveChangesAsync();
+
+                // Return the successful response
+                return Ok(existingScheduledActivity);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the activity.");
             }
         }
     }

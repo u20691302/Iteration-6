@@ -59,6 +59,7 @@ export class ViewScheduleActivityComponent implements OnInit{
   activities: Activity[] = [];
   selectedActivity: number | null = null;
   selectedToolbox: number | null = null;
+  selectedStatus: number | null = null;
   startDateTime: Date = new Date();
   endDateTime: Date = new Date();
   users: User[] = [];
@@ -84,6 +85,7 @@ export class ViewScheduleActivityComponent implements OnInit{
   
   notifications: any[] = [];
   notificationsContractor: any[] = []
+  notificationsAdmin: any[] = []
 
   contractors: Contractor[] = [];
   addUpdateContractor: Contractor[] = [];
@@ -94,11 +96,14 @@ export class ViewScheduleActivityComponent implements OnInit{
   Contractors: ScheduledTaskContractor[] = [];
 
   scheduledTaskToolboxes: ScheduledTaskToolbox[] = [];
-  addUpdateScheduledTaskToolboxes: Toolbox[] = [];
 
   toolboxes: Toolbox[] = [];
 
   ActivityID: number = 0;
+
+  hasTaskStatus2: boolean = true;
+  allTasksStatus3: boolean = true;
+  noTasksStatus2: boolean = true;
 
   addUpdateScheduledActivityRequest: ScheduledActivity = {
     scheduledActivity_ID: 0,
@@ -330,7 +335,8 @@ export class ViewScheduleActivityComponent implements OnInit{
     scheduledActivity_ID: 0,
     notificationStatus_ID: 0,
     scheduledTask_ID: 0,
-    contractor_ID: 0
+    contractor_ID: 0,
+    scheduledTaskToolbox_ID: 0
   };
 
   notificationUser: NotificationUser= {
@@ -379,6 +385,80 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
+  GetAllScheduledActivities(): void {
+    this.scheduledActivityService.getAllScheduledActivities(this.searchTerm).subscribe({
+      next: (scheduledActivities) => {
+        this.scheduledActivities = scheduledActivities;
+  
+        for(var scheduledActivity of this.scheduledActivities ){
+          this.hasTaskStatus2 = scheduledActivity.scheduledActivityScheduledTask.some(task => task.scheduledTask.taskStatus_ID == 2);
+          this.allTasksStatus3 = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID == 3);
+          this.noTasksStatus2 = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID == 1);
+  
+          if(this.hasTaskStatus2){
+            this.ScheduledActivity = {
+              scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+              startDate: new Date(),
+              endDate: new Date(),
+              activity_Location: '',
+              user_ID: 0,
+              activityStatus_ID: 2,
+              activity_ID: 0,
+              activity: {
+                activity_ID: 0,
+                activity_Name: '',
+                activity_Description: '',
+                activityTask: []
+              },
+              scheduledActivityScheduledTask: []
+            };
+          }
+          else if (this.allTasksStatus3) {
+            this.ScheduledActivity = {
+              scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+              startDate: new Date(),
+              endDate: new Date(),
+              activity_Location: '',
+              user_ID: 0,
+              activityStatus_ID: 3,
+              activity_ID: 0,
+              activity: {
+                activity_ID: 0,
+                activity_Name: '',
+                activity_Description: '',
+                activityTask: []
+              },
+              scheduledActivityScheduledTask: []
+            };
+          } else if (this.noTasksStatus2) {
+              this.ScheduledActivity = {
+                scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+                startDate: new Date(),
+                endDate: new Date(),
+                activity_Location: '',
+                user_ID: 0,
+                activityStatus_ID: 1,
+                activity_ID: 0,
+                activity: {
+                  activity_ID: 0,
+                  activity_Name: '',
+                  activity_Description: '',
+                  activityTask: []
+                },
+                scheduledActivityScheduledTask: []
+              };
+          }
+  
+          this.scheduledActivityService.updateScheduledActivityStatus(this.ScheduledActivity).subscribe({
+            next: (scheduledActivity: ScheduledActivity) => {
+              
+            }
+          });
+        }
+      }
+    });
+  }  
+
   isScheduledActivityNotified(scheduledActivityId: number): number {
 
     if (this.notifications.some(notification => notification.scheduledActivity_ID === scheduledActivityId)){
@@ -396,23 +476,6 @@ export class ViewScheduleActivityComponent implements OnInit{
       }
     }
     return 3;
-  }
-
-  GetAllScheduledActivities(): void {
-    this.scheduledActivityService.getAllScheduledActivities(this.searchTerm).subscribe({
-      next: (scheduledActivities) => {
-        this.scheduledActivities = scheduledActivities;
-
-        this.notificationService.getNotificationSupervisor().subscribe({
-          next: (notifications) => {
-            this.notifications = notifications;
-          }
-        });
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
   }
 
   loadTask(id: number) {
@@ -619,6 +682,7 @@ export class ViewScheduleActivityComponent implements OnInit{
               notification_ID: 0,
               date: new Date(),
               contractor_ID:  contractors.contractor_ID,
+              scheduledTaskToolbox_ID: 0,
               scheduledActivity_ID: this.scheduledActivity_ID,
               notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
               notificationStatus_ID: 3,
@@ -1059,6 +1123,7 @@ export class ViewScheduleActivityComponent implements OnInit{
               date: new Date(),
               scheduledActivity_ID: this.scheduledActivity_ID,
               contractor_ID: contractors.contractor_ID,
+              scheduledTaskToolbox_ID: 0,
               notification_Message: contractors.contractor_Name +' have been scheduled as a to a scheduled task, accept to confirm booking.',
               notificationStatus_ID: 3,
               scheduledTask_ID: ScheduledTask.scheduledTask_ID
@@ -1235,6 +1300,7 @@ export class ViewScheduleActivityComponent implements OnInit{
     }
     return false;
   }
+
   openScheduleTaskModal(id: number, content: any, exists: any, name: string){
     this.GetOneScheduledActivities(this.scheduledActivity_ID);
     if(this.checkTaskSchedule(id)){
@@ -1359,12 +1425,21 @@ export class ViewScheduleActivityComponent implements OnInit{
   openAddToolboxModal(content: any, id: number){
     this.isAddMode = true;
     this.GetScheduledTaskToolbox(id);
+    this.GetAllToolbox();
     this.scheduledTask_ID = id;
-    const modalRef = this.modalService.open(content, {
-      size: 'xl',
-      centered: true,
-      backdrop: 'static'
+
+    this.notificationService.getNotificationAdmin().subscribe({
+      next: (notifications) => {
+        this.notificationsAdmin = notifications;
+
+        const modalRef = this.modalService.open(content, {
+          size: 'xl',
+          centered: true,
+          backdrop: 'static'
+        });
+      }
     });
+    
   }
 
   GetScheduledTaskToolbox(id: number): void {
@@ -1375,15 +1450,6 @@ export class ViewScheduleActivityComponent implements OnInit{
       error: (response) => {
         console.log(response);
       }
-    });
-  }
-
-  ScheduleTaskToolboxModal(content: any){
-    this.GetAllToolbox();
-    const modalRef = this.modalService.open(content, {
-      size: 'xl',
-      centered: true,
-      backdrop: 'static'
     });
   }
 
@@ -1398,72 +1464,156 @@ export class ViewScheduleActivityComponent implements OnInit{
     });
   }
 
-  addToolboxToArray(content: any) {
-    if (this.selectedToolbox) {
-      const toolboxIdToAdd = Number(this.selectedToolbox);
-  
-      const isToolboxAlreadyAdded = this.addUpdateScheduledTaskToolboxes.some(toolbox => toolbox.toolbox_ID === toolboxIdToAdd);
-  
-      if (!isToolboxAlreadyAdded) {
-        const toolboxToAdd = this.toolboxes.find(toolbox => toolbox.toolbox_ID === toolboxIdToAdd);
-        if (toolboxToAdd) {
-          this.addUpdateScheduledTaskToolboxes.push(toolboxToAdd);
+  AddScheduledTaskToolbox(success: any, failed: any) {
+    this.scheduledTaskToolbox = {
+      scheduledTaskToolbox_ID: 0,
+      toolbox_ID: Number(this.selectedToolbox || 0),
+      scheduledTask_ID: this.scheduledTask_ID
+    }
+
+    // Check if the record already exists
+    const exists = this.scheduledTaskToolboxes.some(
+      (toolbox) => this.scheduledTaskToolbox.toolbox_ID === toolbox.toolbox_ID
+    );
+
+    // If the record doesn't exist, add it
+    if (!exists) {
+      this.scheduledActivityService.AddScheduledTaskToolbox(this.scheduledTaskToolbox).subscribe({
+        next: (ScheduledTaskToolbox:ScheduledTaskToolbox) => {
+          
+
+          this.notificationAdmin = {
+            notification_ID: 0,
+            date: new Date(),
+            scheduledActivity_ID: this.scheduledActivity_ID,
+            contractor_ID: 0,
+            scheduledTaskToolbox_ID: ScheduledTaskToolbox.scheduledTaskToolbox_ID,
+            notification_Message: this.toolboxes.find(toolbox => toolbox.toolbox_ID === Number(this.selectedToolbox || 0))?.toolbox_Name + ' have been scheduled to a scheduled task, approve to confirm toolbox booking.',
+            notificationStatus_ID: 3,
+            scheduledTask_ID: this.scheduledTask_ID
+          };
+
           this.selectedToolbox = null;
-          this.isToolboxListEmpty = this.addUpdateScheduledTaskToolboxes.length === 0;
+      
+          this.notificationService.AddNotifcationAdmin(this.notificationAdmin).subscribe({
+            next: () => {
+              this.notificationService.getNotificationAdmin().subscribe({
+                next: (notifications) => {
+                  this.notificationsAdmin = notifications;
+                }
+              });
+              this.GetScheduledTaskToolbox(this.scheduledTask_ID)
+            }
+          });
         }
-      } else {
-        this.selectedToolbox = null;
-        const modalRef = this.modalService.open(content, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      }
-    }
-  }  
+      });
   
-  deleteToolboxFromArray(toolboxes: Toolbox) {
-    const index = this.addUpdateScheduledTaskToolboxes.findIndex(s => s.toolbox_ID === toolboxes.toolbox_ID);
-    if (index !== -1) {
-      this.addUpdateScheduledTaskToolboxes.splice(index, 1);
-      console.log(this.addUpdateScheduledTaskToolboxes)
-    }
-    this.isToolboxListEmpty = this.addUpdateScheduledTaskToolboxes.length === 0;
-  }
-
-  loadToolboxesIntoArray() {
-    if (this.scheduledTask) {
-      this.addUpdateScheduledTaskToolboxes = this.scheduledTaskToolboxes
-        ?.filter((scheduledTaskToolbox: ScheduledTaskToolbox) => scheduledTaskToolbox.toolbox !== undefined)
-        .map((toolboxItem: any) => toolboxItem.toolbox) || [];
-    } else {
-      this.addUpdateScheduledTaskToolboxes = [];
-    }
-    this.isToolboxListEmpty = this.addUpdateScheduledTaskToolboxes.length === 0;
-  }
-
-  AddScheduledTaskToolbox(success: any) {
-
-    if (this.addUpdateScheduledTaskToolboxes) {
-      for (var toolbox of this.addUpdateScheduledTaskToolboxes) {
-
-        this.scheduledTaskToolbox = {
-          scheduledTaskToolbox_ID: 0,
-          toolbox_ID: toolbox.toolbox_ID,
-          scheduledTask_ID: this.scheduledTask_ID
-        }
-    
-        this.scheduledActivityService.AddScheduledTaskToolbox(this.scheduledTaskToolbox).subscribe({
-          next: (ScheduledTaskToolbox:ScheduledTaskToolbox) => {
-            
-           
-          }
-        });
-      }
       const modalRef = this.modalService.open(success, {
+        size: 'xl',
+        centered: true,
+        backdrop: 'static'
+      });
+      
+    } else {
+      const modalRef = this.modalService.open(failed, {
         size: 'xl',
         centered: true,
         backdrop: 'static'
       });
     }
   }
+
+
+  DeleteScheduledTaskToolbox(scheduledTaskToolboxID: number, success: any, failed: any) {
+    this.scheduledActivityService.deleteScheduledTaskToolbox(scheduledTaskToolboxID).subscribe({
+      next: (response) => {
+        this.GetScheduledTaskToolbox(this.scheduledTask_ID)
+        const modalRef = this.modalService.open(success, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+      },
+      error: (response) => {
+        console.log(response);
+        const modalRef = this.modalService.open(failed, {
+          size: 'dialog-centered',
+          backdrop: 'static'
+        });
+      }
+    });
+  }
+
+  isScheduledTaskToolboxNotified(scheduledTaskId: number,  scheduledTaskToolbox_ID: number): number {
+        if (this.notificationsAdmin.some(notification => notification.scheduledTask_ID == scheduledTaskId)){
+
+          const notification = this.notificationsAdmin.find(notification => notification.scheduledTask_ID == scheduledTaskId && notification.scheduledTaskToolbox_ID == scheduledTaskToolbox_ID );
+          
+          if (notification.notificationStatus_ID == 1){
+            return 1;
+          }
+          else if (notification.notificationStatus_ID == 2){
+            return 2;
+          }
+          else if (notification.notificationStatus_ID == 3){
+            return 3;
+          }
+        }
+        return 3;
+  }
+
+  openUpdateTaskStatus(content: any, id: number){
+    this.scheduledTask_ID = id;
+
+    const modalRef = this.modalService.open(content, {
+      centered: true,
+      backdrop: 'static'
+    });    
+  }
+
+  updateScheduledTaskStatus(content: any){
+    this.scheduledTask = {
+      scheduledTask_ID: this.scheduledTask_ID,
+      startDate: new Date(),
+      endDate: new Date(),
+      taskStatus_ID: Number(this.selectedStatus),
+      task_ID: 0,
+      task: {
+        task_ID: 0,
+        task_Name: '',
+        task_Description: '',
+        skill_ID: 0,
+        skill: {
+          skill_ID: 0,
+          skill_Name: '',
+          skill_Description: ''
+        }
+      },
+      users: [],
+      contractors: []
+    }
+
+    this.scheduledActivityService.updateScheduledTaskStatus(this.scheduledTask).subscribe({
+      next: (ScheduledTask: ScheduledTask) => {
+        this.scheduledActivityService.getOneScheduledActivity(this.scheduledActivity_ID).subscribe({
+          next: (scheduledActivity) => {
+            this.addUpdateScheduledActivityRequest = scheduledActivity;
+            this.activityName = this.addUpdateScheduledActivityRequest.activity.activity_Name;
+            this.ActivityID = this.addUpdateScheduledActivityRequest.activity.activity_ID;
+            this.filterTasksBySearchTerm(this.addUpdateScheduledActivityRequest.scheduledActivityScheduledTask);
+
+            this.GetAllScheduledActivities();
+            
+            const modalRef = this.modalService.open(content, {
+              size: 'xl',
+              centered: true,
+              backdrop: 'static'
+            }); 
+          },
+          error: (response) => {
+            console.log(response);
+          }
+        });
+      }
+    });
+  }      
 }
