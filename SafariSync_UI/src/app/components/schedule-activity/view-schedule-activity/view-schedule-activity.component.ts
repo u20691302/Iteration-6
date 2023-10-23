@@ -1600,9 +1600,7 @@ export class ViewScheduleActivityComponent implements OnInit{
             this.activityName = this.addUpdateScheduledActivityRequest.activity.activity_Name;
             this.ActivityID = this.addUpdateScheduledActivityRequest.activity.activity_ID;
             this.filterTasksBySearchTerm(this.addUpdateScheduledActivityRequest.scheduledActivityScheduledTask);
-
-            this.GetAllScheduledActivities();
-            
+           
             const modalRef = this.modalService.open(content, {
               size: 'xl',
               centered: true,

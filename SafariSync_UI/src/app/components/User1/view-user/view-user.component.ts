@@ -415,7 +415,7 @@ export class ViewUserComponent implements OnInit {
 
   updateUserRole(success: any){
     this.addUpdateRequest = {
-      user_ID:this.userID,
+      user_ID:Number(this.userID),
       username: '',
       surname: '',
       email: '',

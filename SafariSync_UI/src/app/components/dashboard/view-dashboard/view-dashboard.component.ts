@@ -92,43 +92,35 @@ export class ViewDashboardComponent implements OnInit {
   constructor(private modalService: NgbModal, private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
-    // interval(5000)
-    //   .subscribe(() => {
-    //     this.ngOnInit();
-    //     console.log(1) 
-    //   });
-
-    this.fetchRatingSettings();
-    this.GetAllStock();
-    this.GetAllUsers();
-    this.GetAllScheduledActivities();
-
-    this.userStore.getFullNameFromStore().subscribe(val => {
-      let fullNameFromToken = this.userTyService.getFullNameFromToekn();
-      this.fullName = val || fullNameFromToken;
-    });
-
     this.userStore.getRoleFromStore().subscribe(val =>{
       let userRole = this.userTyService.getRoleFromToken();
         this.userRole = userRole;
-    });
 
-    this.userStore.getUserIdFromStore().subscribe(val =>{
-      let userid = this.userTyService.getUserIdFromToken();
-        this.userID = userid;
-    });
+        if (this.userRole === "Admin"){
+          this.ReadAllNotificationAdmin();
+        }
+        else if (this.userRole === "Supervisor"){
+          this.ReadAllNotificationSupervisor();
+        }
+        else if (this.userRole === "Farm Worker"){
+          this.ReadAllNotificationUser();
+        }
 
-    this.notifications = [];
-
-    if (this.userRole === "Admin"){
-      this.ReadAllNotificationAdmin();
-    }
-    else if (this.userRole === "Supervisor"){
-      this.ReadAllNotificationSupervisor();
-    }
-    else if (this.userRole === "Farm Worker"){
-      this.ReadAllNotificationUser();
-    }
+        this.fetchRatingSettings();
+        this.GetAllStock();
+        this.GetAllUsers();
+        this.GetAllScheduledActivities();
+    
+        this.userStore.getFullNameFromStore().subscribe(val => {
+          let fullNameFromToken = this.userTyService.getFullNameFromToekn();
+          this.fullName = val || fullNameFromToken;
+        });
+    
+        this.userStore.getUserIdFromStore().subscribe(val =>{
+          let userid = this.userTyService.getUserIdFromToken();
+            this.userID = userid;
+        });
+    }); 
   }
 
   ReadAllNotificationSupervisor(): void {

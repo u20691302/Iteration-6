@@ -842,7 +842,7 @@
   <div class="modal-footer"></div>
 </ng-template>
 
-<!-- Confirmation of delete -->
+<!-- Status Update Confirmation -->
 <ng-template #statusUpdateConfirmation let-modal class="modal fade">
   <div class="modal-header">
     <h5 class="modal-title">Success</h5>
@@ -850,7 +850,7 @@
   <div class="modal-body">
     <p><b>This scheduled task's status has been successfully updated.</b></p>
     <div class="text-center">
-      <button type="button" class="btn-update" (click)="modal.close('Close click')">OK</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click'); ngOnInit()">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>

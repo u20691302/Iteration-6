@@ -48,7 +48,7 @@
               </div>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 1" style="text-align:center;">
-              <p *ngIf="notification.scheduledTaskToolbox_ID == 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
+              <p *ngIf="notification.scheduledTaskToolbox_ID === 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
               <p *ngIf="notification.scheduledTaskToolbox_ID > 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Approved</p>
             </td>
             <td *ngIf="notification.notificationStatus_ID === 2" style="text-align:center;">
