@@ -42,6 +42,18 @@ export class User1Service {
     );
   }
 
+  getAllUsersDashboard(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseApiUrl}/api/User/ReadAllUsersDashboardAsync`).pipe(
+      map(users => {
+        return users;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
+
   getAllUserForTasks(term: string): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseApiUrl}/api/User/ReadAllUsersAsync`).pipe(
       map(users => {

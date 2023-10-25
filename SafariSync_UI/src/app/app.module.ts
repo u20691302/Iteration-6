@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -52,8 +52,6 @@ import { ViewPreviousReportsComponent } from './components/reporting/view-previo
 import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
 import { AuditActionRecordsComponent } from './components/audit-action-records/audit-action-records.component';
 import { TimeoutSettingsComponent } from './components/timeout-settings/timeout-settings.component';
-
-
 
 const routes: Routes = [
   // Existing routes...
@@ -119,7 +117,7 @@ const routes: Routes = [
     NgChartsModule,
     
   ],
-  providers: [UserService, AuthGuard],
+  providers: [UserService, AuthGuard], 
   bootstrap: [AppComponent]
 })
 export class AppModule { }

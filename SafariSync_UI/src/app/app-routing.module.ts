@@ -35,6 +35,7 @@ import { RegisterFarmworkerComponent } from './components/user/register-farmwork
 import { RegisterSupervisorComponent } from './components/user/register-supervisor/register-supervisor.component';
 import { AuditActionRecordsComponent } from './components/audit-action-records/audit-action-records.component';
 import { TimeoutSettingsComponent } from './components/timeout-settings/timeout-settings.component';
+import { UserService } from 'src/app/services/user/user.service';
 
 
 const routes: Routes = [

@@ -23,15 +23,13 @@ namespace SafariSync_API.Controllers.NotificationController
         }
 
         [HttpGet]
-        [Route("ReadSupervisorNotifications")]
-        public async Task<IActionResult> ReadSupervisorNotifications()
+        [Route("ReadSupervisorNotifications/{id}")]
+        public async Task<IActionResult> ReadSupervisorNotifications(int id)
         {
             try
             {
-                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.OrderBy(e => e.Date).Include(e => e.NotificationStatus)
-                                                                                        .Include(e => e.ScheduledActivity!).ThenInclude(e => e.ScheduledActivityScheduledTask)
-                                                                                                                          .ThenInclude(e => e.ScheduledTask)
-                                                                                                                          .ToListAsync();
+                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.Where(e => e.User_ID == id).OrderBy(e => e.Date).Include(e => e.NotificationStatus)
+                                                                                        .Include(e => e.ScheduledActivity!).ToListAsync();
 
                 // Return the scheduledActivity data with associated scheduledTasks
                 return Ok(scheduledActivity);

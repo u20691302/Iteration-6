@@ -3,9 +3,9 @@
   <h3>{{fullName}}'s Dashboard</h3>
 </div>
 
-<div class="dashboard" >
+<div class="dashboard">
   <!-- First Column -->
-  <div *ngIf="this.userRole == 'Admin';" class="column">
+  <div *ngIf="this.userRole === 'Admin';" class="column">
     <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Scheduled Activity Status</h5>
     <!-- Section 1 -->
     <div class="section">
@@ -25,7 +25,7 @@
   </div>
 
   <!-- Middle Column -->
-  <div class="column middle-column" [ngClass]="{'center-column': userRole !== 'Admin'}" >
+  <div class="column middle-column" [ngClass]="{'center-column': this.userRole !== 'Admin'}" >
     <h4 style="color: #CD1543; font-weight: bold; align-self: center;">Activity Stream</h4>
     <div class="notification-center">
       <table class= "middle-table">
@@ -66,7 +66,7 @@
   </div>
 
   <!-- Third Column -->
-  <div *ngIf="this.userRole == 'Admin';" class="column">
+  <div *ngIf="this.userRole === 'Admin';" class="column">
     <!-- Section 4 -->
     <h5 style="color: #CD1543; font-weight: bold; align-self: center;">Stock Items Near Depeletion</h5>
     <div class="section">

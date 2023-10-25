@@ -17,8 +17,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationSupervisor } from 'src/app/models/notifications/notificationSupervisor.model';
 import { NotificationAdmin } from 'src/app/models/notifications/notificationAdmin.model';
 import { NotificationUser } from 'src/app/models/notifications/notificationUser.model';
-
-
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-view-dashboard',
@@ -56,7 +55,7 @@ export class ViewDashboardComponent implements OnInit {
     ratingSettings_Lower: 2
   };
 
-  userRole: string = "";
+  userRole: string = '';
   userID: number = 0;
 
   notificationSupervisor: NotificationSupervisor = {
@@ -88,45 +87,50 @@ export class ViewDashboardComponent implements OnInit {
     scheduledActivity_ID: 0,
     scheduledTask_ID: 0,
   };
-
-  constructor(private modalService: NgbModal, private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) { }
+  
+  constructor(private modalService: NgbModal, private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) {}
 
   ngOnInit(): void {
-    this.userStore.getRoleFromStore().subscribe(val =>{
-      let userRole = this.userTyService.getRoleFromToken();
-        this.userRole = userRole;
 
-        if (this.userRole === "Admin"){
-          this.ReadAllNotificationAdmin();
-        }
-        else if (this.userRole === "Supervisor"){
-          this.ReadAllNotificationSupervisor();
-        }
-        else if (this.userRole === "Farm Worker"){
-          this.ReadAllNotificationUser();
-        }
+    
+    this.userStore.getRoleFromStore().subscribe(val => {
+      let role = this.userTyService.getRoleFromToken();
+      this.userRole = val || role;
 
-        this.fetchRatingSettings();
-        this.GetAllStock();
-        this.GetAllUsers();
-        this.GetAllScheduledActivities();
-    
-        this.userStore.getFullNameFromStore().subscribe(val => {
-          let fullNameFromToken = this.userTyService.getFullNameFromToekn();
-          this.fullName = val || fullNameFromToken;
-        });
-    
-        this.userStore.getUserIdFromStore().subscribe(val =>{
-          let userid = this.userTyService.getUserIdFromToken();
-            this.userID = userid;
-        });
-    }); 
+      this.userStore.getUserIdFromStore().subscribe(val => {
+        let userid = this.userTyService.getUserIdFromToken();
+          this.userID = userid;
+
+          if (this.userRole === "Admin"){
+            this.ReadAllNotificationAdmin();
+          }
+          else if (this.userRole === "Supervisor"){
+            this.ReadAllNotificationSupervisor(this.userID);
+          }
+          else if (this.userRole === "Farm Worker"){
+            this.ReadAllNotificationUser();
+          }
+      });
+    });
+
+    console.log(this.userRole);
+
+    this.GetAllStock();
+    this.fetchRatingSettings();
+    this.GetAllUsers();
+    this.GetAllScheduledActivities();
+
+    this.userStore.getFullNameFromStore().subscribe(val => {
+      let fullNameFromToken = this.userTyService.getFullNameFromToekn();
+      this.fullName = val || fullNameFromToken;
+    });
   }
 
-  ReadAllNotificationSupervisor(): void {
-    this.notificationService.getNotificationSupervisor().subscribe({
+  async ReadAllNotificationSupervisor(id: number): Promise<void> {
+    this.notificationService.getNotificationSupervisor(id).subscribe({
       next: (notifications) => {
-        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
+        this.notifications = notifications;
+        // .filter(n => n.user_ID === Number(this.userID))
       },
       error: (response) => {
         console.log(response);
@@ -208,7 +212,7 @@ export class ViewDashboardComponent implements OnInit {
   }
 
   GetAllScheduledActivities(): void {
-    this.scheduledActivityService.getAllScheduledActivities("").subscribe({
+    this.scheduledActivityService.getAllScheduledActivitiesDashboard().subscribe({
       next: (scheduledActivities) => {
         this.scheduledActivities = scheduledActivities;
         // Count the number of completed activities
@@ -261,7 +265,7 @@ export class ViewDashboardComponent implements OnInit {
   }
 
   GetAllUsers(): void {
-    this.userService.getAllUsers("").subscribe({
+    this.userService.getAllUsersDashboard().subscribe({
       next: (users) => {
         // Filter users by roles "User" or "Farm Worker"
         this.users = users.filter(user => {

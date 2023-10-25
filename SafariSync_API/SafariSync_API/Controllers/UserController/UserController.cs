@@ -426,6 +426,26 @@ namespace SafariSync_API.Controllers.UserController
         }
 
         [HttpGet]
+        [Route("ReadAllUsersDashboardAsync")]
+        public async Task<IActionResult> ReadAllUsersDashboardAsync()
+        {
+            try
+            {
+                var results = await safariSyncDBContext.User
+                    .Include(e => e.Ratings)
+                    .ToListAsync();
+
+                // Return an Ok response with the retrieved users
+                return Ok(results);
+            }
+            catch (Exception)
+            {
+                // Return a StatusCode 500 response if an exception occurs during the operation
+                return StatusCode(500, "Internal Server Error. Please contact support.");
+            }
+        }
+
+        [HttpGet]
         [Route("ReadAllRatingsAsync")]
         public async Task<IActionResult> ReadAllRatingsAsync()
         {

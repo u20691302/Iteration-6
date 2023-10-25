@@ -50,6 +50,26 @@ namespace SafariSync_API.Controllers.ScheduledScheduledActivityController
         }
 
         [HttpGet]
+        [Route("ReadAllScheduledActivityDashboardAsync")]
+        public async Task<IActionResult> ReadAllScheduledActivityDashboardAsync()
+        {
+            try
+            {
+                var scheduledActivity = await safariSyncDBContext.ScheduledActivity
+                    .Include(es => es.ActivityStatus)
+                    .ToListAsync();
+
+                // Return the scheduledActivity data with associated scheduledTasks
+                return Ok(scheduledActivity);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching scheduledActivity data.");
+            }
+        }
+
+        [HttpGet]
         [Route("ReadOneScheduledActivityAsync/{id}")]
         public async Task<IActionResult> ReadOneScheduledActivityAsync(int id)
         {

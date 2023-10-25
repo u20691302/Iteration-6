@@ -140,6 +140,18 @@ export class ScheduledActivityService {
     );
   }
 
+  getAllScheduledActivitiesDashboard(): Observable<ScheduledActivity[]> {
+    return this.http.get<ScheduledActivity[]>(`${this.baseApiUrl}/api/ScheduledActivity/ReadAllScheduledActivityDashboardAsync`).pipe(
+      map(scheduledActivities => {
+          return scheduledActivities;
+      }),
+      catchError(error => {
+        console.log(error);
+        throw error;
+      })
+    );
+  }
+
   getOneScheduledActivity(id: number): Observable<ScheduledActivity> {
     return this.http.get<ScheduledActivity>(`${this.baseApiUrl}/api/ScheduledActivity/ReadOneScheduledActivityAsync/${id}`);
   } 
