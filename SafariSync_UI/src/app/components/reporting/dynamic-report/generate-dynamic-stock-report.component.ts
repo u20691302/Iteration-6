@@ -47,6 +47,7 @@ export class GenerateDynamicStockReportComponent implements OnInit   {
   retrievedUserID: number = 0;
   selectedsupp:string="";
 
+
   addUpdateStockRequest: Stock = {
     stock_ID: 0,
     stock_Name: '',

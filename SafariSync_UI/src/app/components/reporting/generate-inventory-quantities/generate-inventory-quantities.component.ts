@@ -1,131 +1,95 @@
-import { AfterViewInit, Component, OnInit, TemplateRef } from '@angular/core';
-import { Stock } from 'src/app/models/stock/stock.model';
-import { StockService } from 'src/app/services/stock/stock.service';
+import { Component, OnInit } from '@angular/core';
+import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
+import { ScheduledActivityService } from 'src/app/services/scheduleActivity/schedule-activity.service';
+import { ActivityService } from 'src/app/services/activity/activity.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgForm } from '@angular/forms';
-import { StockSupplier } from 'src/app/models/stock/stockSupplier.model';
-import { Observable, tap } from 'rxjs';
-import { Supplier } from 'src/app/models/supplier/supplier.model';
-import { SupplierService } from 'src/app/services/supplier/supplier.service';
-import { ViewChild, ElementRef } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl, SafeUrl  } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import jsPDF, * as jspdf from 'jspdf';
 import 'jspdf-autotable';
 import {UserOptions} from "jspdf-autotable"
-import { UserService } from 'src/app/services/user/user.service';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
-import { EquipmentService } from 'src/app/services/equipment/equipment.service';
-import { Equipment } from 'src/app/models/equipment/equipment.model';
-import { EquipmentSupplier } from 'src/app/models/equipment/equipmentSupplier.model';
+import { UserService } from 'src/app/services/user/user.service';
+import { ReportsService } from 'src/app/services/reports/reports.service';
+import { Report } from 'src/app/models/report/report.model';
+
+
+
 
 @Component({
   selector: 'app-generate-inventory-quantities',
   templateUrl: './generate-inventory-quantities.component.html',
   styleUrls: ['./generate-inventory-quantities.component.scss']
 })
-export class GenerateInventoryQuantitiesComponent {
-
-  constructor(private equipmentService: EquipmentService, private sanitizer: DomSanitizer, private stockService: StockService, private supplierService: SupplierService, private modalService: NgbModal, private userService: UserService, private userStore: UserStoreService) { }
-
-  stocks: Stock[] = [];
-  stockName = "";
-  stockSupplier: StockSupplier[] = [];
-  suppliers: Supplier[] = [];
-  addUpdateSuppliers: Supplier[] = [];
-  selectedSupplier: number | null = null;
-  isSupplierListEmpty: boolean = true;
+export class GenerateInventoryQuantitiesComponent implements OnInit {
+  scheduledActivities: ScheduledActivity[] = [];
   searchTerm: string = '';
-  isAddMode: boolean = true;
-  output: string = '';
-  fullName: string = '';
-  totalquan: number = 0;
-  totalquan1: number = 0;
-  totalquan2: number = 0;
-
-
-
 
   generatedPdf: any;
   pdfSrc: SafeResourceUrl = '';
 
   downloadReport: jsPDF = new jsPDF('portrait', 'px', 'a4');
 
+  totalActivities: number = 0;
+  inProgressActivities:number = 0;
+
+  pendingScheduling:number = 0;
+  completedActivities:number = 0;
+
+  public fullName: string = "";
+  public surname: string = "";
+
+  retrievedUserID: number = 0;
 
 
-  addUpdateStockRequest: Stock = {
-    stock_ID: 0,
-    stock_Name: '',
-    stock_Description: '',
-    stock_Quantity_On_Hand: 0,
-    stock_Low_Level_Warning: 0,
-    stockSupplier: [
-      {
-        stockSupplier_ID: 0,
-        stock_ID: 0,
-        supplier_ID: 0,
-        supplier: {
-          supplier_ID: 0,
-          supplier_Name: '',
-          supplier_Phone_Number: '',
-          supplier_Email_Address: '',
-          supplier_Address: '',
-          supplierType_ID: 0,
-          supplierType: {
-            supplierType_ID: 0,
-            supplierType_Name: '',
-          }
-        },
-      },
-    ],
-  };
 
-  Stock: Stock = {
-    stock_ID: 0,
-    stock_Name: '',
-    stock_Description: '',
-    stock_Quantity_On_Hand: 0,
-    stock_Low_Level_Warning: 0,
-    stockSupplier: [
-      {
-        stockSupplier_ID: 0,
-        stock_ID: 0,
-        supplier_ID: 0,
-        supplier: {
-          supplier_ID: 0,
-          supplier_Name: '',
-          supplier_Phone_Number: '',
-          supplier_Email_Address: '',
-          supplier_Address: '',
-          supplierType_ID: 0,
-          supplierType: {
-            supplierType_ID: 0,
-            supplierType_Name: '',
-          }
-        },
-      },
-    ],
-  };
 
-  AddUpdateStockSupplierRequest: StockSupplier = {
-    stockSupplier_ID: 0,
-    stock_ID: 0,
-    supplier_ID: 0
-  };
+  constructor(private userService: UserService, private reportsService: ReportsService, private userTyService: UserService, private userStore: UserStoreService, private scheduledActivityService: ScheduledActivityService, private modalService: NgbModal, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
-    this.GetAllStock();
-    this.GetAllEquipment();
-    //get the users name
+    this.getAllScheduledActivities();
+
     this.userStore.getFullNameFromStore().subscribe(val => {
-      let fullNameFromToken = this.userService.getFullNameFromToekn();
+      let fullNameFromToken = this.userTyService.getFullNameFromToekn();
       this.fullName = val || fullNameFromToken;
     });
+
+    this.userStore.getUserIdFromStore().subscribe(val => {
+      let idFromToken = this.userService.getUserIdFromToken();
+      this.retrievedUserID = val || idFromToken;
+    });
+    
+    this.userStore.getSurnameFromStore().subscribe(val => {
+      let surnamefromToken = this.userTyService.getSurnameFromToken();
+      this.surname = val || surnamefromToken;
+    });
+
   }
 
-  GetAllStock(): void {
-    this.stockService.getAllStocks(this.searchTerm).subscribe({
-      next: (stock) => {
-        this.stocks = stock;
+  getAllScheduledActivities(): void {
+    this.scheduledActivityService.getAllScheduledActivities(this.searchTerm).subscribe({
+      next: (activities) => {
+        this.scheduledActivities = activities;
+        // Count the number of completed activities
+        const completeddActivities = this.scheduledActivities.filter(
+          (activity) => activity.activityStatus?.activity_Status === 'Completed'
+        );
+         this.completedActivities = completeddActivities.length;
+         // Count the number of inprogress activities
+        const inprog = this.scheduledActivities.filter(
+          (activity) => activity.activityStatus?.activity_Status === 'In Progress'
+        );
+         this.inProgressActivities = inprog.length;
+        // Count the total number of all activities
+         this.totalActivities = this.scheduledActivities.length;
+       
+
+        // Count the notstarted activities
+        const notstartact = this.scheduledActivities.filter(
+          (activity) => activity.activityStatus?.activity_Status === 'Not Started'
+        );
+         this.pendingScheduling = notstartact.length;
+
+
       },
       error: (response) => {
         console.log(response);
@@ -133,93 +97,19 @@ export class GenerateInventoryQuantitiesComponent {
     });
   }
 
-  OnSearch(): void {
-    this.GetAllStock();
-  }
-
-  ClearSearchTerm(): void {
-    this.searchTerm = '';
-    this.OnSearch();
-  }
-
-  LoadStock(id:number, content: any){
-    this.GetAllSuppliers();
-    this.isAddMode = false;
-    if (!isNaN(id)) {
-      this.stockService.loadStock(id)
-      .subscribe({
-        next: (response) => {
-          this.addUpdateStockRequest = response;
-          const modalRef = this.modalService.open(content, {
-            size: 'dialog-centered',
-            backdrop: 'static'
-          });
-          this.loadSuppliersIntoArray();
-        }
-      })
-    }
-  }
-
-  LoadStockSupplier(id:number): void {
-    this.stockService.LoadStockSupplier(id).subscribe({
-      next: (stockSuppliers) => {
-        this.AddUpdateStockSupplierRequest = stockSuppliers;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
-
-  GetAllSuppliers(): void {
-    this.supplierService.getAllSuppliers(this.searchTerm).subscribe({
-      next: (suppliers) => {
-        this.suppliers = suppliers;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
-
-  LoadSupplier(id: number, content: any) {
-    this.isAddMode = false;
-    if (!isNaN(id)) {
-      this.stockService.loadStock(id).subscribe({
-        next: (response) => {
-          this.addUpdateStockRequest = response;
-          this.stockName = this.addUpdateStockRequest.stock_Name;
-          this.loadSuppliersIntoArray();
-          const modalRef = this.modalService.open(content, {
-            size: 'lg',
-            centered: true,
-            backdrop: 'static'
-          });
-        }
-      });
-    }
-  }
-
-  loadSuppliersIntoArray() {
-    this.addUpdateSuppliers = this.addUpdateStockRequest.stockSupplier
-      ?.map(supplierItem => supplierItem.supplier)
-      .filter(supplier => supplier !== undefined) as Supplier[];
-      this.isSupplierListEmpty = this.addUpdateSuppliers.length === 0;
-  }  
-  
   generatePDF() {
     const doc = new (jspdf as any).jsPDF('portrait', 'px', 'a4');
   
-    const fullnamee = "Generated By: " + this.fullName;
+    const fullnamee = "Generated By: " + this.fullName + " " + this.surname;
     const date = "Date Generated: " + new Date();
     const title = "Report Name: " + "Inventory Report";
-
+  
     function addHeader(doc: any, isFirstPage: boolean) {
       const headerText = 'SafariSync';
       const headerHeight = 30;
       const headerColor = '#001844';
-
-    const pageCount = doc.internal.getNumberOfPages();
+  
+      const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(12);
@@ -259,7 +149,7 @@ export class GenerateInventoryQuantitiesComponent {
     function addFooter(doc: any) {
       const footerHeight = 30;
       const footerColor = '#FF0000'; // Red color
-    
+  
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
@@ -268,7 +158,7 @@ export class GenerateInventoryQuantitiesComponent {
         doc.setFontSize(12);
         doc.setTextColor(255);
         doc.text("EPI-USE", 10, doc.internal.pageSize.getHeight() - footerHeight / 2);
-    
+  
         // Add the image to the bottom right of the footer
         const imageWidth = 50; // Adjust the width of the image as needed
         const imageHeight = 20; // Adjust the height of the image as needed
@@ -278,38 +168,74 @@ export class GenerateInventoryQuantitiesComponent {
       }
     }
   
-    let startY = 80;
-  addHeader(doc, true);
+      // Filter the activities based on their status
+    const completedActivities = this.scheduledActivities.filter(activity =>
+      activity.activityStatus?.activity_Status === 'Completed'
+    );
 
-  const combinedData = []; // This array will store combined data for equipment and stock
+    const inProgressActivities = this.scheduledActivities.filter(activity =>
+      activity.activityStatus?.activity_Status === 'In Progress'
+    );
 
-  // Combine data from stocks into the combinedData array
-  this.stocks.forEach((stock) => {
-    combinedData.push([stock.stock_Name, stock.stock_Quantity_On_Hand.toString(), "Stock"]);
-  });
+    const notStartedActivities = this.scheduledActivities.filter(activity =>
+      activity.activityStatus?.activity_Status === 'Not Started'
+    );
 
-  // Combine data from equipment into the combinedData array
-  this.equipments.forEach((equipment) => {
-    combinedData.push([equipment.equipment_Name, equipment.equipment_Quantity_On_Hand.toString(), "Equipment"]);
-  });
+    const totalCompletedActivities = completedActivities.length;
+    const totalInProgressActivities = inProgressActivities.length;
+    const totalNotStartedActivities = notStartedActivities.length;
+    const grandTotal = totalCompletedActivities + totalInProgressActivities + totalNotStartedActivities; // Calculate the grand total
 
-  // Calculate and add the total sum of quantities for equipment and stock
-  const totalQuantityStock = this.stocks.reduce((total, stock) => total + stock.stock_Quantity_On_Hand, 0);
-  const totalQuantityEquipment = this.equipments.reduce((total, equipment) => total + equipment.equipment_Quantity_On_Hand, 0);
 
-  // Add the grand total to the combinedData array
-  combinedData.push(['Grand Total', totalQuantityStock + totalQuantityEquipment, '']);
+    addHeader(doc, true);
+  let startY = 100; // Initial startY value
 
-  // Add separate totals for stock and equipment
-  combinedData.push(['Stock Subtotal', totalQuantityStock, '']);
-  combinedData.push(['Equipment Subtotal', totalQuantityEquipment, '']);
+  // Create a table for completed activities
+  if (completedActivities.length > 0) {
+    doc.text("Completed Activities", 14, startY);
+    doc.autoTable({
+      head: [['Name', 'Description']],
+      body: completedActivities.map(activity => [activity.activity.activity_Name, activity.activity.activity_Description]),
+      startY: startY + 10, // Add vertical spacing
+    });
+    startY = doc.autoTable.previous.finalY + 15; // Update startY for the next table
+  }
 
-  // Generate the table with combined data
-  doc.autoTable({
-    head: [['Name', 'Quantity', 'Type']],
-    body: combinedData,
-    startY: startY,
-  });
+  // Create a table for in-progress activities
+  if (inProgressActivities.length > 0) {
+    doc.text("In Progress Activities", 14, startY);
+    doc.autoTable({
+      head: [['Name', 'Description']],
+      body: inProgressActivities.map(activity => [activity.activity.activity_Name, activity.activity.activity_Description]),
+      startY: startY + 10, // Add vertical spacing
+    });
+    startY = doc.autoTable.previous.finalY + 15; // Update startY for the next table
+  }
+
+  // Create a table for not started/ending activities
+  if (notStartedActivities.length > 0) {
+    doc.text("Not Started/Ending Activities", 14, startY);
+    doc.autoTable({
+      head: [['Name', 'Description']],
+      body: notStartedActivities.map(activity => [activity.activity.activity_Name, activity.activity.activity_Description]),
+      startY: startY + 10, // Add vertical spacing
+    });
+    startY = doc.autoTable.previous.finalY + 15; // Update startY for the next table
+  }
+
+ // Create a table for totals
+doc.text("Activity Status Totals", 14, startY);
+doc.autoTable({
+  head: [['Status', 'Total']],
+  body: [
+    ['Completed', totalCompletedActivities],
+    ['In Progress', totalInProgressActivities],
+    ['Not Started', totalNotStartedActivities],
+    // Add a row for the grand total with bold text
+    [{ content: 'Total Number of Scheduled Activites', styles: { fontStyle: 'bold' } }, grandTotal],
+  ],
+  startY: startY + 15, // Add vertical spacing
+});
 
   addFooter(doc);
 
@@ -319,296 +245,61 @@ export class GenerateInventoryQuantitiesComponent {
   this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
 
   this.downloadReport = doc;
+  this.SaveReport();
+
 }
-
-
-
-OpenPDFModal(content: any) {
-  const modalRef = this.modalService.open(content, {
-    size: 'dialog-centered',
-    backdrop: 'static'
-  });
-}
-
-downloadPDF() {
-  this.downloadReport.save('Equipment Report' + ' ' + new Date());
-}
-
-
-
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
-equipments: Equipment[] = [];
-  equipmentName = "";
-  equipmentSupplier: EquipmentSupplier[] = [];
-  suppliersEquip: Supplier[] = [];
-  addUpdateSuppliersEquip: Supplier[] = [];
-  selectedSupplierEquip: number | null = null;
-  isSupplierListEmptyEquip: boolean = true;
-  searchTermEquip: string = '';
-  isAddModeEquip: boolean = true;
-  outputEquip: string = '';
-
-
-  addUpdateEquipmentRequest: Equipment = {
-    equipment_ID: 0,
-    equipment_Name: '',
-    equipment_Description: '',
-    equipment_Quantity_On_Hand: 0,
-    equipment_Low_Level_Warning: 0,
-    equipmentSupplier: [
-      {
-        equipmentSupplier_ID: 0,
-        equipment_ID: 0,
-        supplier_ID: 0,
-        supplier: {
-          supplier_ID: 0,
-          supplier_Name: '',
-          supplier_Phone_Number: '',
-          supplier_Email_Address: '',
-          supplier_Address: '',
-          supplierType_ID: 0,
-          supplierType: {
-            supplierType_ID: 0,
-            supplierType_Name: '',
-          }
-        },
-      },
-    ],
-  };
-
-  Equipment: Equipment = {
-    equipment_ID: 0,
-    equipment_Name: '',
-    equipment_Description: '',
-    equipment_Quantity_On_Hand: 0,
-    equipment_Low_Level_Warning: 0,
-    equipmentSupplier: [
-      {
-        equipmentSupplier_ID: 0,
-        equipment_ID: 0,
-        supplier_ID: 0,
-        supplier: {
-          supplier_ID: 0,
-          supplier_Name: '',
-          supplier_Phone_Number: '',
-          supplier_Email_Address: '',
-          supplier_Address: '',
-          supplierType_ID: 0,
-          supplierType: {
-            supplierType_ID: 0,
-            supplierType_Name: '',
-          }
-        },
-      },
-    ],
-  };
-
-  AddUpdateEquipmentSupplierRequest: EquipmentSupplier = {
-    equipmentSupplier_ID: 0,
-    equipment_ID: 0,
-    supplier_ID: 0
-  };
-
-
-  GetAllEquipment(): void {
-    this.equipmentService.getAllEquipments(this.searchTermEquip).subscribe({
-      next: (equipment) => {
-        this.equipments = equipment;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
-
-  OnSearchEquip(): void {
-    this.GetAllEquipment();
-  }
-
-  ClearSearchTermEquip(): void {
-    this.searchTerm = '';
-    this.OnSearch();
-  }
-
-  OpenAddModal(content:any){
-    this.isAddMode = true;
-    this.addUpdateEquipmentRequest = {
-      equipment_ID: 0,
-      equipment_Name: '',
-      equipment_Description: '',
-      equipment_Quantity_On_Hand: 0,
-      equipment_Low_Level_Warning: 0
-    };
-    this.addUpdateSuppliers = [];
-    this.GetAllSuppliers();
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-  }
-
-  AddEquipment(success: any, failed:any) {
-    this.Equipment = {
-      equipment_ID: 0,
-      equipment_Name: this.addUpdateEquipmentRequest.equipment_Name,
-      equipment_Description: this.addUpdateEquipmentRequest.equipment_Description,
-      equipment_Quantity_On_Hand: this.addUpdateEquipmentRequest.equipment_Quantity_On_Hand,
-      equipment_Low_Level_Warning: this.addUpdateEquipmentRequest.equipment_Low_Level_Warning,
-      suppliers: this.addUpdateSuppliers
-    };
-    console.log(this.Equipment); // Verify the content of this.Equipment
-    this.equipmentService.AddEquipment(this.Equipment).subscribe({
-      next: (equipment: Equipment) => {
-        this.ngOnInit();
-        const modalRef = this.modalService.open(success, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      },
-      error: (response: any) => {
-        console.log(response);
-        const modalRef = this.modalService.open(failed, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      }
-    });
-  }
-
-  LoadEquipment(id:number, content: any){
-    this.GetAllSuppliers();
-    this.isAddMode = false;
-    if (!isNaN(id)) {
-      this.equipmentService.loadEquipment(id)
-      .subscribe({
-        next: (response) => {
-          this.addUpdateEquipmentRequest = response;
-          const modalRef = this.modalService.open(content, {
-            size: 'dialog-centered',
-            backdrop: 'static'
-          });
-          this.loadSuppliersIntoArray();
-        }
-      })
-    }
-  }
-
-  OpenUpdateModal(content:any){
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-  }
-
-  UpdateEquipment(success: any, failed:any) {
-    this.addUpdateEquipmentRequest = {
-      equipment_ID: this.addUpdateEquipmentRequest.equipment_ID,
-      equipment_Name: this.addUpdateEquipmentRequest.equipment_Name,
-      equipment_Description: this.addUpdateEquipmentRequest.equipment_Description,
-      equipment_Quantity_On_Hand: this.addUpdateEquipmentRequest.equipment_Quantity_On_Hand,
-      equipment_Low_Level_Warning: this.addUpdateEquipmentRequest.equipment_Low_Level_Warning,
-      suppliers: this.addUpdateSuppliers
-    };
-    this.equipmentService.updateEquipment(this.addUpdateEquipmentRequest).subscribe({
-      next: (equipment: Equipment) => {
-        this.ngOnInit();
-        const modalRef = this.modalService.open(success, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      },
-      error: (response: any) => {
-        console.log(response);
-        const modalRef = this.modalService.open(failed, {
-          size: 'dialog-centered',
-          backdrop: 'static'
-        });
-      }
-    });
-  }
-
-  OpenAddUpdateConfirmDetailsModal(content: any) {
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-    this.Equipment = this.addUpdateEquipmentRequest;
-    // const selectedEquipmentType = this.equipmentSupplier.find(type => type.equipmentType_ID === Number(this.equipment.equipmentType_ID));
-    // this.output = selectedEquipmentType ? selectedEquipmentType.equipmentType_Name : 'Cannot Find Equipment Type';
-  }
-
-  OpenDeleteModal(content: any, equipment: Equipment) {
-    const modalRef = this.modalService.open(content, {
-      size: 'dialog-centered',
-      backdrop: 'static'
-    });
-    this.Equipment = equipment;
-  }
-
-
-  LoadEquipmentSupplier(id:number): void {
-    this.equipmentService.LoadEquipmentSupplier(id).subscribe({
-      next: (equipmentSuppliers) => {
-        this.AddUpdateEquipmentSupplierRequest = equipmentSuppliers;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
-
-  GetAllSuppliersEquip(): void {
-    this.supplierService.getAllSuppliers(this.searchTerm).subscribe({
-      next: (suppliers) => {
-        this.suppliers = suppliers;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
-
-  LoadSupplierEquip(id: number, content: any) {
-    this.isAddMode = false;
-    if (!isNaN(id)) {
-      this.equipmentService.loadEquipment(id).subscribe({
-        next: (response) => {
-          this.addUpdateEquipmentRequest = response;
-          this.equipmentName = this.addUpdateEquipmentRequest.equipment_Name;
-          this.loadSuppliersIntoArray();
-          const modalRef = this.modalService.open(content, {
-            size: 'lg',
-            centered: true,
-            backdrop: 'static'
-          });
-        }
-      });
-    }
-  }
-
-  loadSuppliersIntoArrayEquip() {
-    this.addUpdateSuppliers = this.addUpdateEquipmentRequest.equipmentSupplier
-      ?.map(supplierItem => supplierItem.supplier)
-      .filter(supplier => supplier !== undefined) as Supplier[];
-      this.isSupplierListEmpty = this.addUpdateSuppliers.length === 0;
-  }  
-
-
-  calculateTotalQuantity(items: any[]): number {
-    return items.reduce((total, item) => total + item.stock_Quantity_On_Hand, 0);
-}
-
-calculateTotalQuantityEquip(items: any[]): number {
-  return items.reduce((total, item) => total + item.equipment_Quantity_On_Hand, 0);
-}
-
-
-
-
   
+    
+  
+
+  downloadPDF() {
+    this.downloadReport.save('Scheduled Activities Report' + ' ' + new Date());
+  }
+
+  OpenPDFModal(content: any) {
+    const modalRef = this.modalService.open(content, {
+      size: 'dialog-centered',
+      backdrop: 'static'
+    });
+  }
+
+  saveReportRequest: Report = {
+    report_ID: 0,
+    report_Title: '',
+    createdAt: new Date(),
+    user_ID: 0,
+    pdfUrl: ''
+  };
+  
+
+  async SaveReport() {
+    const blobUrl = URL.createObjectURL(this.generatedPdf);
+  
+    // Convert the blob URL to base64
+    const pdfBlob = await fetch(blobUrl).then(response => response.blob());
+    const pdfBlobBuffer = await pdfBlob.arrayBuffer();
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBlobBuffer)));
+  
+    this.saveReportRequest = {
+      report_ID: 0,
+      report_Title: 'Scheduled Activities Report',
+      createdAt: new Date(),
+      user_ID: this.retrievedUserID,
+      pdfUrl: pdfBase64 // Add the serialized PDF data here
+    };
+  
+    this.reportsService.SaveReport(this.saveReportRequest)
+      .subscribe(
+        (response) => {
+          console.log('Report saved successfully:', response);
+          // Handle success, you can show a success message or perform other actions
+        },
+        (error) => {
+          console.error('Error saving report:', error);
+          // Handle error, you can show an error message or perform other actions
+        }
+      );
+  }
+
+
 }

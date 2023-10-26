@@ -15,19 +15,27 @@ export class NotificationService {
 
   constructor(private http: HttpClient) { }
 
-  getNotificationSupervisor(id: number): Observable<NotificationSupervisor[]> {
-    return this.http.get<NotificationSupervisor[]>(`${this.baseApiUrl}/api/Notification/ReadSupervisorNotifications/${id}`);
+  getNotificationSupervisor1(id: number): Observable<NotificationSupervisor[]> {
+    return this.http.get<NotificationSupervisor[]>(`${this.baseApiUrl}/api/Notification/ReadSupervisorNotifications1/${id}`);
   } 
+
+  getNotificationUser1(id: number): Observable<NotificationUser[]> {
+    return this.http.get<NotificationUser[]>(`${this.baseApiUrl}/api/Notification/ReadUserNotifications1/${id}`);
+  } 
+
+
 
   getNotificationAdmin(): Observable<NotificationAdmin[]> {
     return this.http.get<NotificationAdmin[]>(`${this.baseApiUrl}/api/Notification/ReadAdminNotifications`);
   } 
 
+  getNotificationSupervisor(): Observable<NotificationSupervisor[]> {
+    return this.http.get<NotificationSupervisor[]>(`${this.baseApiUrl}/api/Notification/ReadSupervisorNotifications`);
+  } 
+
   getNotificationUser(): Observable<NotificationUser[]> {
     return this.http.get<NotificationUser[]>(`${this.baseApiUrl}/api/Notification/ReadUserNotifications`);
   } 
-
-
 
 
 
@@ -42,7 +50,6 @@ export class NotificationService {
   AddNotifcationSupervisor(addNotificationSupervisorRequest: NotificationSupervisor): Observable<NotificationSupervisor> {
     return this.http.post<NotificationSupervisor>(this.baseApiUrl + '/api/Notification/AddNotificationSupervisor/', addNotificationSupervisorRequest);
   }
-
 
 
 

@@ -59,7 +59,7 @@
       <tr>
         <td>{{ report.report_Title }}</td>
         <td>{{ report.user?.username }} {{ report.user?.surname }}</td>
-        <td>{{ report.createdAt }}</td>
+        <td>{{ report.createdAt | date:'short' }}</td>
         <td>
           <div class="button-container">
             <button class="btn-update" (click)="OpenPDFModal(PDFModal, report.pdfUrl)"> 

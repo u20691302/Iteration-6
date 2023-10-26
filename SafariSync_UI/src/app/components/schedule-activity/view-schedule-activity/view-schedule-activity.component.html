@@ -50,7 +50,10 @@
         <td>{{ scheduledActivity.activity.activity_Description }}</td>
         <td>{{ scheduledActivity.startDate | date:'short'}}</td>
         <td>{{ scheduledActivity.endDate | date:'short'}}</td>
-        <td>{{ scheduledActivity.activity_Location }}</td>
+        <td>
+          {{ scheduledActivity.activity_Location }}
+          <button class="btn-form-add" (click)="openMapsModal(MapsModel, scheduledActivity.activity_Location)">View on Map</button>
+        </td>
         <td>
           {{ scheduledActivity.users?.username }} {{ scheduledActivity.users?.surname }}
           <p *ngIf="isScheduledActivityNotified(scheduledActivity.scheduledActivity_ID) === 1" style="color:green;">
@@ -297,9 +300,20 @@
             </div>
           </div>                                            
 
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="scheduledActivity_Location" class="form-label">Location</label>
             <input type="text" class="text-input form-control" id="scheduledActivity_Location" name="scheduledActivity_Location" [(ngModel)]="addUpdateScheduledActivityRequest.activity_Location" required>
+            <div *ngIf="form.controls['scheduledActivity_Location']?.invalid && (form.controls['scheduledActivity_Location']?.dirty || form.controls['scheduledActivity_Location']?.touched)">
+              <div *ngIf="form.controls['scheduledActivity_Location']?.errors?.['required']">
+                <p class="validation-notification">Scheduled Activity Location is required.</p>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="mb-3">
+            <label for="scheduledActivity_Location" class="form-label">Location</label>
+            <input type="text" class="text-input form-control" id="scheduledActivity_Location" name="scheduledActivity_Location" [(ngModel)]="addUpdateScheduledActivityRequest.activity_Location" >
+            <button type="button" class="btn-add" (click)="openMapsModal(MapsModel, addUpdateScheduledActivityRequest.activity_Location);">Maps</button>
             <div *ngIf="form.controls['scheduledActivity_Location']?.invalid && (form.controls['scheduledActivity_Location']?.dirty || form.controls['scheduledActivity_Location']?.touched)">
               <div *ngIf="form.controls['scheduledActivity_Location']?.errors?.['required']">
                 <p class="validation-notification">Scheduled Activity Location is required.</p>
@@ -850,7 +864,23 @@
   <div class="modal-body">
     <p><b>This scheduled task's status has been successfully updated.</b></p>
     <div class="text-center">
-      <button type="button" class="btn-update" (click)="modal.close('Close click'); ngOnInit()">OK</button>
+      <button type="button" class="btn-update" (click)="modal.close('Close click');">OK</button>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
+
+<!-- Status Update Confirmation -->
+<ng-template #MapsModel let-modal class="modal fade">
+  <div class="modal-header">
+    <h5 class="modal-title">Choose the Location</h5>
+  </div>
+  <div class="modal-body">
+    <div class="full" id="maps">
+
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn-update" (click)="clearLocation(); modal.close('Close click');">OK</button>
     </div>
   </div>
   <div class="modal-footer"></div>

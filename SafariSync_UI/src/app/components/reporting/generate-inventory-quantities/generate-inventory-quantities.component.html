@@ -1,5 +1,5 @@
 <div class="top-panel">
-    <h3>Generate Inventory Quantities Report</h3>
+  <h3>Generate Scheduled Activity Report</h3>
 </div>
 
 <!-- Toolbar -->
@@ -12,22 +12,11 @@
     </div>
     <div class="col-md-4 d-flex justify-content-end">
       <div class="input-group custom-search-bar">
-        <input type="text" class="text-input input form-control flex-fill" placeholder="Search Stocks..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="OnSearch()">
-        <span class="input-group-text" *ngIf="searchTerm" (click)="ClearSearchTerm()">
+        <input type="text" class="text-input input form-control flex-fill" placeholder="Search Scheduled Activities..." name="searchString" autocomplete="off" [(ngModel)]="searchTerm" (ngModelChange)="getAllScheduledActivities()">
+        <span class="input-group-text" *ngIf="searchTerm" (click)="searchTerm = ''">
           <i class="fa-solid fa-times"></i>
         </span>
         <span class="input-group-text" *ngIf="!searchTerm">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </span>
-      </div>
-    </div>
-    <div class="col-md-4 d-flex justify-content-end">
-      <div class="input-group custom-search-bar">
-        <input type="text" class="text-input input form-control flex-fill" placeholder="Search Equipment..." name="searchStringEquip" autocomplete="off" [(ngModel)]="searchTermEquip" (ngModelChange)="OnSearchEquip()">
-        <span class="input-group-text" *ngIf="searchTermEquip" (click)="ClearSearchTermEquip()">
-          <i class="fa-solid fa-times"></i>
-        </span>
-        <span class="input-group-text" *ngIf="!searchTermEquip">
           <i class="fa-solid fa-magnifying-glass"></i>
         </span>
       </div>
@@ -36,80 +25,53 @@
 </div>
 
 <div class="tables-container">
-  <!-- Stock Table and Search -->
-<div class="table-container">
+  <!-- Scheduled Activity Table -->
+  <div class="table-container">
     <table class="table table-hover">
-        <thead>
-            <tr>
-                <th><u>Stock Name</u></th>
-                <th><u>Quantity on Hand</u></th>
-            </tr>
-        </thead>
-        <tbody *ngFor="let stock of stocks">
-            <tr>
-                <td>{{ stock.stock_Name }}</td>
-                <td>{{ stock.stock_Quantity_On_Hand }}</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td><strong>Total Quantity:</strong></td>
-                <td><strong>{{ calculateTotalQuantity(stocks) }}</strong></td>
-            </tr>
-        </tfoot>
-        <tbody *ngIf="stocks.length === 0">
-            <tr>
-                <td colspan="2">No Stock Listings</td>
-            </tr>
-        </tbody>
+      <thead>
+        <tr>
+          <th><u>Scheduled Activity Name</u></th>
+          <th><u>Start Date</u></th>
+          <th><u>End Date</u></th>
+          <th><u>Status</u></th>
+          <!-- Add more columns as needed -->
+        </tr>
+      </thead>
+      <tbody *ngFor="let activity of scheduledActivities">
+        <tr>
+          <td>{{ activity.activity.activity_Name }}</td>
+          <td>{{ activity.startDate| date: 'short' }}</td>
+          <td>{{ activity.endDate| date: 'short' }}</td>
+          <td>{{ activity.activityStatus?.activity_Status }}</td>
+          <!-- Add more columns as needed -->
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>Total Scheduled Activities:</strong></td>
+          <td><strong>{{ scheduledActivities.length }}</strong></td>
+          <!-- Add more columns as needed -->
+        </tr>
+      </tfoot>
+      <tbody *ngIf="scheduledActivities.length === 0">
+        <tr>
+          <td colspan="2">No Scheduled Activities</td>
+        </tr>
+      </tbody>
     </table>
-</div>
-
-<!-- Equipment Table and Search -->
-<div class="table-container">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th><u>Equipment Name</u></th>
-                <th><u>Quantity on Hand</u></th>
-            </tr>
-        </thead>
-        <tbody *ngFor="let equipment of equipments">
-            <tr>
-                <td>{{ equipment.equipment_Name }}</td>
-                <td>{{ equipment.equipment_Quantity_On_Hand }}</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td><strong>Total Quantity:</strong></td>
-                <td><strong>{{ calculateTotalQuantityEquip(equipments) }}</strong></td>
-            </tr>
-        </tfoot>
-        <tbody *ngIf="equipments.length === 0">
-            <tr>
-                <td colspan="2">No Equipment Listings</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-</div>
-
-
-
-<div class="button-container">
-  <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)" >Generate PDF</button> 
-</div>
-
-<div class="button-container">
-    <h3>Total Inventory Quantity is: {{ calculateTotalQuantityEquip(equipments) + calculateTotalQuantity(stocks) }}</h3>
   </div>
+</div>
+
+<div class="button-container">
+  <button class="Generate-button" (click)="generatePDF(); OpenPDFModal(PDFModal)">Generate PDF</button>
+</div>
+
+
 
 <!-- PDF modal template -->
 <ng-template #PDFModal let-modal class="modal fade">
   <div class="modal-header">
-    <h5 class="modal-title">Generated Stock Report</h5>
+    <h5 class="modal-title">Generated Scheduled Activity Report</h5>
   </div>
   <div class="modal-body">
     <!-- Embed the PDF using an iframe -->
@@ -122,79 +84,3 @@
   </div>
   <div class="modal-footer"></div>
 </ng-template>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-<!-- View Suppliers Modal -->
-<ng-template #ViewSuppliers let-modal class="modal fade">
-  <div class="modal-header">
-    <h5 class="modal-title">Suppliers of {{stockName}} </h5>
-  </div>
-  <div class="modal-body">
-    <div class="supplier-table-container">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th><u>Supplier Name</u></th>
-            <th><u>Phone Number</u></th>
-            <th><u>Email Address</u></th>
-            <th><u>Address</u></th>
-            <th><u>Type</u></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let supplier of addUpdateStockRequest.stockSupplier">
-            <td>{{ supplier.supplier?.supplier_Name }}</td>
-            <td>{{ supplier.supplier?.supplier_Phone_Number }}</td>
-            <td>{{ supplier.supplier?.supplier_Email_Address }}</td>
-            <td>{{ supplier.supplier?.supplier_Address }}</td>
-            <td>{{ supplier.supplier?.supplierType?.supplierType_Name }}</td>
-            
-          </tr>
-        </tbody>
-        <tbody *ngIf="stocks.length === 0">
-          <tr>
-            <td colspan="6">No Supplier Listings</td>
-          </tr>
-        </tbody>
-      </table>
-
-    </div>
-    <div class="modal-button-container">
-      <button class="btn-return" (click)="modal.close('Close click')">Return</button>
-    </div>
-  </div>
-  <div class="modal-footer"></div>
-</ng-template> 
-
-
-
-
-

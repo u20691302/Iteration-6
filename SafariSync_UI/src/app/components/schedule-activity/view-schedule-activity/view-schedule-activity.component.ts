@@ -26,6 +26,7 @@ import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { ScheduledTaskToolbox } from 'src/app/models/scheduledActivity/scheduledTaskToolbox.model';
 import { Toolbox } from 'src/app/models/toolbox/toolbox.model';
 import { ToolboxService } from 'src/app/services/toolbox/toolbox.service';
+import { Loader } from '@googlemaps/js-api-loader';
 
 @Component({
   selector: 'app-view-schedule-activity',
@@ -34,6 +35,17 @@ import { ToolboxService } from 'src/app/services/toolbox/toolbox.service';
 })
 
 export class ViewScheduleActivityComponent implements OnInit{
+
+  title = "google-maps";
+  map: google.maps.Map | undefined; // Initialize with undefined
+  hardwareData: any[] = [ // Replace with your hardware shop data
+    { name: 'Hardware Shop 1', lat: -25.1234, lng: 28.5678 },
+    { name: 'Hardware Shop 2', lat: -26.9876, lng: 27.4321 },
+    { name: 'Hardware Shop 3', lat: -27.1234, lng: 28.4578 },
+    { name: 'Hardware Shop 4', lat: -26.5876, lng: 26.8921 },
+    { name: 'Farming  Shop 1', lat: -25.3634, lng: 28.2378 },
+    { name: 'Farming Shop 2', lat: -29.9876, lng: 26.4321 },
+  ];
 
   constructor(private toolboxService: ToolboxService, private userStore: UserStoreService, private auditService:AuditService, private notificationService: NotificationService, private contractorService: ContractorService, private userService: User1Service, private scheduledActivityService: ScheduledActivityService, private activityService: ActivityService, private modalService: NgbModal, private formBuilder: FormBuilder, private route: ActivatedRoute, private userTyService: UserService) { 
     this.form = this.formBuilder.group({
@@ -101,9 +113,11 @@ export class ViewScheduleActivityComponent implements OnInit{
 
   ActivityID: number = 0;
 
-  hasTaskStatus2: boolean = true;
-  allTasksStatus3: boolean = true;
-  noTasksStatus2: boolean = true;
+  inProgress: boolean = false;
+  completed: boolean = false;
+  notStarted: boolean = false;
+
+   saCompleted: boolean = false;
 
   addUpdateScheduledActivityRequest: ScheduledActivity = {
     scheduledActivity_ID: 0,
@@ -366,6 +380,8 @@ export class ViewScheduleActivityComponent implements OnInit{
   fullName: string = '';
   userID: number = 0;
 
+  public loader: any;
+
   ngOnInit(): void {
     this.GetAllScheduledActivities();
 
@@ -383,77 +399,133 @@ export class ViewScheduleActivityComponent implements OnInit{
       let userid = this.userTyService.getUserIdFromToken();
         this.userID = userid;
     });
+
+    this.loader = new Loader({
+      apiKey:"AIzaSyAhOThTD21QD8m8kquM3nSqqfaQnz-YdBc" // Replace with your Google Maps API key
+    });
   }
 
+  addHardwareMarkers() {
+    if (this.map) {
+      this.hardwareData.forEach((hardware) => {
+        const marker = new google.maps.Marker({
+          position: { lat: hardware.lat, lng: hardware.lng },
+          map: this.map,
+          title: hardware.name // Change  "Hardware"
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div><b>${hardware.name}</b></div>`
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(this.map, marker);
+        });
+      });
+    }
+  }
+
+
   GetAllScheduledActivities(): void {
+    this.notificationService.getNotificationSupervisor().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications;
+      }
+    });
+
     this.scheduledActivityService.getAllScheduledActivities(this.searchTerm).subscribe({
       next: (scheduledActivities) => {
         this.scheduledActivities = scheduledActivities;
+        console.log(this.scheduledActivities);
   
         for(var scheduledActivity of this.scheduledActivities ){
-          this.hasTaskStatus2 = scheduledActivity.scheduledActivityScheduledTask.some(task => task.scheduledTask.taskStatus_ID == 2);
-          this.allTasksStatus3 = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID == 3);
-          this.noTasksStatus2 = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID == 1);
-  
-          if(this.hasTaskStatus2){
-            this.ScheduledActivity = {
-              scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
-              startDate: new Date(),
-              endDate: new Date(),
-              activity_Location: '',
-              user_ID: 0,
-              activityStatus_ID: 2,
-              activity_ID: 0,
-              activity: {
-                activity_ID: 0,
-                activity_Name: '',
-                activity_Description: '',
-                activityTask: []
-              },
-              scheduledActivityScheduledTask: []
-            };
-          }
-          else if (this.allTasksStatus3) {
-            this.ScheduledActivity = {
-              scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
-              startDate: new Date(),
-              endDate: new Date(),
-              activity_Location: '',
-              user_ID: 0,
-              activityStatus_ID: 3,
-              activity_ID: 0,
-              activity: {
-                activity_ID: 0,
-                activity_Name: '',
-                activity_Description: '',
-                activityTask: []
-              },
-              scheduledActivityScheduledTask: []
-            };
-          } else if (this.noTasksStatus2) {
-              this.ScheduledActivity = {
-                scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
-                startDate: new Date(),
-                endDate: new Date(),
-                activity_Location: '',
-                user_ID: 0,
-                activityStatus_ID: 1,
-                activity_ID: 0,
-                activity: {
+
+          if (scheduledActivity.scheduledActivityScheduledTask.length>0){
+
+              this.inProgress = scheduledActivity.scheduledActivityScheduledTask.some(task => task.scheduledTask.taskStatus_ID === 2);
+              this.completed = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID === 3);
+              this.notStarted = scheduledActivity.scheduledActivityScheduledTask.every(task => task.scheduledTask.taskStatus_ID === 1);
+
+              if(this.inProgress){
+                this.ScheduledActivity = {
+                  scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+                  startDate: new Date(),
+                  endDate: new Date(),
+                  activity_Location: '',
+                  user_ID: 0,
+                  activityStatus_ID: 2,
                   activity_ID: 0,
-                  activity_Name: '',
-                  activity_Description: '',
-                  activityTask: []
-                },
-                scheduledActivityScheduledTask: []
-              };
+                  activity: {
+                    activity_ID: 0,
+                    activity_Name: '',
+                    activity_Description: '',
+                    activityTask: []
+                  },
+                  scheduledActivityScheduledTask: []
+                };
+              } else if (this.completed) {
+                  this.ScheduledActivity = {
+                    scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+                    startDate: new Date(),
+                    endDate: new Date(),
+                    activity_Location: '',
+                    user_ID: 0,
+                    activityStatus_ID: 3,
+                    activity_ID: 0,
+                    activity: {
+                      activity_ID: 0,
+                      activity_Name: '',
+                      activity_Description: '',
+                      activityTask: []
+                    },
+                    scheduledActivityScheduledTask: []
+                  };
+              } else if (this.notStarted) {
+                  this.ScheduledActivity = {
+                    scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+                    startDate: new Date(),
+                    endDate: new Date(),
+                    activity_Location: '',
+                    user_ID: 0,
+                    activityStatus_ID: 1,
+                    activity_ID: 0,
+                    activity: {
+                      activity_ID: 0,
+                      activity_Name: '',
+                      activity_Description: '',
+                      activityTask: []
+                    },
+                    scheduledActivityScheduledTask: []
+                  };
+                }
           }
-  
+          else {
+            this.ScheduledActivity = {
+              scheduledActivity_ID: scheduledActivity.scheduledActivity_ID,
+              startDate: new Date(),
+              endDate: new Date(),
+              activity_Location: '',
+              user_ID: 0,
+              activityStatus_ID: 1,
+              activity_ID: 0,
+              activity: {
+                activity_ID: 0,
+                activity_Name: '',
+                activity_Description: '',
+                activityTask: []
+              },
+              scheduledActivityScheduledTask: []
+            };
+          }
+          
           this.scheduledActivityService.updateScheduledActivityStatus(this.ScheduledActivity).subscribe({
             next: (scheduledActivity: ScheduledActivity) => {
               
             }
           });
+
+          this.saCompleted = true;
+            
         }
       }
     });
@@ -1137,6 +1209,8 @@ export class ViewScheduleActivityComponent implements OnInit{
           }
         }
         
+        this.GetAllScheduledActivities();
+
         const modalRef = this.modalService.open(success, {
           size: 'xl',
           centered: true,
@@ -1600,7 +1674,9 @@ export class ViewScheduleActivityComponent implements OnInit{
             this.activityName = this.addUpdateScheduledActivityRequest.activity.activity_Name;
             this.ActivityID = this.addUpdateScheduledActivityRequest.activity.activity_ID;
             this.filterTasksBySearchTerm(this.addUpdateScheduledActivityRequest.scheduledActivityScheduledTask);
-           
+
+            this.ngOnInit();
+
             const modalRef = this.modalService.open(content, {
               size: 'xl',
               centered: true,
@@ -1613,5 +1689,72 @@ export class ViewScheduleActivityComponent implements OnInit{
         });
       }
     });
-  }      
+  } 
+  
+  Place: string = '';
+
+  openMapsModal(content: any, location?: string){
+    let lat: number, lng: number;
+    if (location) {
+      [lat, lng] = location.split(', ').map(Number);
+    } else {
+      lat = -24.88590179999999;
+      lng = 26.4033695;
+    }
+  
+    const modalRef = this.modalService.open(content, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
+    }); 
+  
+    this.loader.load().then(() => {
+      const mapElement = document.getElementById("maps");
+      if (mapElement) {
+        this.map = new google.maps.Map(mapElement, {
+          center: { lat: lat, lng: lng },
+          zoom: 17,
+          mapTypeId: google.maps.MapTypeId.SATELLITE
+        });
+        console.log(this.map); // Log the map data
+  
+        // Create a new marker at the selected location
+        const marker = new google.maps.Marker({
+          position: { lat: lat, lng: lng },
+          map: this.map
+        });
+  
+        // Add a click event listener to the map
+        this.map.addListener('click', (event: google.maps.KmlMouseEvent) => {
+          // Check if event.latLng is not null
+          if (event.latLng) {
+            // Update the marker's position to the clicked location
+            marker.setPosition(event.latLng);
+  
+            // Save the coordinates
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+  
+            // Get the text box and set its value to the coordinates
+            const coordinatesInput = document.getElementById('scheduledActivity_Location') as HTMLInputElement;
+            coordinatesInput.value = `${lat}, ${lng}`;
+  
+            // Update addUpdateScheduledActivityRequest.activity_Location
+            this.addUpdateScheduledActivityRequest.activity_Location = coordinatesInput.value;
+  
+            // Log the value of addUpdateScheduledActivityRequest.activity_Location
+            console.log(this.addUpdateScheduledActivityRequest.activity_Location);
+          }
+        });
+  
+        this.addHardwareMarkers();
+      }
+      
+    });
+  }
+
+  clearLocation(): void{
+    // Get the text box and set its value to the coordinates
+    this.addUpdateScheduledActivityRequest.activity_Location = "";
+  }
 }

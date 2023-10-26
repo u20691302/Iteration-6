@@ -128,8 +128,8 @@ export class GenerateStockReportComponent implements OnInit   {
     });
 
     this.userStore.getSurnameFromStore().subscribe(val => {
-      let fullNameFromToken = this.userService.getSurnameFromToken();
-      this.surname = val || fullNameFromToken;
+      let surnamefromtoken = this.userService.getSurnameFromToken();
+      this.surname = val || surnamefromtoken;
     });
 
     this.fullName = this.name + ' ' + this.surname;

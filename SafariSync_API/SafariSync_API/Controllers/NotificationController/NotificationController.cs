@@ -23,8 +23,8 @@ namespace SafariSync_API.Controllers.NotificationController
         }
 
         [HttpGet]
-        [Route("ReadSupervisorNotifications/{id}")]
-        public async Task<IActionResult> ReadSupervisorNotifications(int id)
+        [Route("ReadSupervisorNotifications1/{id}")]
+        public async Task<IActionResult> ReadSupervisorNotifications1(int id)
         {
             try
             {
@@ -42,8 +42,46 @@ namespace SafariSync_API.Controllers.NotificationController
         }
 
         [HttpGet]
+        [Route("ReadUserNotifications1/{id}")]
+        public async Task<IActionResult> ReadUserNotifications1(int id)
+        {
+            try
+            {
+                var scheduledActivity = await safariSyncDBContext.NotificationUser.Where(e => e.User_ID == id).OrderBy(e => e.Date).Include(e => e.NotificationStatus)
+                                                                                  .Include(e => e.ScheduledTask).ToListAsync();
+
+                // Return the scheduledActivity data with associated scheduledTasks
+                return Ok(scheduledActivity);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching scheduledActivity data.");
+            }
+        }
+
+        [HttpGet]
+        [Route("ReadSupervisorNotifications")]
+        public async Task<IActionResult> ReadSupervisorNotifications(int id)
+        {
+            try
+            {
+                var scheduledActivity = await safariSyncDBContext.NotificationSupervisor.OrderBy(e => e.Date).Include(e => e.NotificationStatus)
+                                                                                        .Include(e => e.ScheduledActivity!).ToListAsync();
+
+                // Return the scheduledActivity data with associated scheduledTasks
+                return Ok(scheduledActivity);
+            }
+            catch (Exception)
+            {
+                // Handle the exception and return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching scheduledActivity data.");
+            }
+        }
+
+        [HttpGet]
         [Route("ReadUserNotifications")]
-        public async Task<IActionResult> ReadUserNotifications()
+        public async Task<IActionResult> ReadUserNotifications(int id)
         {
             try
             {

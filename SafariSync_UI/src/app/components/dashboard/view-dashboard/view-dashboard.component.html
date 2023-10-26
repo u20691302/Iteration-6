@@ -37,7 +37,7 @@
            
           </tr>
         </thead>
-        <tbody>
+        <!-- <tbody>
           <tr *ngFor="let notification of notifications">
             <td>{{ notification.date | date:'short'}}</td>
             <td>{{ notification.notification_Message }}</td>
@@ -55,8 +55,29 @@
               <p style="color:red;"><i class="fa fa-times-circle" aria-hidden="true"></i> Rejected</p>
             </td>
           </tr>
+        </tbody> -->
+
+        <tbody>
+          <tr *ngFor="let notification of notifications$ | async">
+            <td>{{ notification.date | date:'short'}}</td>
+            <td>{{ notification.notification_Message }}</td>
+            <td *ngIf="notification.notificationStatus_ID === 3">
+              <div class="button-container">
+                <button class="button-but" (click)="openAcceptModal(AcceptConfirmationModal, notification.notification_ID)">Accept</button>
+                <button class="button-reject" (click)="openRejectModal(RejectConfirmationModal, notification.notification_ID)">Reject</button>
+              </div>
+            </td>
+            <td *ngIf="notification.notificationStatus_ID === 1" style="text-align:center;">
+              <p *ngIf="notification.scheduledTaskToolbox_ID === undefined" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
+              <p *ngIf="notification.scheduledTaskToolbox_ID > 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Approved</p>
+              <p *ngIf="notification.contractor_ID > 0" style="color:green;"><i class="fa fa-check-circle" aria-hidden="true"></i> Accepted</p>
+            </td>
+            <td *ngIf="notification.notificationStatus_ID === 2" style="text-align:center;">
+              <p style="color:red;"><i class="fa fa-times-circle" aria-hidden="true"></i> Rejected</p>
+            </td>
+          </tr>
         </tbody>
-        <tbody *ngIf="notifications.length === 0">
+        <tbody *ngIf="(notifications$ | async)?.length === 0">
           <tr>
             <td colspan="3">No Recent Updates</td>
           </tr>

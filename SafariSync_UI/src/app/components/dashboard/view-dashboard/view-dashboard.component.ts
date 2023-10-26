@@ -12,7 +12,7 @@ import { ScheduledActivityService } from 'src/app/services/scheduleActivity/sche
 import { ScheduledActivity } from 'src/app/models/scheduledActivity/scheduledActivity.model';
 import { UserStoreService } from 'src/app/services/user/user-store.service';
 import { NotificationService } from 'src/app/services/notification/notification.service';
-import { interval } from 'rxjs';
+import { Observable, interval, of } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationSupervisor } from 'src/app/models/notifications/notificationSupervisor.model';
 import { NotificationAdmin } from 'src/app/models/notifications/notificationAdmin.model';
@@ -35,7 +35,7 @@ export class ViewDashboardComponent implements OnInit {
 
   pendingScheduling:number = 0;
   completedActivities:number = 0;
-  notifications: any[] = [];
+  notifications$: Observable<any[]> = of([]);
 
   notificationID: number = 0;
 
@@ -91,24 +91,25 @@ export class ViewDashboardComponent implements OnInit {
   constructor(private modalService: NgbModal, private userStore: UserStoreService, private stockService: StockService, private userService: User1Service, private userTyService: UserService, private scheduledActivityService: ScheduledActivityService, private notificationService: NotificationService) {}
 
   ngOnInit(): void {
-
-    
     this.userStore.getRoleFromStore().subscribe(val => {
       let role = this.userTyService.getRoleFromToken();
       this.userRole = val || role;
 
       this.userStore.getUserIdFromStore().subscribe(val => {
         let userid = this.userTyService.getUserIdFromToken();
-          this.userID = userid;
+          this.userID = val || userid;
 
           if (this.userRole === "Admin"){
-            this.ReadAllNotificationAdmin();
+            // this.ReadAllNotificationAdmin();
+            this.notifications$ = this.notificationService.getNotificationAdmin();
           }
           else if (this.userRole === "Supervisor"){
-            this.ReadAllNotificationSupervisor(this.userID);
+            // this.ReadAllNotificationSupervisor(this.userID);
+            this.notifications$ = this.notificationService.getNotificationSupervisor1(this.userID);
           }
           else if (this.userRole === "Farm Worker"){
-            this.ReadAllNotificationUser();
+            // this.ReadAllNotificationUser();
+            this.notifications$ = this.notificationService.getNotificationUser1(this.userID);
           }
       });
     });
@@ -126,39 +127,17 @@ export class ViewDashboardComponent implements OnInit {
     });
   }
 
-  async ReadAllNotificationSupervisor(id: number): Promise<void> {
-    this.notificationService.getNotificationSupervisor(id).subscribe({
-      next: (notifications) => {
-        this.notifications = notifications;
-        // .filter(n => n.user_ID === Number(this.userID))
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
+  // async ReadAllNotificationSupervisor(id: number): Promise<void> {
+  //   this.notifications$ = this.notificationService.getNotificationSupervisor(id);
+  // }
 
-  ReadAllNotificationUser(): void {
-    this.notificationService.getNotificationUser().subscribe({
-      next: (notifications) => {
-        this.notifications = notifications.filter(n => n.user_ID === Number(this.userID));
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
+  // async ReadAllNotificationUser(): Promise<void> {
+  //   this.notifications$ = this.notificationService.getNotificationUser();
+  // }
 
-  ReadAllNotificationAdmin(): void {
-    this.notificationService.getNotificationAdmin().subscribe({
-      next: (notifications) => {
-        this.notifications = notifications;
-      },
-      error: (response) => {
-        console.log(response);
-      }
-    });
-  }
+  // ReadAllNotificationAdmin(): void {
+  //   this.notifications$ = this.notificationService.getNotificationAdmin();
+  // }
   
   ngOnDestroy() {
     if (this.chart) {
@@ -304,6 +283,7 @@ export class ViewDashboardComponent implements OnInit {
 
   openAcceptModal(content: any, id: number){
     this.notificationID=id;
+    console.log(this.notificationID)
     const modalRef = this.modalService.open(content, {
       size: 's',
       centered: true,
@@ -342,10 +322,10 @@ export class ViewDashboardComponent implements OnInit {
       scheduledTask_ID: 0,
     };
 
-    this.userStore.getRoleFromStore().subscribe(val =>{
-      let userRole = this.userTyService.getRoleFromToken();
-        this.userRole = userRole;
-    });
+    // this.userStore.getRoleFromStore().subscribe(val =>{
+    //   let userRole = this.userTyService.getRoleFromToken();
+    //     this.userRole = val || userRole;
+    // });
 
     if (this.userRole === "Admin"){
       this.notificationService.UpdateNotificationAdminStatus(this.notificationAdmin).subscribe({
@@ -425,10 +405,10 @@ export class ViewDashboardComponent implements OnInit {
       scheduledTask_ID: 0,
     };
 
-    this.userStore.getRoleFromStore().subscribe(val =>{
-      let userRole = this.userTyService.getRoleFromToken();
-        this.userRole = userRole;
-    });
+    // this.userStore.getRoleFromStore().subscribe(val =>{
+    //   let userRole = this.userTyService.getRoleFromToken();
+    //     this.userRole = userRole;
+    // });
 
     if (this.userRole === "Admin"){
       this.notificationService.UpdateNotificationAdminStatus(this.notificationAdmin).subscribe({

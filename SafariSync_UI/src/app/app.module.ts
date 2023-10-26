@@ -1,6 +1,6 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -52,6 +52,8 @@ import { ViewPreviousReportsComponent } from './components/reporting/view-previo
 import { GenerateDynamicStockReportComponent } from './components/reporting/dynamic-report/generate-dynamic-stock-report.component';
 import { AuditActionRecordsComponent } from './components/audit-action-records/audit-action-records.component';
 import { TimeoutSettingsComponent } from './components/timeout-settings/timeout-settings.component';
+import { SpinnerComponent } from './components/loader/spinner/spinner.component';
+import { LoadingInterceptor } from './components/interceptor/loading.interceptor';
 
 const routes: Routes = [
   // Existing routes...
@@ -100,7 +102,8 @@ const routes: Routes = [
     GenerateDynamicStockReportComponent,
     GenerateUserReportComponent,
     AuditActionRecordsComponent,
-    TimeoutSettingsComponent
+    TimeoutSettingsComponent,
+    SpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -117,7 +120,10 @@ const routes: Routes = [
     NgChartsModule,
     
   ],
-  providers: [UserService, AuthGuard], 
+  providers: [UserService, AuthGuard, {
+    provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true
+  }
+  ], 
   bootstrap: [AppComponent]
 })
 export class AppModule { }
